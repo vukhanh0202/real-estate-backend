@@ -1,8 +1,7 @@
 package com.uit.realestate.domain.action;
 
 import com.uit.realestate.domain.SqlEntity;
-import com.uit.realestate.domain.house.House;
-import com.uit.realestate.domain.user.Role;
+import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,8 +23,8 @@ public class Comment extends SqlEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "house_id")
-    private House house;
+    @JoinColumn(name = "apartment_id")
+    private Apartment apartment;
 
     @Column(columnDefinition = "TEXT")
     private String description;

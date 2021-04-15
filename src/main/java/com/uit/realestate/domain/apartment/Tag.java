@@ -1,8 +1,7 @@
-package com.uit.realestate.domain.house;
+package com.uit.realestate.domain.apartment;
 
 import com.uit.realestate.domain.SqlEntity;
-import com.uit.realestate.domain.house.join.HouseTag;
-import com.uit.realestate.domain.user.User;
+import com.uit.realestate.domain.apartment.join.ApartmentTag;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,5 +23,5 @@ public class Tag extends SqlEntity {
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tag")
-    private Set<HouseTag> houseTags = new HashSet<>();
+    private Set<ApartmentTag> apartmentTags = new HashSet<>();
 }

@@ -1,10 +1,8 @@
 package com.uit.realestate.domain.action;
 
 import com.uit.realestate.domain.SqlEntity;
-import com.uit.realestate.domain.action.id.HouseUserId;
-import com.uit.realestate.domain.house.House;
-import com.uit.realestate.domain.house.Tag;
-import com.uit.realestate.domain.house.join.id.HouseTagId;
+import com.uit.realestate.domain.action.id.ApartmentUserId;
+import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,11 +16,11 @@ import javax.persistence.*;
 public class Favourite extends SqlEntity {
 
     @EmbeddedId
-    private HouseUserId id = new HouseUserId();
+    private ApartmentUserId id = new ApartmentUserId();
 
-    @MapsId("houseId")
+    @MapsId("apartmentId")
     @ManyToOne(fetch = FetchType.LAZY)
-    private House house;
+    private Apartment apartment;
 
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,4 +1,4 @@
-package com.uit.realestate.domain.action.id;
+package com.uit.realestate.domain.apartment.join.id;
 
 import lombok.Data;
 
@@ -8,23 +8,23 @@ import java.util.Objects;
 
 @Data
 @Embeddable
-public class HouseUserId implements Serializable {
+public class ApartmentTagId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long houseId;
-    private Long userId;
+    private Long apartmentId;
+    private String tagCode;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        HouseUserId that = (HouseUserId) o;
-        return Objects.equals(houseId, that.houseId) && Objects.equals(userId, that.userId);
+        ApartmentTagId that = (ApartmentTagId) o;
+        return Objects.equals(apartmentId, that.apartmentId) && Objects.equals(tagCode, that.tagCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(houseId, userId);
+        return Objects.hash(apartmentId, tagCode);
     }
 }

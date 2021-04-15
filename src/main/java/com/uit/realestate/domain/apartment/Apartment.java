@@ -1,12 +1,10 @@
-package com.uit.realestate.domain.house;
+package com.uit.realestate.domain.apartment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.uit.realestate.constant.enums.ETypeHouse;
+import com.uit.realestate.constant.enums.ETypeApartment;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.action.Comment;
-import com.uit.realestate.domain.house.join.HouseTag;
-import com.uit.realestate.domain.user.Role;
-import com.uit.realestate.domain.user.UserAddress;
+import com.uit.realestate.domain.apartment.join.ApartmentTag;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,9 +14,9 @@ import java.util.*;
 
 @NoArgsConstructor
 @Entity
-@Table(name = "house")
+@Table(name = "apartment")
 @Data
-public class House extends SqlEntity {
+public class Apartment extends SqlEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -41,20 +39,20 @@ public class House extends SqlEntity {
     private Double totalPrice;
 
     @Enumerated(EnumType.STRING)
-    private ETypeHouse typeHouse;
+    private ETypeApartment typeHouse;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "UTC")
     private Date expiredDate;
 
-    @OneToOne(mappedBy = "house",cascade = CascadeType.ALL,
+    @OneToOne(mappedBy = "apartment",cascade = CascadeType.ALL,
             orphanRemoval = true,fetch = FetchType.LAZY)
-    private HouseAddress houseAddress;
+    private ApartmentAddress houseAddress;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "house")
-    private Set<HouseTag> houseTags = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "apartment")
+    private Set<ApartmentTag> apartmentTags = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "house")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "apartment")
     private List<Comment> comments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

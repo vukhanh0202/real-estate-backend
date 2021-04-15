@@ -1,11 +1,8 @@
-package com.uit.realestate.domain.house;
+package com.uit.realestate.domain.apartment;
 
 import com.uit.realestate.domain.SqlEntity;
-import com.uit.realestate.domain.action.Comment;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -24,5 +21,5 @@ public class Category extends SqlEntity {
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
-    private List<House> houses = new ArrayList<>();
+    private List<Apartment> apartments = new ArrayList<>();
 }

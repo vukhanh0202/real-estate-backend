@@ -1,6 +1,6 @@
 package com.uit.realestate.constant.enums;
 
-public enum ETypeHouse {
+public enum ETypeApartment {
     BUY,
     RENT
 }

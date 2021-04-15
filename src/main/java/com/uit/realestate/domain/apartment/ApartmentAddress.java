@@ -1,6 +1,5 @@
-package com.uit.realestate.domain.house;
+package com.uit.realestate.domain.apartment;
 
-import com.uit.realestate.domain.user.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,8 +8,8 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "house_address")
-public class HouseAddress {
+@Table(name = "apartment_address")
+public class ApartmentAddress {
 
     @Id
     private Long id;
@@ -18,7 +17,7 @@ public class HouseAddress {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "id",foreignKey = @ForeignKey(name = "none"))
-    private House house;
+    private Apartment apartment;
 
     private String countryCode;
     private String countryName;
