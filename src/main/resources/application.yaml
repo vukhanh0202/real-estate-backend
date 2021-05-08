@@ -30,7 +30,8 @@ spring:
   jackson:
     serialization:
       INDENT_OUTPUT: true
-
+jwt:
+  secret: JWTSuperSecretKey
 server:
   port: 8080
   servlet:

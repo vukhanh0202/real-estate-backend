@@ -15,6 +15,8 @@
 	<description>Project Real Estate consulting system</description>
 	<properties>
 		<java.version>11</java.version>
+		<mapstruct.version>1.4.1.Final</mapstruct.version>
+		<lombok.version>1.18.12</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -40,7 +42,28 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20180813</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
+		</dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

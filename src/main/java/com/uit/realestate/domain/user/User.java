@@ -1,6 +1,7 @@
 package com.uit.realestate.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.uit.realestate.constant.enums.EGender;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.action.Comment;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class User extends SqlEntity {
     private String firstName;
     private String lastName;
     private String avatar;
-    private String gender;
+    private EGender gender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
@@ -55,4 +56,7 @@ public class User extends SqlEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
 
+    public User(Long id) {
+        this.id = id;
+    }
 }
