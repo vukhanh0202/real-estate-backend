@@ -17,13 +17,7 @@ public class Province {
     private Long id;
 
     @Column
-    private String code;
-
-    @Column
     private String name;
-
-    @Column(name = "eng_name")
-    private String engName;
 
     @Column(name = "short_name")
     private String shortName;

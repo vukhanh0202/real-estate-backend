@@ -1,6 +1,6 @@
-package com.uit.realestate.service;
+package com.uit.realestate.service.auth;
 
-import com.uit.realestate.repository.UserRepository;
+import com.uit.realestate.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

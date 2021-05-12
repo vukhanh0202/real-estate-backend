@@ -2,8 +2,8 @@ package com.uit.realestate.configuration;
 
 import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.domain.user.User;
-import com.uit.realestate.repository.UserRepository;
-import com.uit.realestate.service.JwtUserDetailsService;
+import com.uit.realestate.repository.user.UserRepository;
+import com.uit.realestate.service.auth.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

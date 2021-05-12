@@ -1,4 +1,4 @@
-package com.uit.realestate.repository;
+package com.uit.realestate.repository.user;
 
 import com.uit.realestate.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

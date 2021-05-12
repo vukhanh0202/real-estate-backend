@@ -17,9 +17,6 @@ public class District{
     @Column
     private String name;
 
-    @Column(name = "eng_name")
-    private String engName;
-
     @Column(name = "short_name")
     private String shortName;
 

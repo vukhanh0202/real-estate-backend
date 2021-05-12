@@ -1,9 +1,9 @@
 package com.uit.realestate.controller;
 
 import com.uit.realestate.configuration.JwtTokenUtil;
-import com.uit.realestate.dto.UserLoginDto;
+import com.uit.realestate.dto.auth.UserLoginDto;
 import com.uit.realestate.exception.ForbiddenException;
-import com.uit.realestate.service.JwtUserDetailsService;
+import com.uit.realestate.service.auth.JwtUserDetailsService;
 import com.uit.realestate.utils.MessageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -50,6 +50,7 @@ public class AuthController {
 
         JSONObject json = new JSONObject();
         json.put("access_token", token);
+        log.info("Auth Controller: put access token");
         return ResponseEntity.status(HttpStatus.OK).body(json.toString());
     }
 

@@ -1,4 +1,4 @@
-package com.uit.realestate.dto;
+package com.uit.realestate.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
