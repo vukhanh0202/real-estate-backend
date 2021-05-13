@@ -5,6 +5,8 @@ import com.uit.realestate.constant.enums.ETypeApartment;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.action.Comment;
 import com.uit.realestate.domain.apartment.join.ApartmentTag;
+import com.uit.realestate.domain.user.User;
+import com.uit.realestate.domain.user.UserAddress;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,9 +32,6 @@ public class Apartment extends SqlEntity {
     @Column(columnDefinition = "TEXT")
     private String overview;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
     private Double area;
 
     private Double price;
@@ -48,7 +47,7 @@ public class Apartment extends SqlEntity {
 
     @OneToOne(mappedBy = "apartment",cascade = CascadeType.ALL,
             orphanRemoval = true,fetch = FetchType.LAZY)
-    private ApartmentAddress houseAddress;
+    private ApartmentAddress apartmentAddress;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "apartment")
     private Set<ApartmentTag> apartmentTags = new HashSet<>();
@@ -59,4 +58,24 @@ public class Apartment extends SqlEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+
+    @OneToOne(mappedBy = "apartment",cascade = CascadeType.ALL,
+            orphanRemoval = true,fetch = FetchType.LAZY)
+    private ApartmentDetail apartmentDetail;
+
+    public void setApartmentDetail(ApartmentDetail apartmentDetail) {
+        if (apartmentDetail == null) {
+            if (this.apartmentDetail != null) {
+                this.apartmentDetail.setApartment(null);
+            }
+        }
+        else {
+            apartmentDetail.setApartment(this);
+        }
+        this.apartmentDetail = apartmentDetail;
+    }
 }

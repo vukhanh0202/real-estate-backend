@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApartmentBasicDto extends BaseDto {
+public class ApartmentDto extends BaseDto {
 
     private Long id;
 
@@ -23,7 +23,11 @@ public class ApartmentBasicDto extends BaseDto {
 
     private String address;
 
+    @JsonProperty("total_price")
     private Double totalPrice;
 
     private Double area;
+
+    @JsonProperty("apartment_detail")
+    private ApartmentDetailDto apartmentDetail;
 }

@@ -1,11 +1,10 @@
 package com.uit.realestate.mapper.apartment;
 
 import com.uit.realestate.domain.apartment.Apartment;
-import com.uit.realestate.domain.apartment.Category;
-import com.uit.realestate.dto.apartment.ApartmentBasicDto;
-import com.uit.realestate.dto.category.CategoryDto;
+import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.mapper.MapperBase;
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,24 +13,51 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public abstract class ApartmentMapper implements MapperBase {
 
+    @Autowired
+    private ApartmentDetailMapper apartmentDetailMapper;
+
     //*************************************************
     //********** Mapper Apartment To ApartmentBasicDto (Search) **********
     //*************************************************
     @Named("toApartmentBasicDto")
     @BeforeMapping
-    protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentBasicDto dto) {
-        dto.setAddress(apartment.getHouseAddress().getDistrictName() + ", " + apartment.getHouseAddress().getProvinceName());
+    protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentDto dto) {
+        dto.setAddress(apartment.getApartmentAddress().getDistrictName() + ", " + apartment.getApartmentAddress().getProvinceName());
     }
 
     @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Named("toApartmentBasicDtoList")
     @Mapping(source = "id", target = "id")
     @Mapping(source = "code", target = "code")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "overview", target = "overview")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
-    public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment);
+    public abstract ApartmentDto toApartmentBasicDto(Apartment apartment);
 
     @BeanMapping(ignoreByDefault = true)
-    public abstract List<ApartmentBasicDto> toApartmentBasicDtoList(List<Apartment> apartmentList);
+    @IterableMapping(qualifiedByName = "toApartmentBasicDtoList")
+    public abstract List<ApartmentDto> toApartmentBasicDtoList(List<Apartment> apartmentList);
+
+
+
+    //*************************************************
+    //********** Mapper Apartment To ApartmentFullDto (Detail) **********
+    //*************************************************
+    @Named("toApartmentFullDto")
+    @BeforeMapping
+    protected void toApartmentFullDto(Apartment apartment, @MappingTarget ApartmentDto dto) {
+        dto.setAddress(apartment.getApartmentAddress().getDistrictName() + ", " + apartment.getApartmentAddress().getProvinceName());
+        dto.setApartmentDetail(apartmentDetailMapper.toApartmentDetailDto(apartment.getApartmentDetail()));
+    }
+
+    @BeanMapping(qualifiedByName = "toApartmentFullDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "code", target = "code")
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "overview", target = "overview")
+    @Mapping(source = "totalPrice", target = "totalPrice")
+    @Mapping(source = "area", target = "area")
+    public abstract ApartmentDto toApartmentFullDto(Apartment apartment);
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uit.realestate.constant.enums.EGender;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.action.Comment;
+import com.uit.realestate.domain.apartment.Apartment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -55,6 +56,9 @@ public class User extends SqlEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
+    private List<Apartment> apartments = new ArrayList<>();
 
     public User(Long id) {
         this.id = id;

@@ -16,7 +16,7 @@ public class UserAddress {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "id",foreignKey = @javax.persistence.ForeignKey(name = "none"))
+    @JoinColumn(name = "id")
     private User user;
 
     private String countryCode;

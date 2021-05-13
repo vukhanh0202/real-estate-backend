@@ -36,4 +36,12 @@ public class ApartmentController {
                 .body(new ApiResponse(apartmentService.getSearchApartmentService()
                         .execute()));
     }
+
+    @ApiOperation(value = "Get apartment detail")
+    @GetMapping(value = "/public/apartment/{id}")
+    public ResponseEntity<?> findAllCategory(@PathVariable("id") Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getGetApartmentDetailService()
+                        .execute(id)));
+    }
 }
