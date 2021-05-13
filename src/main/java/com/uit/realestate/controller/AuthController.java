@@ -5,6 +5,8 @@ import com.uit.realestate.dto.auth.UserLoginDto;
 import com.uit.realestate.exception.ForbiddenException;
 import com.uit.realestate.service.auth.JwtUserDetailsService;
 import com.uit.realestate.utils.MessageHelper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import static com.uit.realestate.constant.MessageCode.User.USER_NOT_FOUND;
 @RestController
 @Slf4j
 @RequestMapping("/auth")
+@Api(value = "Auth APIs")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -38,6 +41,7 @@ public class AuthController {
         this.messageHelper = messageHelper;
     }
 
+    @ApiOperation(value = "Login")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody UserLoginDto authenticationRequest){
 

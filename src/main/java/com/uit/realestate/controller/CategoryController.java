@@ -2,6 +2,8 @@ package com.uit.realestate.controller;
 
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.service.category.ICategoryService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,11 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
+@Api(value = "Category APIs")
 public class CategoryController {
 
     @Autowired
     private ICategoryService categoryService;
 
+    @ApiOperation(value = "Find All Category")
     @GetMapping(value = "/public/all-category")
     public ResponseEntity<?> findAllCategory(){
         return ResponseEntity.status(HttpStatus.OK)
