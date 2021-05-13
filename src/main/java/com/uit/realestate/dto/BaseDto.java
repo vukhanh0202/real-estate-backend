@@ -1,12 +1,20 @@
 package com.uit.realestate.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.uit.realestate.dto.user.UserDto;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
+@NoArgsConstructor
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseDto {
     private static final long serialVersionUID = 1L;
 

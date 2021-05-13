@@ -27,6 +27,7 @@ public class Apartment extends SqlEntity {
 
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String overview;
 
     @Column(columnDefinition = "TEXT")

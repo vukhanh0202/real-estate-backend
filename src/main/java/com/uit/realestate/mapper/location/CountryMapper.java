@@ -6,6 +6,7 @@ import com.uit.realestate.mapper.MapperBase;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public abstract class CountryMapper implements MapperBase {
 
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "code", target = "code")
     @Mapping(source = "name", target = "name")
     @Mapping(source = "phoneCode", target = "phoneCode")
