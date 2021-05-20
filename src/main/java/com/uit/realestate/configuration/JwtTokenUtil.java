@@ -1,14 +1,18 @@
 package com.uit.realestate.configuration;
 
+import com.uit.realestate.domain.user.User;
 import com.uit.realestate.exception.BadRequestException;
+import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.utils.MessageHelper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,8 +33,11 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
 
-    public JwtTokenUtil(MessageHelper messageHelper) {
+    private final UserRepository userRepository;
+
+    public JwtTokenUtil(MessageHelper messageHelper, UserRepository userRepository) {
         this.messageHelper = messageHelper;
+        this.userRepository = userRepository;
     }
 
     //retrieve username from jwt token
@@ -65,6 +72,8 @@ public class JwtTokenUtil implements Serializable {
     //generate token for user
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        claims.put("role", user.getRole().getId());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 

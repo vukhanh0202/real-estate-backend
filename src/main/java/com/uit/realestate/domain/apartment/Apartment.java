@@ -24,9 +24,6 @@ public class Apartment extends SqlEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true)
-    private String code;
-
     private String title;
 
     @Column(columnDefinition = "TEXT")
@@ -39,7 +36,7 @@ public class Apartment extends SqlEntity {
     private Double totalPrice;
 
     @Enumerated(EnumType.STRING)
-    private ETypeApartment typeHouse;
+    private ETypeApartment typeApartment;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "UTC")
@@ -48,6 +45,18 @@ public class Apartment extends SqlEntity {
     @OneToOne(mappedBy = "apartment",cascade = CascadeType.ALL,
             orphanRemoval = true,fetch = FetchType.LAZY)
     private ApartmentAddress apartmentAddress;
+
+    public void setApartmentAddress(ApartmentAddress apartmentAddress) {
+        if (apartmentAddress == null) {
+            if (this.apartmentAddress != null) {
+                this.apartmentAddress.setApartment(null);
+            }
+        }
+        else {
+            apartmentAddress.setApartment(this);
+        }
+        this.apartmentAddress = apartmentAddress;
+    }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "apartment")
     private Set<ApartmentTag> apartmentTags = new HashSet<>();

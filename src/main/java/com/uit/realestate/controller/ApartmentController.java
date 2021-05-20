@@ -2,11 +2,13 @@ package com.uit.realestate.controller;
 
 import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.dto.response.ApiResponse;
+import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.ApartmentSearch;
 import com.uit.realestate.service.apartment.IApartmentService;
 import com.uit.realestate.service.apartment.ISearchApartmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -43,5 +45,13 @@ public class ApartmentController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getGetApartmentDetailService()
                         .execute(id)));
+    }
+
+    @ApiOperation(value = "Add new apartment" , authorizations = { @Authorization(value="JWT") })
+    @PostMapping(value = "/add-apartment")
+    public ResponseEntity<?> addNewApartment(@RequestBody AddApartmentRequest addApartmentRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getAddApartmentService()
+                        .execute(addApartmentRequest)));
     }
 }

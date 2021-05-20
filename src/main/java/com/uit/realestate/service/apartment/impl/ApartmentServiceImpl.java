@@ -1,5 +1,6 @@
 package com.uit.realestate.service.apartment.impl;
 
+import com.uit.realestate.service.apartment.IAddApartmentService;
 import com.uit.realestate.service.apartment.IApartmentService;
 import com.uit.realestate.service.apartment.IGetApartmentDetailService;
 import com.uit.realestate.service.apartment.ISearchApartmentService;
@@ -22,4 +23,7 @@ public class ApartmentServiceImpl implements IApartmentService {
 
     @Autowired
     private IGetApartmentDetailService getApartmentDetailService;
+
+    @Autowired
+    private IAddApartmentService addApartmentService;
 }

@@ -1,9 +1,12 @@
 package com.uit.realestate.domain.location;
 
+import com.uit.realestate.domain.apartment.ApartmentAddress;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -23,4 +26,7 @@ public class District{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "province_id", foreignKey = @javax.persistence.ForeignKey(name = "none"))
     private Province province;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "district")
+    private List<ApartmentAddress> apartmentAddresses = new ArrayList<>();
 }
