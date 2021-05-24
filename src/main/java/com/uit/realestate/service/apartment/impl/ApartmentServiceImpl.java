@@ -26,4 +26,7 @@ public class ApartmentServiceImpl implements IApartmentService {
 
     @Autowired
     private IFindLatestNewApartmentService findLatestNewApartmentService;
+
+    @Autowired
+    private IFindHighlightApartmentService findHighlightApartmentService;
 }

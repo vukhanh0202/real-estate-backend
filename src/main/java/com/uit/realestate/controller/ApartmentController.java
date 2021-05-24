@@ -42,9 +42,17 @@ public class ApartmentController {
 
     @ApiOperation(value = "Get latest new apartment ")
     @GetMapping(value = "/public/apartment/latest-new")
-    public ResponseEntity<?> findLatestNeApart() {
+    public ResponseEntity<?> findLatestNewApartment() {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getFindLatestNewApartmentService()
+                        .execute()));
+    }
+
+    @ApiOperation(value = "Get highlight apartment ")
+    @GetMapping(value = "/public/apartment/highlight")
+    public ResponseEntity<?> findHighlightApartment() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getFindHighlightApartmentService()
                         .execute()));
     }
 

@@ -15,4 +15,6 @@ public interface IApartmentService {
     IAddApartmentService<AddApartmentRequest, Boolean> getAddApartmentService();
 
     IFindLatestNewApartmentService<Void, List<ApartmentBasicDto>> getFindLatestNewApartmentService();
+
+    IFindHighlightApartmentService<Void, List<ApartmentBasicDto>> getFindHighlightApartmentService();
 }

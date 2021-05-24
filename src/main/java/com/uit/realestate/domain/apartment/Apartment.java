@@ -35,6 +35,8 @@ public class Apartment extends SqlEntity {
 
     private Double totalPrice;
 
+    private Boolean highlight = false;
+
     @Enumerated(EnumType.STRING)
     private ETypeApartment typeApartment;
 

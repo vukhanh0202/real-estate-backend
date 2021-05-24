@@ -9,4 +9,6 @@ import java.util.List;
 public interface ApartmentRepository extends JpaRepository<Apartment, Long> {
 
     List<Apartment> findTop4ByOrderByCreatedAtDesc();
+
+    List<Apartment> findTop4ByHighlightTrueOrderByUpdatedAtDesc();
 }
