@@ -39,6 +39,15 @@ public class ApartmentController {
                         .execute()));
     }
 
+
+    @ApiOperation(value = "Get latest new apartment ")
+    @GetMapping(value = "/public/apartment/latest-new")
+    public ResponseEntity<?> findLatestNeApart() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getFindLatestNewApartmentService()
+                        .execute()));
+    }
+
     @ApiOperation(value = "Get apartment detail")
     @GetMapping(value = "/public/apartment/{id}")
     public ResponseEntity<?> findAllCategory(@PathVariable("id") Long id) {
@@ -54,4 +63,5 @@ public class ApartmentController {
                 .body(new ApiResponse(apartmentService.getAddApartmentService()
                         .execute(addApartmentRequest)));
     }
+
 }

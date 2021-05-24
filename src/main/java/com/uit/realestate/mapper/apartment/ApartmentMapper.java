@@ -1,6 +1,7 @@
 package com.uit.realestate.mapper.apartment;
 
 import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
@@ -27,28 +28,27 @@ public abstract class ApartmentMapper implements MapperBase {
     //*************************************************
     //********** Mapper Apartment To ApartmentBasicDto (Search) **********
     //*************************************************
-    @Named("toApartmentBasicDto")
+    @Named("toApartmentPreviewDto")
     @BeforeMapping
-    protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentDto dto) {
+    protected void toApartmentPreviewDto(Apartment apartment, @MappingTarget ApartmentDto dto) {
         if (apartment.getApartmentAddress()!=null){
             dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                     + ", " + apartment.getApartmentAddress().getProvince().getName());
         }
     }
 
-    @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Named("toApartmentBasicDtoList")
+    @BeanMapping(qualifiedByName = "toApartmentPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Named("toApartmentPreviewDtoList")
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "overview", target = "overview")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
-    public abstract ApartmentDto toApartmentBasicDto(Apartment apartment);
+    public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment);
 
     @BeanMapping(ignoreByDefault = true)
-    @IterableMapping(qualifiedByName = "toApartmentBasicDtoList")
-    public abstract List<ApartmentDto> toApartmentBasicDtoList(List<Apartment> apartmentList);
-
+    @IterableMapping(qualifiedByName = "toApartmentPreviewDtoList")
+    public abstract List<ApartmentDto> toApartmentPreviewDtoList(List<Apartment> apartmentList);
 
 
     //*************************************************
@@ -69,6 +69,31 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
     public abstract ApartmentDto toApartmentFullDto(Apartment apartment);
+
+
+    //*************************************************
+    //********** Mapper Apartment To Apartment Basic **********
+    //*************************************************
+    @Named("toApartmentBasicDto")
+    @BeforeMapping
+    protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentBasicDto dto) {
+        dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
+                + ", " + apartment.getApartmentAddress().getProvince().getName());
+    }
+
+    @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "overview", target = "overview")
+    @Mapping(source = "totalPrice", target = "totalPrice")
+    @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
+    @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
+    @Mapping(source = "createdBy", target = "createdBy", qualifiedByName = "getAudit")
+    @Mapping(source = "createdAt", target = "createdAt")
+    public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment);
+
+    @BeanMapping(ignoreByDefault = true)
+    public abstract List<ApartmentBasicDto> toApartmentBasicDtoList(List<Apartment> apartmentList);
 
     //*************************************************
     //********** Mapper AddApartmentRequest To Apartment (Entity) **********
