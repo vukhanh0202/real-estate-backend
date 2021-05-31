@@ -25,6 +25,6 @@ public class SearchApartmentServiceImpl extends AbstractBaseService<ISearchApart
     @Override
     public List<ApartmentDto> doing(Input input) {
         log.info("Search Apartment");
-        return apartmentMapper.toApartmentPreviewDtoList(apartmentRepository.findAll());
+        return apartmentMapper.toApartmentPreviewDtoList(apartmentRepository.findAllByAndIsDeletedFalse(input.getPageable()));
     }
 }

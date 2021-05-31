@@ -88,6 +88,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
+    @Mapping(source = "area", target = "area")
     @Mapping(source = "createdBy", target = "createdBy", qualifiedByName = "getAudit")
     @Mapping(source = "createdAt", target = "createdAt")
     public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment);

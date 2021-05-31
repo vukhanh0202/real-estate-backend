@@ -29,4 +29,7 @@ public class ApartmentServiceImpl implements IApartmentService {
 
     @Autowired
     private IFindHighlightApartmentService findHighlightApartmentService;
+
+    @Autowired
+    private ICountSearchApartmentService countSearchApartmentService;
 }
