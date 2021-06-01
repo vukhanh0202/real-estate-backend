@@ -21,7 +21,7 @@ public class PaginationResponse<T> {
     /**
      * Total item all of page.
      */
-    private Integer totalItem;
+    private Long totalItem;
 
     /**
      * Total item of page.
@@ -40,7 +40,8 @@ public class PaginationResponse<T> {
      * @param page index of current page
      * @param contents contents of page
      */
-    public PaginationResponse(Integer total, Integer amount, Integer page, List<T> contents){
+
+    public PaginationResponse(Long total, Integer amount, Integer page, List<T> contents){
         this.contents =  contents;
         this.totalItem = total;
         this.page = page;
@@ -52,7 +53,7 @@ public class PaginationResponse<T> {
      * @return
      */
     @JsonProperty("total_page")
-    public Integer totalPage() {
+    public Long totalPage() {
         return amount > 0 ? (totalItem - 1) / amount + 1 : 0;
     }
 

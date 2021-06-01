@@ -35,11 +35,8 @@ public class ApartmentController {
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(requests, page, size);
         input.createPageable(sortDirection, sortBy);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new PaginationResponse(
-                        Integer.parseInt(apartmentService.getCountSearchApartmentService().execute().toString())
-                        , size
-                        , page
-                        , apartmentService.getSearchApartmentService().execute(input)));
+                .body(new ApiResponse(apartmentService.getSearchApartmentService()
+                        .execute(input)));
     }
 
 
