@@ -2,6 +2,7 @@ package com.uit.realestate.constant;
 
 public interface MessageCode {
     interface User {
+        String USER_WRONG = "message.user.Wrong";
         String USER_NOT_FOUND = "message.user.NotFound";
     }
     interface Token {

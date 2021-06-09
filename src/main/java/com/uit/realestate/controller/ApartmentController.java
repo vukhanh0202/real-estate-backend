@@ -1,10 +1,10 @@
 package com.uit.realestate.controller;
 
 import com.uit.realestate.constant.AppConstant;
+import com.uit.realestate.constant.enums.ETypeApartment;
+import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.dto.response.ApiResponse;
-import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
-import com.uit.realestate.payload.apartment.ApartmentSearch;
 import com.uit.realestate.service.apartment.IApartmentService;
 import com.uit.realestate.service.apartment.ISearchApartmentService;
 import io.swagger.annotations.Api;
@@ -26,14 +26,22 @@ public class ApartmentController {
     private IApartmentService apartmentService;
 
     @ApiOperation(value = "Search apartment")
-    @PostMapping(value = "/public/apartment/search")
-    public ResponseEntity<?> findAllCategory(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
-                                             @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
-                                             @RequestParam(value = "sort_by", defaultValue = "id") String sortBy,
-                                             @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
-                                             @RequestBody ApartmentSearch requests) {
-        ISearchApartmentService.Input input = new ISearchApartmentService.Input(requests, page, size);
-        input.createPageable(sortDirection, sortBy);
+    @GetMapping(value = "/public/apartment/search")
+    public ResponseEntity<?> findAllApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
+                                              @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                              @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
+                                              @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
+                                              @RequestParam(value = "district_id", required = false) Long districtId,
+                                              @RequestParam(value = "province_id", required = false) Long provinceId,
+                                              @RequestParam(value = "price_from", required = false) Double priceFrom,
+                                              @RequestParam(value = "price_to", required = false) Double priceTo,
+                                              @RequestParam(value = "area_from", required = false) Double areaFrom,
+                                              @RequestParam(value = "area_to", required = false) Double areaTo,
+                                              @RequestParam(value = "category_id", required = false) Long categoryId,
+                                              @RequestParam(value = "type_apartment") ETypeApartment typeApartment) {
+        ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment);
+        input.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getSearchApartmentService()
                         .execute(input)));
@@ -64,7 +72,7 @@ public class ApartmentController {
                         .execute(id)));
     }
 
-    @ApiOperation(value = "Add new apartment" , authorizations = { @Authorization(value="JWT") })
+    @ApiOperation(value = "Add new apartment", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/add-apartment")
     public ResponseEntity<?> addNewApartment(@RequestBody AddApartmentRequest addApartmentRequest) {
         return ResponseEntity.status(HttpStatus.OK)

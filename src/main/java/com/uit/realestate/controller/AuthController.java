@@ -18,7 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import static com.uit.realestate.constant.MessageCode.User.USER_NOT_FOUND;
+import static com.uit.realestate.constant.MessageCode.User.USER_WRONG;
 
 @RestController
 @Slf4j
@@ -62,7 +62,7 @@ public class AuthController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException | BadCredentialsException e) {
-            throw new ForbiddenException(messageHelper.getMessage(USER_NOT_FOUND,username));
+            throw new ForbiddenException(messageHelper.getMessage(USER_WRONG,username));
         }
     }
 }

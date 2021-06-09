@@ -26,6 +26,8 @@ public class UserDto {
 
     private FileCaption avatar;
 
+    private String description;
+
     public UserDto(Long id, String username, FileCaption avatar, String email) {
         this.id = id;
         this.username = username;

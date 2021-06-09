@@ -32,6 +32,8 @@ public class User extends SqlEntity {
     private String firstName;
     private String lastName;
     private String avatar;
+    private String phone;
+    private String description;
     private EGender gender;
 
     @ManyToOne(fetch = FetchType.LAZY)
