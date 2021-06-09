@@ -1,7 +1,7 @@
 package com.uit.realestate.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.uit.realestate.constant.enums.EGender;
+import com.uit.realestate.constant.enums.user.EGender;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.action.Comment;
 import com.uit.realestate.domain.apartment.Apartment;

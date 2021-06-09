@@ -2,7 +2,6 @@ package com.uit.realestate.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.uit.realestate.constant.enums.ERoleType;
 import lombok.Data;
 
 @Data

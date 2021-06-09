@@ -1,7 +1,7 @@
 package com.uit.realestate.domain.user.join.id;
 
-import com.uit.realestate.constant.enums.EPrivilegeType;
-import com.uit.realestate.constant.enums.ERoleType;
+import com.uit.realestate.constant.enums.user.EPrivilegeType;
+import com.uit.realestate.constant.enums.user.ERoleType;
 import lombok.Data;
 
 import javax.persistence.Embeddable;

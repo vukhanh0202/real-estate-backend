@@ -1,12 +1,16 @@
 package com.uit.realestate.controller;
 
 import com.uit.realestate.constant.AppConstant;
-import com.uit.realestate.constant.enums.ETypeApartment;
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.sort.ESortApartment;
+import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
+import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.service.apartment.IApartmentService;
 import com.uit.realestate.service.apartment.ISearchApartmentService;
+import com.uit.realestate.service.apartment.IValidateApartmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -15,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,6 +30,23 @@ public class ApartmentController {
     @Autowired
     private IApartmentService apartmentService;
 
+    /**
+     * Search apartment
+     *
+     * @param page
+     * @param size
+     * @param sortBy
+     * @param sortDirection
+     * @param districtId
+     * @param provinceId
+     * @param priceFrom
+     * @param priceTo
+     * @param areaFrom
+     * @param areaTo
+     * @param categoryId
+     * @param typeApartment
+     * @return
+     */
     @ApiOperation(value = "Search apartment")
     @GetMapping(value = "/public/apartment/search")
     public ResponseEntity<?> findAllApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
@@ -47,7 +69,11 @@ public class ApartmentController {
                         .execute(input)));
     }
 
-
+    /**
+     * Get latest new apartment (4 items)
+     *
+     * @return
+     */
     @ApiOperation(value = "Get latest new apartment ")
     @GetMapping(value = "/public/apartment/latest-new")
     public ResponseEntity<?> findLatestNewApartment() {
@@ -56,6 +82,11 @@ public class ApartmentController {
                         .execute()));
     }
 
+    /**
+     * Get hightlight apartment (4 items)
+     *
+     * @return
+     */
     @ApiOperation(value = "Get highlight apartment ")
     @GetMapping(value = "/public/apartment/highlight")
     public ResponseEntity<?> findHighlightApartment() {
@@ -64,6 +95,12 @@ public class ApartmentController {
                         .execute()));
     }
 
+    /**
+     * Get detail apartment
+     *
+     * @param id
+     * @return
+     */
     @ApiOperation(value = "Get apartment detail")
     @GetMapping(value = "/public/apartment/{id}")
     public ResponseEntity<?> findAllCategory(@PathVariable("id") Long id) {
@@ -72,12 +109,65 @@ public class ApartmentController {
                         .execute(id)));
     }
 
+    /**
+     * Add new apartment
+     *
+     * @param addApartmentRequest
+     * @return
+     */
     @ApiOperation(value = "Add new apartment", authorizations = {@Authorization(value = "JWT")})
-    @PostMapping(value = "/add-apartment")
+    @PostMapping(value = "/apartment/create")
     public ResponseEntity<?> addNewApartment(@RequestBody AddApartmentRequest addApartmentRequest) {
+        addApartmentRequest.setStatus(EApartmentStatus.PENDING);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getAddApartmentService()
                         .execute(addApartmentRequest)));
+    }
+
+    /**
+     * Update apartment
+     *
+     * @param updateApartmentRequest
+     * @return
+     */
+    @ApiOperation(value = "Update apartment", authorizations = {@Authorization(value = "JWT")})
+    @PutMapping(value = "/apartment/{id}/update")
+    public ResponseEntity<?> updateApartment(@PathVariable("id") Long id,
+                                             @RequestBody UpdateApartmentRequest updateApartmentRequest) {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        updateApartmentRequest.setAuthorId(userPrincipal.getId());
+        updateApartmentRequest.setId(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getUpdateApartmentService()
+                        .execute(updateApartmentRequest)));
+    }
+
+    /**
+     * Update apartment
+     *
+     * @return
+     */
+    @ApiOperation(value = "Close apartment", authorizations = {@Authorization(value = "JWT")})
+    @PutMapping(value = "/apartment/{id}/close/")
+    public ResponseEntity<?> cancelApartment(@PathVariable("id") Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getCloseApartmentService()
+                        .execute(id)));
+    }
+
+    /**
+     * Approve/Decline apartment
+     *
+     * @param decision
+     * @return
+     */
+    @ApiOperation(value = "Validate apartment", authorizations = {@Authorization(value = "JWT")})
+    @PostMapping(value = "/apartment/{id}/validate")
+    public ResponseEntity<?> validateApartment(@PathVariable("id") Long id,
+                                               @RequestParam(value = "decision") Boolean decision) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getValidateApartmentService()
+                        .execute(new IValidateApartmentService.Input(id, decision))));
     }
 
 }

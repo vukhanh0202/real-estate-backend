@@ -1,4 +1,4 @@
-package com.uit.realestate.constant.enums;
+package com.uit.realestate.constant.enums.user;
 
 public enum ERoleType {
     ADMIN,

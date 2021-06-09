@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.uit.realestate.constant.enums.ERoleType;
+import com.uit.realestate.constant.enums.user.ERoleType;
 import com.uit.realestate.data.serializer.CustomAuthorityDeserializer;
 import lombok.Data;
 import lombok.Getter;

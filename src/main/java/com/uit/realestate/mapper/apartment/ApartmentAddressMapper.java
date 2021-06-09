@@ -10,6 +10,7 @@ import com.uit.realestate.mapper.location.DistrictMapper;
 import com.uit.realestate.mapper.location.ProvinceMapper;
 import com.uit.realestate.payload.address.ApartmentAddressRequest;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
+import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.location.CountryRepository;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.location.ProvinceRepository;
@@ -37,13 +38,33 @@ public abstract class ApartmentAddressMapper implements MapperBase {
     @BeforeMapping
     protected void toApartmentAddress(ApartmentAddressRequest apartmentAddressRequest,
                                       @MappingTarget ApartmentAddress apartmentAddress) {
-            apartmentAddress.setCountry(countryRepository.findById(apartmentAddressRequest.getCountryCode()).get());
-            apartmentAddress.setProvince(provinceRepository.findById(apartmentAddressRequest.getProvinceId()).get());
-            apartmentAddress.setDistrict(districtRepository.findById(apartmentAddressRequest.getDistrictId()).get());
+        apartmentAddress.setCountry(countryRepository.findById(apartmentAddressRequest.getCountryCode()).get());
+        apartmentAddress.setProvince(provinceRepository.findById(apartmentAddressRequest.getProvinceId()).get());
+        apartmentAddress.setDistrict(districtRepository.findById(apartmentAddressRequest.getDistrictId()).get());
     }
 
     @BeanMapping(qualifiedByName = "toApartmentAddress", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "address", target = "address")
     public abstract ApartmentAddress toApartmentAddress(ApartmentAddressRequest apartmentDetail);
+
+
+    @Named("toApartmentAddressMapping")
+    @BeforeMapping
+    protected void toApartmentAddressMapping(ApartmentAddressRequest apartmentAddressRequest,
+                                             @MappingTarget ApartmentAddress apartmentAddress) {
+        if (apartmentAddressRequest.getCountryCode() != null) {
+            apartmentAddress.setCountry(countryRepository.findById(apartmentAddressRequest.getCountryCode()).get());
+        }
+        if (apartmentAddressRequest.getProvinceId() != null) {
+            apartmentAddress.setProvince(provinceRepository.findById(apartmentAddressRequest.getProvinceId()).get());
+        }
+        if (apartmentAddressRequest.getDistrictId() != null) {
+            apartmentAddress.setDistrict(districtRepository.findById(apartmentAddressRequest.getDistrictId()).get());
+        }
+    }
+
+    @BeanMapping(qualifiedByName = "toApartmentAddressMapping", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "address", target = "address")
+    public abstract void updateApartmentAddress(ApartmentAddressRequest dto, @MappingTarget ApartmentAddress apartment);
 
 }

@@ -1,12 +1,12 @@
 package com.uit.realestate.domain.apartment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.uit.realestate.constant.enums.ETypeApartment;
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.action.Comment;
 import com.uit.realestate.domain.apartment.join.ApartmentTag;
 import com.uit.realestate.domain.user.User;
-import com.uit.realestate.domain.user.UserAddress;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -39,6 +39,9 @@ public class Apartment extends SqlEntity {
 
     @Enumerated(EnumType.STRING)
     private ETypeApartment typeApartment;
+
+    @Enumerated(EnumType.STRING)
+    private EApartmentStatus status = EApartmentStatus.PENDING;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "UTC")

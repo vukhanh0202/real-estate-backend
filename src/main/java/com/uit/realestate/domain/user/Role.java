@@ -1,6 +1,6 @@
 package com.uit.realestate.domain.user;
 
-import com.uit.realestate.constant.enums.ERoleType;
+import com.uit.realestate.constant.enums.user.ERoleType;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.user.join.RolePrivilege;
 import lombok.Data;

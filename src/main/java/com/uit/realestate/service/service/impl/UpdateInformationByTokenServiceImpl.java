@@ -26,7 +26,7 @@ public class UpdateInformationByTokenServiceImpl extends AbstractBaseService<Upd
     @Override
     public void preExecute(UpdateUserRequest updateUserRequest) {
         if (userRepository.findById(updateUserRequest.getId()).isEmpty()){
-            throw new NotFoundException(messageHelper.getMessage(MessageCode.User.USER_NOT_FOUND));
+            throw new NotFoundException(messageHelper.getMessage(MessageCode.User.NOT_FOUND));
         }
     }
 

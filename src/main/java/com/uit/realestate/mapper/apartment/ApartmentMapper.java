@@ -5,6 +5,7 @@ import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
+import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.category.CategoryRepository;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Named("toApartmentPreviewDto")
     @BeforeMapping
     protected void toApartmentPreviewDto(Apartment apartment, @MappingTarget ApartmentDto dto) {
-        if (apartment.getApartmentAddress()!=null){
+        if (apartment.getApartmentAddress() != null) {
             dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                     + ", " + apartment.getApartmentAddress().getProvince().getName());
         }
@@ -44,6 +45,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "overview", target = "overview")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
+    @Mapping(source = "status", target = "status")
     public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment);
 
     @BeanMapping(ignoreByDefault = true)
@@ -68,6 +70,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "overview", target = "overview")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
+    @Mapping(source = "status", target = "status")
     public abstract ApartmentDto toApartmentFullDto(Apartment apartment);
 
 
@@ -115,6 +118,31 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "typeApartment", target = "typeApartment")
     @Mapping(source = "expiredDate", target = "expiredDate")
+    @Mapping(source = "status", target = "status")
     public abstract Apartment toApartment(AddApartmentRequest addApartmentRequest);
+
+    @Named("updateApartmentMapping")
+    @BeforeMapping
+    protected void updateApartmentMapping(UpdateApartmentRequest updateApartmentRequest, @MappingTarget Apartment apartment) {
+        if (updateApartmentRequest.getCategoryId() != null) {
+            apartment.setCategory(categoryRepository.findById(updateApartmentRequest.getCategoryId()).get());
+        }
+        if (updateApartmentRequest.getApartmentAddress() != null) {
+            apartmentAddressMapper.updateApartmentAddress(updateApartmentRequest.getApartmentAddress(), apartment.getApartmentAddress());
+        }
+        if (updateApartmentRequest.getApartmentDetail() != null) {
+            apartmentDetailMapper.updateApartmentDetail(updateApartmentRequest.getApartmentDetail(), apartment.getApartmentDetail());
+        }
+    }
+
+    @BeanMapping(qualifiedByName = "updateApartmentMapping", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "overview", target = "overview")
+    @Mapping(source = "area", target = "area")
+    @Mapping(source = "price", target = "price")
+    @Mapping(source = "totalPrice", target = "totalPrice")
+    @Mapping(source = "typeApartment", target = "typeApartment")
+    @Mapping(source = "expiredDate", target = "expiredDate")
+    public abstract void updateApartment(UpdateApartmentRequest dto, @MappingTarget Apartment apartment);
 
 }
