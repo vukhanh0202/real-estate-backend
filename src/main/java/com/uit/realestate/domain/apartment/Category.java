@@ -1,6 +1,7 @@
 package com.uit.realestate.domain.apartment;
 
 import com.uit.realestate.domain.SqlEntity;
+import com.uit.realestate.domain.tracking.TrackingCategory;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +23,11 @@ public class Category extends SqlEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
     private List<Apartment> apartments = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+    private List<TrackingCategory> trackingCategories = new ArrayList<>();
+
+    public Category(Long id) {
+        this.id = id;
+    }
 }

@@ -8,9 +8,15 @@ import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
+import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
+import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
 import com.uit.realestate.service.apartment.IApartmentService;
 import com.uit.realestate.service.apartment.ISearchApartmentService;
 import com.uit.realestate.service.apartment.IValidateApartmentService;
+import com.uit.realestate.service.tracking.ITrackingService;
+import com.uit.realestate.service.tracking.TrackingCategoryService;
+import com.uit.realestate.service.tracking.TrackingDistrictService;
+import com.uit.realestate.service.tracking.TrackingProvinceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -19,8 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Slf4j
@@ -29,6 +39,15 @@ public class ApartmentController {
 
     @Autowired
     private IApartmentService apartmentService;
+
+    @Autowired
+    private TrackingCategoryService trackingCategoryService;
+
+    @Autowired
+    private TrackingDistrictService trackingDistrictService;
+
+    @Autowired
+    private TrackingProvinceService trackingProvinceService;
 
     /**
      * Search apartment
@@ -60,7 +79,18 @@ public class ApartmentController {
                                               @RequestParam(value = "area_from", required = false) Double areaFrom,
                                               @RequestParam(value = "area_to", required = false) Double areaTo,
                                               @RequestParam(value = "category_id", required = false) Long categoryId,
-                                              @RequestParam(value = "type_apartment") ETypeApartment typeApartment) {
+                                              @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
+                                              HttpServletRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = null;
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            userId = ((UserPrincipal) authentication.getPrincipal()).getId();
+        }
+        log.info("Tracking User");
+        trackingCategoryService.tracking(userId, request.getRemoteAddr(), categoryId, AppConstant.DEFAULT_RATING);
+        trackingDistrictService.tracking(userId, request.getRemoteAddr(), districtId, AppConstant.DEFAULT_RATING);
+        trackingProvinceService.tracking(userId, request.getRemoteAddr(), provinceId, AppConstant.DEFAULT_RATING);
+
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment);
         input.createPageable(sortDirection, sortBy.getValue());

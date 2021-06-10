@@ -5,6 +5,9 @@ import com.uit.realestate.constant.enums.user.EGender;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.action.Comment;
 import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.domain.tracking.TrackingCategory;
+import com.uit.realestate.domain.tracking.TrackingDistrict;
+import com.uit.realestate.domain.tracking.TrackingProvince;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -43,6 +46,15 @@ public class User extends SqlEntity {
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,
             orphanRemoval = true,fetch = FetchType.LAZY)
     private UserAddress userAddress;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<TrackingCategory> trackingCategories = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<TrackingProvince> trackingProvinces = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<TrackingDistrict> trackingCountries = new ArrayList<>();
 
     public void setUserAddress(UserAddress userAddress) {
         if (userAddress == null) {

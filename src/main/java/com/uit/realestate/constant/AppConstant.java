@@ -18,4 +18,8 @@ public interface AppConstant {
      */
     String FILE_SIZE_LIMIT = "file.attach.size";
 
+    /**
+     * Default rating
+     */
+    Long DEFAULT_RATING = 1L;
 }
