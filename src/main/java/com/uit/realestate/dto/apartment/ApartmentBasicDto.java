@@ -34,4 +34,7 @@ public class ApartmentBasicDto extends BaseDto {
     private Long bathroomQuantity;
 
     private FileCaption picture;
+
+    @JsonProperty("category_name")
+    private String categoryName;
 }

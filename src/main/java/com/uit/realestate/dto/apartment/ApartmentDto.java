@@ -24,6 +24,9 @@ public class ApartmentDto extends BaseDto {
 
     private String address;
 
+    @JsonProperty("category_name")
+    private String categoryName;
+
     @JsonProperty("total_price")
     private Double totalPrice;
 

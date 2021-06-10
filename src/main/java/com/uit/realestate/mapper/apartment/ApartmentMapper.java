@@ -46,6 +46,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
+    @Mapping(source = "category.name", target = "categoryName")
     public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment);
 
     @BeanMapping(ignoreByDefault = true)
@@ -71,6 +72,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
+    @Mapping(source = "category.name", target = "categoryName")
     public abstract ApartmentDto toApartmentFullDto(Apartment apartment);
 
 
@@ -94,6 +96,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "area", target = "area")
     @Mapping(source = "createdBy", target = "createdBy", qualifiedByName = "getAudit")
     @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(source = "category.name", target = "categoryName")
     public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment);
 
     @BeanMapping(ignoreByDefault = true)
