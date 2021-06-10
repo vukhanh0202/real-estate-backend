@@ -13,7 +13,7 @@ public interface IApartmentService {
 
     ISearchApartmentService<ISearchApartmentService.Input, PaginationResponse<ApartmentDto>> getSearchApartmentService();
 
-    IGetApartmentDetailService<Long, ApartmentDto> getGetApartmentDetailService();
+    IGetApartmentDetailService<IGetApartmentDetailService.Input, ApartmentDto> getGetApartmentDetailService();
 
     IAddApartmentService<AddApartmentRequest, Boolean> getAddApartmentService();
 

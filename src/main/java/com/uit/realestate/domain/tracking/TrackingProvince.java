@@ -11,6 +11,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "tracking_province")
 public class TrackingProvince extends SqlEntity {
 

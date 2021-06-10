@@ -8,15 +8,11 @@ import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
-import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
-import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
 import com.uit.realestate.service.apartment.IApartmentService;
+import com.uit.realestate.service.apartment.IGetApartmentDetailService;
 import com.uit.realestate.service.apartment.ISearchApartmentService;
 import com.uit.realestate.service.apartment.IValidateApartmentService;
-import com.uit.realestate.service.tracking.ITrackingService;
-import com.uit.realestate.service.tracking.TrackingCategoryService;
-import com.uit.realestate.service.tracking.TrackingDistrictService;
-import com.uit.realestate.service.tracking.TrackingProvinceService;
+import com.uit.realestate.service.tracking.TrackingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -25,12 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @RestController
 @Slf4j
@@ -41,13 +37,7 @@ public class ApartmentController {
     private IApartmentService apartmentService;
 
     @Autowired
-    private TrackingCategoryService trackingCategoryService;
-
-    @Autowired
-    private TrackingDistrictService trackingDistrictService;
-
-    @Autowired
-    private TrackingProvinceService trackingProvinceService;
+    private TrackingService tracking;
 
     /**
      * Search apartment
@@ -64,6 +54,7 @@ public class ApartmentController {
      * @param areaTo
      * @param categoryId
      * @param typeApartment
+     * @param userId
      * @return
      */
     @ApiOperation(value = "Search apartment")
@@ -80,16 +71,20 @@ public class ApartmentController {
                                               @RequestParam(value = "area_to", required = false) Double areaTo,
                                               @RequestParam(value = "category_id", required = false) Long categoryId,
                                               @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
+                                              @RequestParam(value = "user_id", required = false) Long userId,
                                               HttpServletRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = null;
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            userId = ((UserPrincipal) authentication.getPrincipal()).getId();
+        String ip = request.getRemoteAddr();
+        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")){
+            try {
+                ip = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
         }
         log.info("Tracking User");
-        trackingCategoryService.tracking(userId, request.getRemoteAddr(), categoryId, AppConstant.DEFAULT_RATING);
-        trackingDistrictService.tracking(userId, request.getRemoteAddr(), districtId, AppConstant.DEFAULT_RATING);
-        trackingProvinceService.tracking(userId, request.getRemoteAddr(), provinceId, AppConstant.DEFAULT_RATING);
+        tracking.trackingCategory(userId, ip, categoryId, AppConstant.DEFAULT_RATING);
+        tracking.trackingDistrict(userId, ip, districtId, AppConstant.DEFAULT_RATING);
+        tracking.trackingProvince(userId, ip, provinceId, AppConstant.DEFAULT_RATING);
 
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment);
@@ -129,14 +124,25 @@ public class ApartmentController {
      * Get detail apartment
      *
      * @param id
+     * @param userId
      * @return
      */
     @ApiOperation(value = "Get apartment detail")
     @GetMapping(value = "/public/apartment/{id}")
-    public ResponseEntity<?> findAllCategory(@PathVariable("id") Long id) {
+    public ResponseEntity<?> findAllCategory(@PathVariable("id") Long id,
+                                             @RequestParam(value = "user_id", required = false) Long userId,
+                                             HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")){
+            try {
+                ip = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getGetApartmentDetailService()
-                        .execute(id)));
+                        .execute(new IGetApartmentDetailService.Input(id, ip, userId))));
     }
 
     /**
