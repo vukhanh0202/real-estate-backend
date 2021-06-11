@@ -25,4 +25,9 @@ public class Favourite extends SqlEntity {
     @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    public Favourite(Apartment apartment, User user) {
+        this.apartment = apartment;
+        this.user = user;
+    }
 }

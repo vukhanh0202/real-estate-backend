@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uit.realestate.constant.enums.user.EGender;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.action.Comment;
+import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.tracking.TrackingCategory;
 import com.uit.realestate.domain.tracking.TrackingDistrict;
@@ -47,15 +48,6 @@ public class User extends SqlEntity {
             orphanRemoval = true,fetch = FetchType.LAZY)
     private UserAddress userAddress;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<TrackingCategory> trackingCategories = new ArrayList<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<TrackingProvince> trackingProvinces = new ArrayList<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<TrackingDistrict> trackingCountries = new ArrayList<>();
-
     public void setUserAddress(UserAddress userAddress) {
         if (userAddress == null) {
             if (this.userAddress != null) {
@@ -67,6 +59,35 @@ public class User extends SqlEntity {
         }
         this.userAddress = userAddress;
     }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<TrackingCategory> trackingCategories = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<TrackingProvince> trackingProvinces = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<TrackingDistrict> trackingCountries = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,
+            orphanRemoval = true, mappedBy = "user")
+    private List<Favourite> favourites = new ArrayList<>();
+
+    //Constructors, getters and setters removed for brevity
+    public void addFavourite(Favourite favourite) {
+        if (favourites == null){
+            favourites = new ArrayList<>();
+        }
+        favourites.add(favourite);
+        favourite.setUser(this);
+    }
+
+    public void removeFavourite(Favourite favourite) {
+        favourites.remove(favourite);
+        favourite.setUser(null);
+    }
+
+
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();

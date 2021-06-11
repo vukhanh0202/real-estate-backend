@@ -3,6 +3,7 @@ package com.uit.realestate.service.apartment.impl;
 import com.uit.realestate.service.apartment.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +29,9 @@ public class ApartmentServiceImpl implements IApartmentService {
 
     private final IFindRecommendApartmentService findRecommendApartmentService;
 
-    public ApartmentServiceImpl(ISearchApartmentService searchApartmentService, IGetApartmentDetailService getApartmentDetailService, IAddApartmentService addApartmentService, IFindLatestNewApartmentService findLatestNewApartmentService, IFindHighlightApartmentService findHighlightApartmentService, IValidateApartmentService validateApartmentService, IUpdateApartmentService updateApartmentService, ICloseApartmentService closeApartmentService, IFindRecommendApartmentService findRecommendApartmentService) {
+    private final IFavouriteApartmentService favouriteApartmentService;
+
+    public ApartmentServiceImpl(ISearchApartmentService searchApartmentService, IGetApartmentDetailService getApartmentDetailService, IAddApartmentService addApartmentService, IFindLatestNewApartmentService findLatestNewApartmentService, IFindHighlightApartmentService findHighlightApartmentService, IValidateApartmentService validateApartmentService, IUpdateApartmentService updateApartmentService, ICloseApartmentService closeApartmentService, IFindRecommendApartmentService findRecommendApartmentService, IFavouriteApartmentService favouriteApartmentService) {
         this.searchApartmentService = searchApartmentService;
         this.getApartmentDetailService = getApartmentDetailService;
         this.addApartmentService = addApartmentService;
@@ -38,5 +41,6 @@ public class ApartmentServiceImpl implements IApartmentService {
         this.updateApartmentService = updateApartmentService;
         this.closeApartmentService = closeApartmentService;
         this.findRecommendApartmentService = findRecommendApartmentService;
+        this.favouriteApartmentService = favouriteApartmentService;
     }
 }

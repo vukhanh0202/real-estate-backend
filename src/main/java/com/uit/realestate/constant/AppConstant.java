@@ -22,4 +22,14 @@ public interface AppConstant {
      * Default rating
      */
     Long DEFAULT_RATING = 1L;
+
+    /**
+     * Default favourite rating
+     */
+    Long DEFAULT_FAVOURITE_RATING = 5L;
+
+    /**
+     * Default disable favourite rating
+     */
+    Long DEFAULT_DISABLE_FAVOURITE_RATING = -5L;
 }

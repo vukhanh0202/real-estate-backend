@@ -28,4 +28,6 @@ public interface IApartmentService {
     ICloseApartmentService<Long, Boolean> getCloseApartmentService();
 
     IFindRecommendApartmentService<IFindRecommendApartmentService.Input, List<ApartmentBasicDto>> getFindRecommendApartmentService();
+
+    IFavouriteApartmentService<IFavouriteApartmentService.Input, Boolean> getFavouriteApartmentService();
 }
