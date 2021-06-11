@@ -2,9 +2,11 @@ package com.uit.realestate.service.service.impl;
 
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.domain.user.User;
+import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.user.UserMapper;
 import com.uit.realestate.payload.user.UpdateUserRequest;
+import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.service.IUpdateInformationByTokenService;
@@ -17,16 +19,34 @@ import org.springframework.stereotype.Service;
 public class UpdateInformationByTokenServiceImpl extends AbstractBaseService<UpdateUserRequest, Boolean>
         implements IUpdateInformationByTokenService<UpdateUserRequest, Boolean> {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
+
+    private final DistrictRepository districtRepository;
+
+    public UpdateInformationByTokenServiceImpl(UserRepository userRepository, UserMapper userMapper, DistrictRepository districtRepository) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.districtRepository = districtRepository;
+    }
 
     @Override
     public void preExecute(UpdateUserRequest updateUserRequest) {
-        if (userRepository.findById(updateUserRequest.getId()).isEmpty()){
-            throw new NotFoundException(messageHelper.getMessage(MessageCode.User.NOT_FOUND));
+        User user = userRepository.findById(updateUserRequest.getId()).orElseThrow(() ->
+                new NotFoundException(messageHelper.getMessage(MessageCode.User.NOT_FOUND)));
+        if (updateUserRequest.getAddress() != null){
+            Long districtId = updateUserRequest.getAddress().getDistrictId();
+            Long provinceId = updateUserRequest.getAddress().getProvinceId();
+            if (districtId == null){
+                districtId = user.getUserAddress().getDistrict().getId();
+            }
+            if (provinceId == null){
+                provinceId = user.getUserAddress().getProvince().getId();
+            }
+            if (!districtRepository.findById(districtId).get().getProvince().getId().equals(provinceId)){
+                throw new InvalidException(messageHelper.getMessage(MessageCode.Address.INVALID));
+            }
         }
     }
 
@@ -34,7 +54,7 @@ public class UpdateInformationByTokenServiceImpl extends AbstractBaseService<Upd
     public Boolean doing(UpdateUserRequest updateUserRequest) {
         log.info("Update information user from user ID");
         User user = userRepository.findById(updateUserRequest.getId()).get();
-        userMapper.updateUser(updateUserRequest,user);
+        userMapper.updateUser(updateUserRequest, user);
         userRepository.save(user);
         return true;
     }

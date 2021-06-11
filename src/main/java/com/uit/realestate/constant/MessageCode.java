@@ -16,4 +16,8 @@ public interface MessageCode {
         String NOT_FOUND = "message.apartment.NotFound";
         String NOT_PENDING = "message.apartment.NotPending";
     }
+
+    interface Address {
+        String INVALID = "message.address.Invalid";
+    }
 }
