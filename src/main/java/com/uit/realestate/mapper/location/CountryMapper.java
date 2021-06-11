@@ -16,7 +16,7 @@ import java.util.List;
 public abstract class CountryMapper implements MapperBase {
 
     @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "code", target = "code")
+    @Mapping(source = "code", target = "id")
     @Mapping(source = "name", target = "name")
     @Mapping(source = "phoneCode", target = "phoneCode")
     public abstract CountryDto toCountryDto(Country country);

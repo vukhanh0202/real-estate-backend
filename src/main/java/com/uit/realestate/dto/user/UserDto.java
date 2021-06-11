@@ -3,6 +3,7 @@ package com.uit.realestate.dto.user;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.uit.realestate.dto.address.UserAddressDto;
 import com.uit.realestate.dto.response.FileCaption;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,8 @@ public class UserDto {
     private FileCaption avatar;
 
     private String description;
+
+    private UserAddressDto addressDto;
 
     public UserDto(Long id, String username, FileCaption avatar, String email) {
         this.id = id;

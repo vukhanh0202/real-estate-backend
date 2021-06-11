@@ -35,6 +35,7 @@ public abstract class ApartmentMapper implements MapperBase {
         if (apartment.getApartmentAddress() != null) {
             dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                     + ", " + apartment.getApartmentAddress().getProvince().getName());
+            dto.setAddressDetail(apartmentAddressMapper.toApartmentAddressDto(apartment.getApartmentAddress()));
         }
     }
 

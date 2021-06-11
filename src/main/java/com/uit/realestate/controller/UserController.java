@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "Update information", authorizations = {@Authorization(value = "JWT")})
-    @PostMapping(value = "/token/update")
+    @PutMapping(value = "/token/update")
     public ResponseEntity<?> updateInformationUser(@RequestBody UpdateUserRequest updateUserRequest){
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         updateUserRequest.setId(userPrincipal.getId());

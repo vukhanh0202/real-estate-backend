@@ -2,6 +2,7 @@ package com.uit.realestate.domain.location;
 
 import com.uit.realestate.domain.apartment.ApartmentAddress;
 import com.uit.realestate.domain.tracking.TrackingDistrict;
+import com.uit.realestate.domain.user.UserAddress;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,6 +34,9 @@ public class District{
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "district")
     private List<TrackingDistrict> trackingCountries = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "district")
+    private List<UserAddress> userAddresses = new ArrayList<>();
 
     public District(Long id) {
         this.id = id;

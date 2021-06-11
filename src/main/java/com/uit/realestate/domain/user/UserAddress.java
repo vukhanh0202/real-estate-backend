@@ -1,5 +1,8 @@
 package com.uit.realestate.domain.user;
 
+import com.uit.realestate.domain.location.Country;
+import com.uit.realestate.domain.location.District;
+import com.uit.realestate.domain.location.Province;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,12 +22,19 @@ public class UserAddress {
     @JoinColumn(name = "id")
     private User user;
 
-    private String countryCode;
-    private String countryName;
-    private Long provinceId;
-    private String provinceName;
-    private Long districtId;
-    private String districtName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "province_id")
+    private Province province;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id")
+    private District district;
+
+    @Column(columnDefinition = "TEXT")
     private String address;
 
 }

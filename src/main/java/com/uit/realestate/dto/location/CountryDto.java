@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CountryDto {
 
-    private String code;
+    private String id;
 
     private String name;
 

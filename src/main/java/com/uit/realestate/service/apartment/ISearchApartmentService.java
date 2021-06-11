@@ -1,5 +1,7 @@
 package com.uit.realestate.service.apartment;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.dto.response.PaginationRequest;
 import com.uit.realestate.service.IService;
@@ -20,6 +22,8 @@ public interface ISearchApartmentService<Input, Output> extends IService<Input, 
         private Double areaTo;
         private Long categoryId;
         private ETypeApartment typeApartment;
+        @JsonIgnore
+        private EApartmentStatus apartmentStatus;
 
         public Input(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
                      Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment) {
@@ -32,6 +36,20 @@ public interface ISearchApartmentService<Input, Output> extends IService<Input, 
             this.areaTo = areaTo;
             this.categoryId = categoryId;
             this.typeApartment = typeApartment;
+        }
+
+        public Input(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
+                     Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment, EApartmentStatus status) {
+            super(page, size);
+            this.districtId = districtId;
+            this.provinceId = provinceId;
+            this.priceFrom = priceFrom;
+            this.priceTo = priceTo;
+            this.areaFrom = areaFrom;
+            this.areaTo = areaTo;
+            this.categoryId = categoryId;
+            this.typeApartment = typeApartment;
+            this.apartmentStatus = status;
         }
     }
 }

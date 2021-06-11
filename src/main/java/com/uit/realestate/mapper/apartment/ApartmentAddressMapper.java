@@ -3,6 +3,9 @@ package com.uit.realestate.mapper.apartment;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.apartment.ApartmentAddress;
 import com.uit.realestate.domain.apartment.ApartmentDetail;
+import com.uit.realestate.domain.user.UserAddress;
+import com.uit.realestate.dto.address.UserAddressDto;
+import com.uit.realestate.dto.apartment.ApartmentAddressDto;
 import com.uit.realestate.dto.apartment.ApartmentDetailDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.mapper.location.CountryMapper;
@@ -66,5 +69,16 @@ public abstract class ApartmentAddressMapper implements MapperBase {
     @BeanMapping(qualifiedByName = "toApartmentAddressMapping", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "address", target = "address")
     public abstract void updateApartmentAddress(ApartmentAddressRequest dto, @MappingTarget ApartmentAddress apartment);
+
+    @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "province.id", target = "provinceId")
+    @Mapping(source = "province.name", target = "provinceName")
+    @Mapping(source = "country.code", target = "countryCode")
+    @Mapping(source = "country.name", target = "countryName")
+    @Mapping(source = "district.id", target = "districtId")
+    @Mapping(source = "district.name", target = "districtName")
+    @Mapping(source = "address", target = "address")
+    public abstract ApartmentAddressDto toApartmentAddressDto(ApartmentAddress apartmentAddress);
 
 }

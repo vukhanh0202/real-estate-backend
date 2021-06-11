@@ -8,10 +8,7 @@ import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
-import com.uit.realestate.service.apartment.IApartmentService;
-import com.uit.realestate.service.apartment.IGetApartmentDetailService;
-import com.uit.realestate.service.apartment.ISearchApartmentService;
-import com.uit.realestate.service.apartment.IValidateApartmentService;
+import com.uit.realestate.service.apartment.*;
 import com.uit.realestate.service.tracking.TrackingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,8 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
@@ -61,22 +56,22 @@ public class ApartmentController {
      */
     @ApiOperation(value = "Search apartment")
     @GetMapping(value = "/public/apartment/search")
-    public ResponseEntity<?> findAllApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
-                                              @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
-                                              @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
-                                              @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
-                                              @RequestParam(value = "district_id", required = false) Long districtId,
-                                              @RequestParam(value = "province_id", required = false) Long provinceId,
-                                              @RequestParam(value = "price_from", required = false) Double priceFrom,
-                                              @RequestParam(value = "price_to", required = false) Double priceTo,
-                                              @RequestParam(value = "area_from", required = false) Double areaFrom,
-                                              @RequestParam(value = "area_to", required = false) Double areaTo,
-                                              @RequestParam(value = "category_id", required = false) Long categoryId,
-                                              @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
-                                              @RequestParam(value = "user_id", required = false) Long userId,
-                                              HttpServletRequest request) {
+    public ResponseEntity<?> findAllApartmentOpen(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
+                                                  @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                                  @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
+                                                  @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
+                                                  @RequestParam(value = "district_id", required = false) Long districtId,
+                                                  @RequestParam(value = "province_id", required = false) Long provinceId,
+                                                  @RequestParam(value = "price_from", required = false) Double priceFrom,
+                                                  @RequestParam(value = "price_to", required = false) Double priceTo,
+                                                  @RequestParam(value = "area_from", required = false) Double areaFrom,
+                                                  @RequestParam(value = "area_to", required = false) Double areaTo,
+                                                  @RequestParam(value = "category_id", required = false) Long categoryId,
+                                                  @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
+                                                  @RequestParam(value = "user_id", required = false) Long userId,
+                                                  HttpServletRequest request) {
         String ip = request.getRemoteAddr();
-        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")){
+        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
             try {
                 ip = InetAddress.getLocalHost().getHostAddress();
             } catch (UnknownHostException e) {
@@ -89,10 +84,78 @@ public class ApartmentController {
         tracking.trackingProvince(userId, ip, provinceId, AppConstant.DEFAULT_RATING);
 
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment);
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN);
         input.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getSearchApartmentService()
+                        .execute(input)));
+    }
+
+    /**
+     * Search apartment admin
+     *
+     * @param page
+     * @param size
+     * @param sortBy
+     * @param sortDirection
+     * @param districtId
+     * @param provinceId
+     * @param priceFrom
+     * @param priceTo
+     * @param areaFrom
+     * @param areaTo
+     * @param categoryId
+     * @param typeApartment
+     * @return
+     */
+    @ApiOperation(value = "Search apartment")
+    @GetMapping(value = "/apartment/search")
+    public ResponseEntity<?> findAllApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
+                                              @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                              @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
+                                              @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
+                                              @RequestParam(value = "district_id", required = false) Long districtId,
+                                              @RequestParam(value = "province_id", required = false) Long provinceId,
+                                              @RequestParam(value = "price_from", required = false) Double priceFrom,
+                                              @RequestParam(value = "price_to", required = false) Double priceTo,
+                                              @RequestParam(value = "area_from", required = false) Double areaFrom,
+                                              @RequestParam(value = "area_to", required = false) Double areaTo,
+                                              @RequestParam(value = "category_id", required = false) Long categoryId,
+                                              @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
+                                              @RequestParam(value = "status") EApartmentStatus status) {
+        ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, status);
+        input.createPageable(sortDirection, sortBy.getValue());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getSearchApartmentService()
+                        .execute(input)));
+    }
+
+    /**
+     * Get recommend apartment
+     *
+     * @return
+     */
+    @ApiOperation(value = "Get recommend apartment ")
+    @GetMapping(value = "/public/apartment/recommend")
+    public ResponseEntity<?> findRecommendApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
+                                                    @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                                    @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
+                                                    @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
+                                                    @RequestParam(value = "user_id", required = false) Long userId,
+                                                    HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
+            try {
+                ip = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+        IFindRecommendApartmentService.Input input = new IFindRecommendApartmentService.Input(page, size, userId, ip);
+        input.createPageable(sortDirection, sortBy.getValue());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getFindRecommendApartmentService()
                         .execute(input)));
     }
 
@@ -135,7 +198,7 @@ public class ApartmentController {
                                              @RequestParam(value = "user_id", required = false) Long userId,
                                              HttpServletRequest request) {
         String ip = request.getRemoteAddr();
-        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")){
+        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
             try {
                 ip = InetAddress.getLocalHost().getHostAddress();
             } catch (UnknownHostException e) {

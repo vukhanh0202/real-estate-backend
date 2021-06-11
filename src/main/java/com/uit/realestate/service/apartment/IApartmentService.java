@@ -26,4 +26,6 @@ public interface IApartmentService {
     IUpdateApartmentService<UpdateApartmentRequest, Boolean> getUpdateApartmentService();
 
     ICloseApartmentService<Long, Boolean> getCloseApartmentService();
+
+    IFindRecommendApartmentService<IFindRecommendApartmentService.Input, List<ApartmentBasicDto>> getFindRecommendApartmentService();
 }
