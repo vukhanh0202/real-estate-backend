@@ -140,9 +140,7 @@ public class ApartmentController {
     @GetMapping(value = "/public/apartment/recommend")
     public ResponseEntity<?> findRecommendApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
                                                     @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
-                                                    @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
-                                                    @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
-                                                    @RequestParam(value = "user_id", required = false) Long userId,
+                                                    @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
                                                     HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
@@ -153,7 +151,7 @@ public class ApartmentController {
             }
         }
         IFindRecommendApartmentService.Input input = new IFindRecommendApartmentService.Input(page, size, userId, ip);
-        input.createPageable(sortDirection, sortBy.getValue());
+        input.createPageable();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getFindRecommendApartmentService()
                         .execute(input)));

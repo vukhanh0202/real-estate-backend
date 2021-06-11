@@ -1,13 +1,8 @@
 package com.uit.realestate.service.apartment.impl;
 
 import com.uit.realestate.service.apartment.*;
-import com.uit.realestate.service.location.IFindAllCountryService;
-import com.uit.realestate.service.location.IFindAllDistrictByProvinceIdService;
-import com.uit.realestate.service.location.IFindAllProvinceByCountryCodeService;
-import com.uit.realestate.service.location.ILocationService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,8 +20,6 @@ public class ApartmentServiceImpl implements IApartmentService {
 
     private final IFindHighlightApartmentService findHighlightApartmentService;
 
-    private final ICountSearchApartmentService countSearchApartmentService;
-
     private final IValidateApartmentService validateApartmentService;
 
     private final IUpdateApartmentService updateApartmentService;
@@ -35,13 +28,12 @@ public class ApartmentServiceImpl implements IApartmentService {
 
     private final IFindRecommendApartmentService findRecommendApartmentService;
 
-    public ApartmentServiceImpl(ISearchApartmentService searchApartmentService, IGetApartmentDetailService getApartmentDetailService, IAddApartmentService addApartmentService, IFindLatestNewApartmentService findLatestNewApartmentService, IFindHighlightApartmentService findHighlightApartmentService, ICountSearchApartmentService countSearchApartmentService, IValidateApartmentService validateApartmentService, IUpdateApartmentService updateApartmentService, ICloseApartmentService closeApartmentService, IFindRecommendApartmentService findRecommendApartmentService) {
+    public ApartmentServiceImpl(ISearchApartmentService searchApartmentService, IGetApartmentDetailService getApartmentDetailService, IAddApartmentService addApartmentService, IFindLatestNewApartmentService findLatestNewApartmentService, IFindHighlightApartmentService findHighlightApartmentService, IValidateApartmentService validateApartmentService, IUpdateApartmentService updateApartmentService, ICloseApartmentService closeApartmentService, IFindRecommendApartmentService findRecommendApartmentService) {
         this.searchApartmentService = searchApartmentService;
         this.getApartmentDetailService = getApartmentDetailService;
         this.addApartmentService = addApartmentService;
         this.findLatestNewApartmentService = findLatestNewApartmentService;
         this.findHighlightApartmentService = findHighlightApartmentService;
-        this.countSearchApartmentService = countSearchApartmentService;
         this.validateApartmentService = validateApartmentService;
         this.updateApartmentService = updateApartmentService;
         this.closeApartmentService = closeApartmentService;

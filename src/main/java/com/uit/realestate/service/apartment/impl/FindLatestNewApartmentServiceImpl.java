@@ -1,5 +1,6 @@
 package com.uit.realestate.service.apartment.impl;
 
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.mapper.apartment.ApartmentMapper;
@@ -27,6 +28,6 @@ public class FindLatestNewApartmentServiceImpl extends AbstractBaseService<Void,
     @Override
     public List<ApartmentBasicDto> doing(Void unused) {
         log.info("Find top 4 new latest apartment");
-        return apartmentMapper.toApartmentBasicDtoList(apartmentRepository.findTop4ByOrderByCreatedAtDesc());
+        return apartmentMapper.toApartmentBasicDtoList(apartmentRepository.findTop4ByStatusOrderByCreatedAtDesc(EApartmentStatus.OPEN));
     }
 }

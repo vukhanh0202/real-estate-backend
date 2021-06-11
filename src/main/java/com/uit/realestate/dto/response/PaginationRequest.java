@@ -49,6 +49,15 @@ public class PaginationRequest {
     /**
      * Create pageable
      *
+     * @return Pageable
+     */
+    public void createPageable() {
+        this.pageable = PageRequest.of(page - 1, size);
+    }
+
+    /**
+     * Create pageable
+     *
      * @param sort
      */
     public void createPageable(final Sort sort) {
