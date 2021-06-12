@@ -24,9 +24,10 @@ public interface ISearchApartmentService<Input, Output> extends IService<Input, 
         private ETypeApartment typeApartment;
         @JsonIgnore
         private EApartmentStatus apartmentStatus;
+        private Long userId;
 
         public Input(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
-                     Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment) {
+                     Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment,Long userId) {
             super(page, size);
             this.districtId = districtId;
             this.provinceId = provinceId;
@@ -36,10 +37,12 @@ public interface ISearchApartmentService<Input, Output> extends IService<Input, 
             this.areaTo = areaTo;
             this.categoryId = categoryId;
             this.typeApartment = typeApartment;
+            this.userId = userId;
         }
 
         public Input(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
-                     Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment, EApartmentStatus status) {
+                     Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment, EApartmentStatus status,
+                     Long userId) {
             super(page, size);
             this.districtId = districtId;
             this.provinceId = provinceId;
@@ -50,6 +53,7 @@ public interface ISearchApartmentService<Input, Output> extends IService<Input, 
             this.categoryId = categoryId;
             this.typeApartment = typeApartment;
             this.apartmentStatus = status;
+            this.userId = userId;
         }
     }
 }

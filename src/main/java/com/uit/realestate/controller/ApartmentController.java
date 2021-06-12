@@ -84,7 +84,7 @@ public class ApartmentController {
         tracking.trackingProvince(userId, ip, provinceId, AppConstant.DEFAULT_RATING);
 
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN);
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId);
         input.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getSearchApartmentService()
@@ -125,10 +125,10 @@ public class ApartmentController {
      */
     @ApiOperation(value = "Get latest new apartment ")
     @GetMapping(value = "/public/apartment/latest-new")
-    public ResponseEntity<?> findLatestNewApartment() {
+    public ResponseEntity<?> findLatestNewApartment(@RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getFindLatestNewApartmentService()
-                        .execute()));
+                        .execute(userId)));
     }
 
     /**
@@ -138,10 +138,10 @@ public class ApartmentController {
      */
     @ApiOperation(value = "Get highlight apartment ")
     @GetMapping(value = "/public/apartment/highlight")
-    public ResponseEntity<?> findHighlightApartment() {
+    public ResponseEntity<?> findHighlightApartment(@RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getFindHighlightApartmentService()
-                        .execute()));
+                        .execute(userId)));
     }
 
     /**
@@ -285,8 +285,9 @@ public class ApartmentController {
                                               @RequestParam(value = "category_id", required = false) Long categoryId,
                                               @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
                                               @RequestParam(value = "status") EApartmentStatus status) {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, status);
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, status, userPrincipal.getId());
         input.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getSearchApartmentService()

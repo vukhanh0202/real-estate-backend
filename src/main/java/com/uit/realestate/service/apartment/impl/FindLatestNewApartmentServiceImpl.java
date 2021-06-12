@@ -16,18 +16,22 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class FindLatestNewApartmentServiceImpl extends AbstractBaseService<Void, List<ApartmentBasicDto>>
-        implements IFindLatestNewApartmentService<Void, List<ApartmentBasicDto>> {
+public class FindLatestNewApartmentServiceImpl extends AbstractBaseService<Long, List<ApartmentBasicDto>>
+        implements IFindLatestNewApartmentService<Long, List<ApartmentBasicDto>> {
 
-    @Autowired
-    ApartmentMapper apartmentMapper;
+    private final ApartmentMapper apartmentMapper;
 
-    @Autowired
-    ApartmentRepository apartmentRepository;
+    private final ApartmentRepository apartmentRepository;
+
+    public FindLatestNewApartmentServiceImpl(ApartmentMapper apartmentMapper, ApartmentRepository apartmentRepository) {
+        this.apartmentMapper = apartmentMapper;
+        this.apartmentRepository = apartmentRepository;
+    }
 
     @Override
-    public List<ApartmentBasicDto> doing(Void unused) {
+    public List<ApartmentBasicDto> doing(Long userId) {
         log.info("Find top 4 new latest apartment");
-        return apartmentMapper.toApartmentBasicDtoList(apartmentRepository.findTop4ByStatusOrderByCreatedAtDesc(EApartmentStatus.OPEN));
+        return apartmentMapper.toApartmentBasicDtoList(apartmentRepository
+                .findTop4ByStatusOrderByCreatedAtDesc(EApartmentStatus.OPEN),userId);
     }
 }

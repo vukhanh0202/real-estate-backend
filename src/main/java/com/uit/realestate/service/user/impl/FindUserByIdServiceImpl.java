@@ -1,4 +1,4 @@
-package com.uit.realestate.service.service.impl;
+package com.uit.realestate.service.user.impl;
 
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.dto.user.UserDto;
@@ -6,7 +6,7 @@ import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.user.UserMapper;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
-import com.uit.realestate.service.service.IFindUserByIdService;
+import com.uit.realestate.service.user.IFindUserByIdService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

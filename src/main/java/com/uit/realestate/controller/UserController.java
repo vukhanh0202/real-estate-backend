@@ -1,15 +1,20 @@
 package com.uit.realestate.controller;
 
+import com.uit.realestate.constant.AppConstant;
+import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.user.UpdateUserRequest;
-import com.uit.realestate.service.location.ILocationService;
-import com.uit.realestate.service.service.IUserService;
+import com.uit.realestate.service.apartment.ISearchApartmentService;
+import com.uit.realestate.service.user.IFindUserApartmentAuthorService;
+import com.uit.realestate.service.user.IFindUserApartmentFavouriteService;
+import com.uit.realestate.service.user.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,5 +46,35 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(userService.getUpdateInformationByTokenService()
                         .execute(updateUserRequest)));
+    }
+
+    @ApiOperation(value = "Get apartment favourite", authorizations = {@Authorization(value = "JWT")})
+    @GetMapping(value = "/token/apartment/favourite")
+    public ResponseEntity<?> getApartmentFavourite(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
+                                                   @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                                   @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
+                                                   @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection){
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        IFindUserApartmentFavouriteService.Input input = new IFindUserApartmentFavouriteService.Input(page, size, userPrincipal.getId());
+        input.createPageable(sortDirection, sortBy.getValue());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(userService.getFindUserApartmentFavouriteService()
+                        .execute(input)));
+    }
+
+    @ApiOperation(value = "Get apartment author", authorizations = {@Authorization(value = "JWT")})
+    @GetMapping(value = "/token/apartment/author")
+    public ResponseEntity<?> getApartmentAuthor(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
+                                                @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                                @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
+                                                @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection){
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        IFindUserApartmentAuthorService.Input input = new IFindUserApartmentAuthorService.Input(page, size, userPrincipal.getId());
+        input.createPageable(sortDirection, sortBy.getValue());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(userService.getFindUserApartmentAuthorService()
+                        .execute(input)));
     }
 }

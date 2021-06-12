@@ -1,4 +1,4 @@
-package com.uit.realestate.service.service.impl;
+package com.uit.realestate.service.user.impl;
 
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.domain.user.User;
@@ -9,9 +9,8 @@ import com.uit.realestate.payload.user.UpdateUserRequest;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
-import com.uit.realestate.service.service.IUpdateInformationByTokenService;
+import com.uit.realestate.service.user.IUpdateInformationByTokenService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service

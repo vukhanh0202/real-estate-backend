@@ -4,6 +4,7 @@ import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.apartment.Category;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -23,11 +24,15 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
             " FULL OUTER JOIN tracking_province tp ON tp.province_id = ad.province_id " +
             " FULL OUTER JOIN tracking_district td ON td.district_id = ad.district_id " +
-            " WHERE (tc.ip = :ip AND (:userId = -1 OR tc.user_id = :userId)) " +
-            "      OR (tp.ip = :ip AND (:userId = -1 OR tp.user_id = :userId)) " +
-            "      OR (td.ip = :ip AND (:userId = -1 OR td.user_id = :userId)) " +
+            " WHERE ((tc.ip = :ip OR tc.user_id = :userId) " +
+            "       OR (tp.ip = :ip OR tp.user_id = :userId) " +
+            "       OR (td.ip = :ip OR td.user_id = :userId)) " +
+            "       AND ap.status = 'OPEN' " +
             " GROUP BY ap.id " +
             " ORDER BY rating DESC ",
             nativeQuery = true)
-    List<Apartment> findRecommendApartmentByUserIdAndIp(Long userId, String ip, Pageable pageable);
+    Page<Apartment> findRecommendApartmentByUserIdAndIp(Long userId, String ip, Pageable pageable);
+
+    Page<Apartment> findAllByAuthorId(Long userId, Pageable pageable);
+
 }

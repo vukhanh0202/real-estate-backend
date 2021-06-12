@@ -31,7 +31,7 @@ public class GetApartmentDetailServiceImpl extends AbstractBaseService<IGetApart
     @Override
     public void preExecute(Input input) {
         Apartment apartment = apartmentRepository.findById(input.getId()).orElse(null);
-        if (apartment == null){
+        if (apartment == null) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Apartment.NOT_FOUND));
         }
     }
@@ -46,6 +46,6 @@ public class GetApartmentDetailServiceImpl extends AbstractBaseService<IGetApart
 
         log.info("Get detail apartment ID: " + input.getId());
 
-        return apartmentMapper.toApartmentFullDto(apartment);
+        return apartmentMapper.toApartmentFullDto(apartment, input.getUserId());
     }
 }

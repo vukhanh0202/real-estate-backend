@@ -42,7 +42,7 @@ public class SearchApartmentServiceImpl extends AbstractBaseService<ISearchApart
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
-                , apartmentMapper.toApartmentPreviewDtoList(result.getContent()));
+                , apartmentMapper.toApartmentPreviewDtoList(result.getContent(), input.getUserId()));
     }
 
     private Specification<Apartment> getApartSpecification(ISearchApartmentService.Input input) {

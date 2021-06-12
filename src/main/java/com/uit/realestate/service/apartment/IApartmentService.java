@@ -17,9 +17,9 @@ public interface IApartmentService {
 
     IAddApartmentService<AddApartmentRequest, Boolean> getAddApartmentService();
 
-    IFindLatestNewApartmentService<Void, List<ApartmentBasicDto>> getFindLatestNewApartmentService();
+    IFindLatestNewApartmentService<Long, List<ApartmentBasicDto>> getFindLatestNewApartmentService();
 
-    IFindHighlightApartmentService<Void, List<ApartmentBasicDto>> getFindHighlightApartmentService();
+    IFindHighlightApartmentService<Long, List<ApartmentBasicDto>> getFindHighlightApartmentService();
 
     IValidateApartmentService<IValidateApartmentService.Input, Boolean> getValidateApartmentService();
 
@@ -27,7 +27,7 @@ public interface IApartmentService {
 
     ICloseApartmentService<Long, Boolean> getCloseApartmentService();
 
-    IFindRecommendApartmentService<IFindRecommendApartmentService.Input, List<ApartmentBasicDto>> getFindRecommendApartmentService();
+    IFindRecommendApartmentService<IFindRecommendApartmentService.Input, PaginationResponse<ApartmentBasicDto>> getFindRecommendApartmentService();
 
     IFavouriteApartmentService<IFavouriteApartmentService.Input, Boolean> getFavouriteApartmentService();
 }

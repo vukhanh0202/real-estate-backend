@@ -6,6 +6,7 @@ import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
+import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +27,22 @@ public abstract class ApartmentMapper implements MapperBase {
     @Autowired
     private ApartmentAddressMapper apartmentAddressMapper;
 
+    @Autowired
+    private FavouriteRepository favouriteRepository;
+
     //*************************************************
     //********** Mapper Apartment To ApartmentBasicDto (Search) **********
     //*************************************************
     @Named("toApartmentPreviewDto")
     @BeforeMapping
-    protected void toApartmentPreviewDto(Apartment apartment, @MappingTarget ApartmentDto dto) {
+    protected void toApartmentPreviewDto(Apartment apartment, @MappingTarget ApartmentDto dto, @Context Long userId) {
         if (apartment.getApartmentAddress() != null) {
             dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                     + ", " + apartment.getApartmentAddress().getProvince().getName());
             dto.setAddressDetail(apartmentAddressMapper.toApartmentAddressDto(apartment.getApartmentAddress()));
+        }
+        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
+            dto.setFavourite(true);
         }
     }
 
@@ -48,11 +55,11 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "category.name", target = "categoryName")
-    public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment);
+    public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment, @Context Long userId);
 
     @BeanMapping(ignoreByDefault = true)
     @IterableMapping(qualifiedByName = "toApartmentPreviewDtoList")
-    public abstract List<ApartmentDto> toApartmentPreviewDtoList(List<Apartment> apartmentList);
+    public abstract List<ApartmentDto> toApartmentPreviewDtoList(List<Apartment> apartmentList, @Context Long userId);
 
 
     //*************************************************
@@ -60,10 +67,13 @@ public abstract class ApartmentMapper implements MapperBase {
     //*************************************************
     @Named("toApartmentFullDto")
     @BeforeMapping
-    protected void toApartmentFullDto(Apartment apartment, @MappingTarget ApartmentDto dto) {
+    protected void toApartmentFullDto(Apartment apartment, @MappingTarget ApartmentDto dto, @Context Long userId) {
         dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                 + ", " + apartment.getApartmentAddress().getProvince().getName());
         dto.setApartmentDetail(apartmentDetailMapper.toApartmentDetailDto(apartment.getApartmentDetail()));
+        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
+            dto.setFavourite(true);
+        }
     }
 
     @BeanMapping(qualifiedByName = "toApartmentFullDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -74,7 +84,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "category.name", target = "categoryName")
-    public abstract ApartmentDto toApartmentFullDto(Apartment apartment);
+    public abstract ApartmentDto toApartmentFullDto(Apartment apartment, @Context Long userId);
 
 
     //*************************************************
@@ -82,9 +92,12 @@ public abstract class ApartmentMapper implements MapperBase {
     //*************************************************
     @Named("toApartmentBasicDto")
     @BeforeMapping
-    protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentBasicDto dto) {
+    protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentBasicDto dto, @Context Long userId) {
         dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                 + ", " + apartment.getApartmentAddress().getProvince().getName());
+        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
+            dto.setFavourite(true);
+        }
     }
 
     @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -98,10 +111,10 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "createdBy", target = "createdBy", qualifiedByName = "getAudit")
     @Mapping(source = "createdAt", target = "createdAt")
     @Mapping(source = "category.name", target = "categoryName")
-    public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment);
+    public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment, @Context Long userId);
 
     @BeanMapping(ignoreByDefault = true)
-    public abstract List<ApartmentBasicDto> toApartmentBasicDtoList(List<Apartment> apartmentList);
+    public abstract List<ApartmentBasicDto> toApartmentBasicDtoList(List<Apartment> apartmentList, @Context Long userId);
 
     //*************************************************
     //********** Mapper AddApartmentRequest To Apartment (Entity) **********

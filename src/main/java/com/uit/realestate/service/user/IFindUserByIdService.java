@@ -1,4 +1,4 @@
-package com.uit.realestate.service.service;
+package com.uit.realestate.service.user;
 
 import com.uit.realestate.service.IService;
 

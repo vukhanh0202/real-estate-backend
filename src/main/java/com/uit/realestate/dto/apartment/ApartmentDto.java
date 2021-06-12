@@ -36,6 +36,8 @@ public class ApartmentDto extends BaseDto {
 
     private EApartmentStatus status;
 
+    private Boolean favourite = false;
+
     @JsonProperty("apartment_detail")
     private ApartmentDetailDto apartmentDetail;
 }
