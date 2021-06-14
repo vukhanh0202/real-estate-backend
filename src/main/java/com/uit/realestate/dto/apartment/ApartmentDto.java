@@ -40,4 +40,7 @@ public class ApartmentDto extends BaseDto {
 
     @JsonProperty("apartment_detail")
     private ApartmentDetailDto apartmentDetail;
+
+    @JsonProperty("type_apartment")
+    private String typeApartment;
 }

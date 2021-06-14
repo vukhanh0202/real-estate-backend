@@ -40,4 +40,7 @@ public class ApartmentBasicDto extends BaseDto {
 
     private Boolean favourite = false;
 
+    @JsonProperty("type_apartment")
+    private String typeApartment;
+
 }

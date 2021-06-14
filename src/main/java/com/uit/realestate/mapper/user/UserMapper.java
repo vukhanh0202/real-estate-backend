@@ -40,7 +40,7 @@ public abstract class UserMapper implements MapperBase {
     @Named("updateUserAddress")
     @BeforeMapping
     protected void updateUserAddress(UpdateUserRequest dto, @MappingTarget User entity) {
-        entity.setUserAddress(userAddressMapper.toUserAddress(dto.getAddress()));
+        userAddressMapper.updateAddress(dto.getAddress(),entity.getUserAddress());
     }
 
     @BeanMapping(qualifiedByName = "updateUserAddress", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

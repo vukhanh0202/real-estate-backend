@@ -54,4 +54,16 @@ public abstract class UserAddressMapper implements MapperBase {
     @BeanMapping(qualifiedByName = "toUserAddress", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "address", target = "address")
     public abstract UserAddress toUserAddress(UserAddressRequest userAddressRequest);
+
+    @Named("updateAddressExist")
+    @BeforeMapping
+    protected void updateAddressExist(UserAddressRequest userAddressRequest,
+                                 @MappingTarget UserAddress userAddress) {
+        userAddress.setCountry(countryRepository.findById(userAddressRequest.getCountryCode()).get());
+        userAddress.setProvince(provinceRepository.findById(userAddressRequest.getProvinceId()).get());
+        userAddress.setDistrict(districtRepository.findById(userAddressRequest.getDistrictId()).get());
+    }
+    @BeanMapping(qualifiedByName = "updateAddressExist", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "address", target = "address")
+    public abstract void updateAddress(UserAddressRequest dto, @MappingTarget UserAddress entity);
 }

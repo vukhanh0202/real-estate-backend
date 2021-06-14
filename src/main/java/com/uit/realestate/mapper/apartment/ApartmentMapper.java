@@ -44,6 +44,7 @@ public abstract class ApartmentMapper implements MapperBase {
         if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
             dto.setFavourite(true);
         }
+        dto.setTypeApartment(apartment.getTypeApartment().getValue());
     }
 
     @BeanMapping(qualifiedByName = "toApartmentPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -74,6 +75,7 @@ public abstract class ApartmentMapper implements MapperBase {
         if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
             dto.setFavourite(true);
         }
+        dto.setTypeApartment(apartment.getTypeApartment().getValue());
     }
 
     @BeanMapping(qualifiedByName = "toApartmentFullDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -98,6 +100,7 @@ public abstract class ApartmentMapper implements MapperBase {
         if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
             dto.setFavourite(true);
         }
+        dto.setTypeApartment(apartment.getTypeApartment().getValue());
     }
 
     @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
