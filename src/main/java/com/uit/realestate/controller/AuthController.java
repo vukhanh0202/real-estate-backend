@@ -1,6 +1,6 @@
 package com.uit.realestate.controller;
 
-import com.uit.realestate.configuration.JwtTokenUtil;
+import com.uit.realestate.configuration.config.JwtTokenUtil;
 import com.uit.realestate.dto.auth.UserLoginDto;
 import com.uit.realestate.exception.ForbiddenException;
 import com.uit.realestate.service.auth.JwtUserDetailsService;

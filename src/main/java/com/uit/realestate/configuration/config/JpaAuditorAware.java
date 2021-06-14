@@ -1,4 +1,4 @@
-package com.uit.realestate.configuration;
+package com.uit.realestate.configuration.config;
 
 import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.domain.user.User;

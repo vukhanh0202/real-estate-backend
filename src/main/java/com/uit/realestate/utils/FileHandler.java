@@ -1,0 +1,31 @@
+package com.uit.realestate.utils;
+
+import com.google.common.io.Files;
+import com.uit.realestate.dto.response.FileCaption;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class FileHandler {
+    private static String MAIN_DIRECTORY;
+    private static final Integer MAX_RANDOM=100000000;
+
+    public static FileCaption formatImage(String originalName, File file) {
+        FileCaption photoCaption = new FileCaption();
+        photoCaption.setOriginalName(originalName);
+        photoCaption.setName(file.getName());
+        photoCaption.setExtension(Files.getFileExtension(originalName));
+        return  photoCaption;
+    }
+
+    public static String generateFileName(Long userId, String originalName) {
+        Date myDate = new Date();
+        return userId + "_" + new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss").format(myDate) + "-"+(int)Math.ceil(Math.random()*MAX_RANDOM) +"." + Files.getFileExtension(originalName);
+    }
+
+    public static String generateFileName(String originalName) {
+        Date myDate = new Date();
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss").format(myDate) + "-"+(int)Math.ceil(Math.random()*MAX_RANDOM) +"." + Files.getFileExtension(originalName);
+    }
+}

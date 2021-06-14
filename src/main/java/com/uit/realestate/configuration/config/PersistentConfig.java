@@ -1,5 +1,6 @@
-package com.uit.realestate.configuration;
+package com.uit.realestate.configuration.config;
 
+import com.uit.realestate.configuration.config.JpaAuditorAware;
 import com.uit.realestate.domain.user.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

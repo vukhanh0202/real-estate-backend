@@ -1,6 +1,8 @@
-package com.uit.realestate.configuration;
+package com.uit.realestate.configuration.config;
 
 
+import com.uit.realestate.configuration.config.JwtAuthenticationEntryPoint;
+import com.uit.realestate.configuration.config.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
