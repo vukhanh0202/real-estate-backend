@@ -203,32 +203,17 @@ public class ApartmentController {
     }
 
     /**
-     * Update apartment
+     * Close Apartment apartment
      *
      * @return
      */
-    @ApiOperation(value = "Close apartment", authorizations = {@Authorization(value = "JWT")})
-    @PutMapping(value = "/apartment/{id}/close/")
-    public ResponseEntity<?> cancelApartment(@PathVariable("id") Long id) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getCloseApartmentService()
-                        .execute(id)));
-    }
-
-    /**
-     * Approve/Decline apartment
-     *
-     * @param decision
-     * @return
-     */
-    @ApiOperation(value = "Validate apartment", authorizations = {@Authorization(value = "JWT")})
-    @PostMapping(value = "/apartment/{id}/validate")
-    public ResponseEntity<?> validateApartment(@PathVariable("id") Long id,
-                                               @RequestParam(value = "decision") Boolean decision) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getValidateApartmentService()
-                        .execute(new IValidateApartmentService.Input(id, decision))));
-    }
+//    @ApiOperation(value = "Close apartment", authorizations = {@Authorization(value = "JWT")})
+//    @PutMapping(value = "/apartment/{id}/close/")
+//    public ResponseEntity<?> cancelApartment(@PathVariable("id") Long id) {
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(new ApiResponse(apartmentService.getCloseApartmentService()
+//                        .execute(id)));
+//    }
 
     /**
      * Favourite apartment
@@ -251,46 +236,5 @@ public class ApartmentController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getFavouriteApartmentService()
                         .execute(new IFavouriteApartmentService.Input(userPrincipal.getId(), apartmentId, ip))));
-    }
-
-    /**
-     * Search apartment admin
-     *
-     * @param page
-     * @param size
-     * @param sortBy
-     * @param sortDirection
-     * @param districtId
-     * @param provinceId
-     * @param priceFrom
-     * @param priceTo
-     * @param areaFrom
-     * @param areaTo
-     * @param categoryId
-     * @param typeApartment
-     * @return
-     */
-    @ApiOperation(value = "Search apartment", authorizations = {@Authorization(value = "JWT")})
-    @GetMapping(value = "/apartment/search")
-    public ResponseEntity<?> findAllApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
-                                              @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
-                                              @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
-                                              @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
-                                              @RequestParam(value = "district_id", required = false) Long districtId,
-                                              @RequestParam(value = "province_id", required = false) Long provinceId,
-                                              @RequestParam(value = "price_from", required = false) Double priceFrom,
-                                              @RequestParam(value = "price_to", required = false) Double priceTo,
-                                              @RequestParam(value = "area_from", required = false) Double areaFrom,
-                                              @RequestParam(value = "area_to", required = false) Double areaTo,
-                                              @RequestParam(value = "category_id", required = false) Long categoryId,
-                                              @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
-                                              @RequestParam(value = "status") EApartmentStatus status) {
-        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, status, userPrincipal.getId());
-        input.createPageable(sortDirection, sortBy.getValue());
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getSearchApartmentService()
-                        .execute(input)));
     }
 }

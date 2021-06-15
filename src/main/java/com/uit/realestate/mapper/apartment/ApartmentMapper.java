@@ -41,7 +41,7 @@ public abstract class ApartmentMapper implements MapperBase {
                     + ", " + apartment.getApartmentAddress().getProvince().getName());
             dto.setAddressDetail(apartmentAddressMapper.toApartmentAddressDto(apartment.getApartmentAddress()));
         }
-        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
+        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()) {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
@@ -72,7 +72,7 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                 + ", " + apartment.getApartmentAddress().getProvince().getName());
         dto.setApartmentDetail(apartmentDetailMapper.toApartmentDetailDto(apartment.getApartmentDetail()));
-        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
+        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()) {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
@@ -86,6 +86,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
     public abstract ApartmentDto toApartmentFullDto(Apartment apartment, @Context Long userId);
 
 
@@ -97,7 +98,7 @@ public abstract class ApartmentMapper implements MapperBase {
     protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentBasicDto dto, @Context Long userId) {
         dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                 + ", " + apartment.getApartmentAddress().getProvince().getName());
-        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()){
+        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()) {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
@@ -128,17 +129,18 @@ public abstract class ApartmentMapper implements MapperBase {
         apartment.setCategory(categoryRepository.findById(addApartmentRequest.getCategoryId()).get());
         apartment.setApartmentAddress(apartmentAddressMapper.toApartmentAddress(addApartmentRequest.getApartmentAddress()));
         apartment.setApartmentDetail(apartmentDetailMapper.toApartmentDetail(addApartmentRequest.getApartmentDetail()));
+        apartment.setPrice(addApartmentRequest.getTotalPrice() / addApartmentRequest.getArea());
     }
 
     @BeanMapping(qualifiedByName = "toApartment", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "title", target = "title")
-    @Mapping(source = "overview", target = "overview")
+//    @Mapping(source = "overview", target = "overview")
     @Mapping(source = "area", target = "area")
-    @Mapping(source = "price", target = "price")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "typeApartment", target = "typeApartment")
     @Mapping(source = "expiredDate", target = "expiredDate")
     @Mapping(source = "status", target = "status")
+//    @Mapping(source = "photos", target = "photos", qualifiedByName = "setFiles")
     public abstract Apartment toApartment(AddApartmentRequest addApartmentRequest);
 
     @Named("updateApartmentMapping")
@@ -153,16 +155,18 @@ public abstract class ApartmentMapper implements MapperBase {
         if (updateApartmentRequest.getApartmentDetail() != null) {
             apartmentDetailMapper.updateApartmentDetail(updateApartmentRequest.getApartmentDetail(), apartment.getApartmentDetail());
         }
+        if (updateApartmentRequest.getTotalPrice() != null || updateApartmentRequest.getArea() != null)
+            apartment.setPrice(updateApartmentRequest.getTotalPrice() / updateApartmentRequest.getArea());
     }
 
     @BeanMapping(qualifiedByName = "updateApartmentMapping", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "title", target = "title")
     @Mapping(source = "overview", target = "overview")
     @Mapping(source = "area", target = "area")
-    @Mapping(source = "price", target = "price")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "typeApartment", target = "typeApartment")
     @Mapping(source = "expiredDate", target = "expiredDate")
+    @Mapping(source = "photos", target = "photos", qualifiedByName = "setFiles")
     public abstract void updateApartment(UpdateApartmentRequest dto, @MappingTarget Apartment apartment);
 
 }

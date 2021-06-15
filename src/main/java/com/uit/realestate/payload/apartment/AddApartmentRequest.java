@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
+import com.uit.realestate.dto.response.FileCaption;
 import com.uit.realestate.payload.address.ApartmentAddressRequest;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class AddApartmentRequest {
@@ -17,8 +19,6 @@ public class AddApartmentRequest {
     private String overview;
 
     private Double area;
-
-    private Double price;
 
     @JsonIgnore
     private EApartmentStatus status;
@@ -40,4 +40,6 @@ public class AddApartmentRequest {
 
     @JsonProperty("apartment_detail")
     private ApartmentDetailRequest apartmentDetail;
+
+    private List<FileCaption> photos;
 }

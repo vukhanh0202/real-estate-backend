@@ -1,6 +1,7 @@
 package com.uit.realestate.service.apartment.impl;
 
 import com.uit.realestate.constant.MessageCode;
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
 import com.uit.realestate.exception.InvalidException;
@@ -43,7 +44,10 @@ public class UpdateApartmentServiceImpl extends AbstractBaseService<UpdateApartm
 
         Apartment apartment = apartmentRepository.findById(updateApartmentRequest.getId())
                 .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.Apartment.NOT_FOUND)));
-        if (!updateApartmentRequest.getAuthorId().equals(apartment.getAuthor().getId())) {
+        if (!updateApartmentRequest.getIsAdmin() && !updateApartmentRequest.getAuthorId().equals(apartment.getAuthor().getId())) {
+            throw new NotFoundException(messageHelper.getMessage(MessageCode.Token.NOT_PERMISSION));
+        }
+        if (!updateApartmentRequest.getIsAdmin() && !apartment.getStatus().equals(EApartmentStatus.PENDING)) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Token.NOT_PERMISSION));
         }
         if (updateApartmentRequest.getCategoryId() != null && categoryRepository.findById(updateApartmentRequest.getId()).isEmpty()) {

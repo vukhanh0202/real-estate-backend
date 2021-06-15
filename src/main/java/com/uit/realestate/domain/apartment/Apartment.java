@@ -38,6 +38,9 @@ public class Apartment extends SqlEntity {
 
     private Boolean highlight = false;
 
+    @Column(columnDefinition = "TEXT")
+    private String photos;
+
     @Enumerated(EnumType.STRING)
     private ETypeApartment typeApartment;
 

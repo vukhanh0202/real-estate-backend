@@ -31,7 +31,9 @@ public class ApartmentServiceImpl implements IApartmentService {
 
     private final IFavouriteApartmentService favouriteApartmentService;
 
-    public ApartmentServiceImpl(ISearchApartmentService searchApartmentService, IGetApartmentDetailService getApartmentDetailService, IAddApartmentService addApartmentService, IFindLatestNewApartmentService findLatestNewApartmentService, IFindHighlightApartmentService findHighlightApartmentService, IValidateApartmentService validateApartmentService, IUpdateApartmentService updateApartmentService, ICloseApartmentService closeApartmentService, IFindRecommendApartmentService findRecommendApartmentService, IFavouriteApartmentService favouriteApartmentService) {
+    private final IHighlightApartmentService highlightApartmentService;
+
+    public ApartmentServiceImpl(ISearchApartmentService searchApartmentService, IGetApartmentDetailService getApartmentDetailService, IAddApartmentService addApartmentService, IFindLatestNewApartmentService findLatestNewApartmentService, IFindHighlightApartmentService findHighlightApartmentService, IValidateApartmentService validateApartmentService, IUpdateApartmentService updateApartmentService, ICloseApartmentService closeApartmentService, IFindRecommendApartmentService findRecommendApartmentService, IFavouriteApartmentService favouriteApartmentService, IHighlightApartmentService highlightApartmentService) {
         this.searchApartmentService = searchApartmentService;
         this.getApartmentDetailService = getApartmentDetailService;
         this.addApartmentService = addApartmentService;
@@ -42,5 +44,6 @@ public class ApartmentServiceImpl implements IApartmentService {
         this.closeApartmentService = closeApartmentService;
         this.findRecommendApartmentService = findRecommendApartmentService;
         this.favouriteApartmentService = favouriteApartmentService;
+        this.highlightApartmentService = highlightApartmentService;
     }
 }

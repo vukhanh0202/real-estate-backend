@@ -5,8 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.dto.BaseDto;
+import com.uit.realestate.dto.response.FileCaption;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @NoArgsConstructor
 @Data
@@ -43,4 +46,6 @@ public class ApartmentDto extends BaseDto {
 
     @JsonProperty("type_apartment")
     private String typeApartment;
+
+    private List<FileCaption> photos;
 }
