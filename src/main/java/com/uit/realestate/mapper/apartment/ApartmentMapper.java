@@ -72,6 +72,7 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                 + ", " + apartment.getApartmentAddress().getProvince().getName());
         dto.setApartmentDetail(apartmentDetailMapper.toApartmentDetailDto(apartment.getApartmentDetail()));
+        dto.setAddressDetail(apartmentAddressMapper.toApartmentAddressDto(apartment.getApartmentAddress()));
         if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()) {
             dto.setFavourite(true);
         }
@@ -129,12 +130,13 @@ public abstract class ApartmentMapper implements MapperBase {
         apartment.setCategory(categoryRepository.findById(addApartmentRequest.getCategoryId()).get());
         apartment.setApartmentAddress(apartmentAddressMapper.toApartmentAddress(addApartmentRequest.getApartmentAddress()));
         apartment.setApartmentDetail(apartmentDetailMapper.toApartmentDetail(addApartmentRequest.getApartmentDetail()));
-        apartment.setPrice(addApartmentRequest.getTotalPrice() / addApartmentRequest.getArea());
+        apartment.setPrice((double) Math.round(addApartmentRequest.getTotalPrice() / addApartmentRequest.getArea()));
+
     }
 
     @BeanMapping(qualifiedByName = "toApartment", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "title", target = "title")
-//    @Mapping(source = "overview", target = "overview")
+    @Mapping(source = "overview", target = "overview")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "typeApartment", target = "typeApartment")
@@ -156,7 +158,7 @@ public abstract class ApartmentMapper implements MapperBase {
             apartmentDetailMapper.updateApartmentDetail(updateApartmentRequest.getApartmentDetail(), apartment.getApartmentDetail());
         }
         if (updateApartmentRequest.getTotalPrice() != null || updateApartmentRequest.getArea() != null)
-            apartment.setPrice(updateApartmentRequest.getTotalPrice() / updateApartmentRequest.getArea());
+            apartment.setPrice((double) Math.round(updateApartmentRequest.getTotalPrice() / updateApartmentRequest.getArea()));
     }
 
     @BeanMapping(qualifiedByName = "updateApartmentMapping", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

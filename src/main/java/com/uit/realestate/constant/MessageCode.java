@@ -11,6 +11,7 @@ public interface MessageCode {
     }
     interface Category {
         String NOT_FOUND = "message.category.NotFound";
+        String EXIST = "message.category.Exist";
     }
     interface Apartment {
         String NOT_FOUND = "message.apartment.NotFound";

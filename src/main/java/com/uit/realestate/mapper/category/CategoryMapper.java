@@ -1,12 +1,9 @@
 package com.uit.realestate.mapper.category;
 
-import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.apartment.Category;
-import com.uit.realestate.domain.location.Country;
 import com.uit.realestate.dto.category.CategoryDto;
-import com.uit.realestate.dto.location.CountryDto;
 import com.uit.realestate.mapper.MapperBase;
-import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
+import com.uit.realestate.payload.category.CategoryRequest;
 import org.mapstruct.*;
 import org.springframework.stereotype.Component;
 
@@ -29,4 +26,12 @@ public abstract class CategoryMapper implements MapperBase {
 
     @BeanMapping(ignoreByDefault = true)
     public abstract List<CategoryDto> toCategoryDtoList(List<Category> categoryList);
+
+    @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "name", target = "name")
+    public abstract Category toCategory(CategoryRequest categoryRequest);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "name", target = "name")
+    public abstract void updateCategory(CategoryRequest dto, @MappingTarget Category category);
 }

@@ -20,16 +20,19 @@ import java.util.List;
 public class FindAllCategoryServiceImpl extends AbstractBaseService<Void, List<CategoryDto>>
         implements IFindAllCategoryService<Void, List<CategoryDto>> {
 
-    @Autowired
-    private CategoryMapper categoryMapper;
+    private final CategoryMapper categoryMapper;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+
+    public FindAllCategoryServiceImpl(CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
+        this.categoryMapper = categoryMapper;
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
     public List<CategoryDto> doing(Void unused) {
         log.info("FindAllCategoryServiceImpl: find all category");
 
-        return categoryMapper.toCategoryDtoList(categoryRepository.findAll());
+        return categoryMapper.toCategoryDtoList(categoryRepository.findAllByIsDeletedFalse());
     }
 }

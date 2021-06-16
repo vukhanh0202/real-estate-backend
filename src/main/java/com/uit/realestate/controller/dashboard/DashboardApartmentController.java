@@ -1,4 +1,4 @@
-package com.uit.realestate.controller;
+package com.uit.realestate.controller.dashboard;
 
 
 import com.uit.realestate.constant.AppConstant;
@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @Api(value = "Apartment Dashboard APIs")
-@RequestMapping("/dashboard")
-public class ApartmentDashboardController {
+@RequestMapping("/dashboard/apartment")
+public class DashboardApartmentController {
 
     @Autowired
     private IApartmentService apartmentService;
@@ -50,7 +50,7 @@ public class ApartmentDashboardController {
      * @return
      */
     @ApiOperation(value = "Search apartment", authorizations = {@Authorization(value = "JWT")})
-    @GetMapping(value = "/apartment/search")
+    @GetMapping(value = "/search")
     public ResponseEntity<?> findAllApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
                                               @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
                                               @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
@@ -80,7 +80,7 @@ public class ApartmentDashboardController {
      * @return
      */
     @ApiOperation(value = "Add new apartment(auto open)", authorizations = {@Authorization(value = "JWT")})
-    @PostMapping(value = "/apartment/create")
+    @PostMapping(value = "/create")
     public ResponseEntity<?> addNewApartment(@RequestBody AddApartmentRequest addApartmentRequest) {
         addApartmentRequest.setStatus(EApartmentStatus.OPEN);
         return ResponseEntity.status(HttpStatus.OK)
@@ -95,7 +95,7 @@ public class ApartmentDashboardController {
      * @return
      */
     @ApiOperation(value = "Update apartment", authorizations = {@Authorization(value = "JWT")})
-    @PutMapping(value = "/apartment/{id}/update")
+    @PutMapping(value = "/{id}/update")
     public ResponseEntity<?> updateApartment(@PathVariable("id") Long id,
                                              @RequestBody UpdateApartmentRequest updateApartmentRequest) {
         updateApartmentRequest.setIsAdmin(true);
@@ -116,7 +116,7 @@ public class ApartmentDashboardController {
      * @return
      */
     @ApiOperation(value = "Validate apartment", authorizations = {@Authorization(value = "JWT")})
-    @PostMapping(value = "/apartment/{id}/validate")
+    @PostMapping(value = "/{id}/validate")
     public ResponseEntity<?> validateApartment(@PathVariable("id") Long id,
                                                @RequestParam(value = "decision") Boolean decision) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -129,8 +129,8 @@ public class ApartmentDashboardController {
      *
      * @return
      */
-    @ApiOperation(value = "Validate apartment", authorizations = {@Authorization(value = "JWT")})
-    @PostMapping(value = "/apartment/{id}/validate")
+    @ApiOperation(value = "Highlight apartment", authorizations = {@Authorization(value = "JWT")})
+    @PostMapping(value = "/validate/highlight/{id}/")
     public ResponseEntity<?> highlightApartment(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getHighlightApartmentService()

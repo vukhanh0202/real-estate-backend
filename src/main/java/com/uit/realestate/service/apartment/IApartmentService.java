@@ -4,7 +4,6 @@ import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
-import com.uit.realestate.payload.apartment.ApartmentSearch;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 
 import java.util.List;
