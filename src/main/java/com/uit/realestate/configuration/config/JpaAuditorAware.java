@@ -18,7 +18,6 @@ public class JpaAuditorAware implements AuditorAware<User> {
             principal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         } catch (Exception e){
             principal=null;
-            log.info("User not login");
         }
         if (principal!=null) {
             return Optional.of(new User(principal.getId()));

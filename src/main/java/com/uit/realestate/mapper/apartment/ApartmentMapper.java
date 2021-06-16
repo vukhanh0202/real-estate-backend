@@ -56,6 +56,8 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
+    @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
     public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment, @Context Long userId);
 
     @BeanMapping(ignoreByDefault = true)
@@ -86,8 +88,10 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
+    @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
+    @Mapping(source = "expiredDate", target = "expiredDate")
     public abstract ApartmentDto toApartmentFullDto(Apartment apartment, @Context Long userId);
 
 
@@ -116,6 +120,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "createdBy", target = "createdBy", qualifiedByName = "getAudit")
     @Mapping(source = "createdAt", target = "createdAt")
     @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(source = "status", target = "status")
     public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment, @Context Long userId);
 
     @BeanMapping(ignoreByDefault = true)
@@ -142,7 +147,8 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "typeApartment", target = "typeApartment")
     @Mapping(source = "expiredDate", target = "expiredDate")
     @Mapping(source = "status", target = "status")
-//    @Mapping(source = "photos", target = "photos", qualifiedByName = "setFiles")
+    @Mapping(source = "authorId", target = "author.id")
+    @Mapping(source = "photos", target = "photos", qualifiedByName = "setFiles")
     public abstract Apartment toApartment(AddApartmentRequest addApartmentRequest);
 
     @Named("updateApartmentMapping")

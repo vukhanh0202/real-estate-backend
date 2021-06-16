@@ -9,6 +9,9 @@ import com.uit.realestate.dto.response.FileCaption;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -29,6 +32,9 @@ public class ApartmentDto extends BaseDto {
 
     private ApartmentAddressDto addressDetail;
 
+    @JsonProperty("category_id")
+    private Long categoryId;
+
     @JsonProperty("category_name")
     private String categoryName;
 
@@ -47,5 +53,16 @@ public class ApartmentDto extends BaseDto {
     @JsonProperty("type_apartment")
     private String typeApartment;
 
+    @JsonProperty("expired_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date expiredDate;
+
     private List<FileCaption> photos;
+
+    @JsonProperty("bedroom_quantity")
+    private Long bedroomQuantity;
+
+    @JsonProperty("bathroom_quantity")
+    private Long bathroomQuantity;
+
 }

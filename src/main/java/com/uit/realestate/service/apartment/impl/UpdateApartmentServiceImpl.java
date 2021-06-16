@@ -45,12 +45,12 @@ public class UpdateApartmentServiceImpl extends AbstractBaseService<UpdateApartm
         Apartment apartment = apartmentRepository.findById(updateApartmentRequest.getId())
                 .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.Apartment.NOT_FOUND)));
         if (!updateApartmentRequest.getIsAdmin() && !updateApartmentRequest.getAuthorId().equals(apartment.getAuthor().getId())) {
-            throw new NotFoundException(messageHelper.getMessage(MessageCode.Token.NOT_PERMISSION));
+            throw new InvalidException(messageHelper.getMessage(MessageCode.Token.NOT_PERMISSION));
         }
         if (!updateApartmentRequest.getIsAdmin() && !apartment.getStatus().equals(EApartmentStatus.PENDING)) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Token.NOT_PERMISSION));
         }
-        if (updateApartmentRequest.getCategoryId() != null && categoryRepository.findById(updateApartmentRequest.getId()).isEmpty()) {
+        if (updateApartmentRequest.getCategoryId() != null && categoryRepository.findById(updateApartmentRequest.getCategoryId()).isEmpty()) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Category.NOT_FOUND));
         }
         if (updateApartmentRequest.getApartmentAddress() != null) {

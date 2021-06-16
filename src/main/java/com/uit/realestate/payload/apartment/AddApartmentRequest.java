@@ -42,4 +42,7 @@ public class AddApartmentRequest {
     private ApartmentDetailRequest apartmentDetail;
 
     private List<FileCaption> photos;
+
+    @JsonIgnore
+    private Long authorId;
 }

@@ -153,7 +153,7 @@ public class ApartmentController {
      */
     @ApiOperation(value = "Get apartment detail")
     @GetMapping(value = "/public/apartment/{id}")
-    public ResponseEntity<?> findAllCategory(@PathVariable("id") Long id,
+    public ResponseEntity<?> findApartmentDetail(@PathVariable("id") Long id,
                                              @RequestParam(value = "user_id", required = false) Long userId,
                                              HttpServletRequest request) {
         String ip = request.getRemoteAddr();
@@ -178,7 +178,9 @@ public class ApartmentController {
     @ApiOperation(value = "Add new apartment", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/apartment/create")
     public ResponseEntity<?> addNewApartment(@RequestBody AddApartmentRequest addApartmentRequest) {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         addApartmentRequest.setStatus(EApartmentStatus.PENDING);
+        addApartmentRequest.setAuthorId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getAddApartmentService()
                         .execute(addApartmentRequest)));
@@ -195,8 +197,8 @@ public class ApartmentController {
     public ResponseEntity<?> updateApartment(@PathVariable("id") Long id,
                                              @RequestBody UpdateApartmentRequest updateApartmentRequest) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        updateApartmentRequest.setAuthorId(userPrincipal.getId());
         updateApartmentRequest.setId(id);
+        updateApartmentRequest.setAuthorId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getUpdateApartmentService()
                         .execute(updateApartmentRequest)));
