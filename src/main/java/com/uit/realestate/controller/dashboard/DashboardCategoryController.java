@@ -5,6 +5,7 @@ import com.uit.realestate.payload.category.CategoryRequest;
 import com.uit.realestate.service.category.ICategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class DashboardCategoryController {
     @Autowired
     private ICategoryService categoryService;
 
-    @ApiOperation(value = "Find All Category")
+    @ApiOperation(value = "Find All Category", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "")
     public ResponseEntity<?> findAllCategory(){
         return ResponseEntity.status(HttpStatus.OK)
@@ -28,7 +29,7 @@ public class DashboardCategoryController {
                         .execute()));
     }
 
-    @ApiOperation(value = "Create Category")
+    @ApiOperation(value = "Create Category", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/create")
     public ResponseEntity<?> createCategory(@RequestBody CategoryRequest categoryRequest){
         return ResponseEntity.status(HttpStatus.OK)
@@ -36,7 +37,7 @@ public class DashboardCategoryController {
                         .execute(categoryRequest)));
     }
 
-    @ApiOperation(value = "Update Category")
+    @ApiOperation(value = "Update Category", authorizations = {@Authorization(value = "JWT")})
     @PutMapping(value = "/update/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable("id") Long id,
                                             @RequestBody CategoryRequest categoryRequest){
@@ -46,7 +47,7 @@ public class DashboardCategoryController {
                         .execute(categoryRequest)));
     }
 
-    @ApiOperation(value = "Find All Category")
+    @ApiOperation(value = "Delete Category", authorizations = {@Authorization(value = "JWT")})
     @DeleteMapping(value = "/delete/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable("id") Long id){
         return ResponseEntity.status(HttpStatus.OK)

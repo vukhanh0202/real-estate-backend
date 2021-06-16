@@ -18,11 +18,11 @@ public abstract class UserMapper implements MapperBase {
     @Autowired
     private UserAddressMapper userAddressMapper;
 
-    @Named("toUserDto")
-    @BeforeMapping
-    protected void toApartmentPreviewDto(User user, @MappingTarget UserDto userDto) {
-        userDto.setAddressDto(userAddressMapper.toUserAddressDto(user.getUserAddress()));
-    }
+//    @Named("toUserDto")
+//    @BeforeMapping
+//    protected void toApartmentPreviewDto(User user, @MappingTarget UserDto userDto) {
+//        userDto.setAddressDto(userAddressMapper.toUserAddressDto(user.getUserAddress()));
+//    }
 
     @BeanMapping(qualifiedByName = "toUserDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
@@ -31,6 +31,7 @@ public abstract class UserMapper implements MapperBase {
     @Mapping(source = "email", target = "email")
     @Mapping(source = "phone", target = "phone")
     @Mapping(source = "description", target = "description")
+    @Mapping(source = "createdAt", target = "createdAt")
     public abstract UserDto toUserDto(User user);
 
     @BeanMapping(ignoreByDefault = true)

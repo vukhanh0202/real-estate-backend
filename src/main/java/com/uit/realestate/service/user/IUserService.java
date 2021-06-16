@@ -2,6 +2,7 @@ package com.uit.realestate.service.user;
 
 import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.dto.response.PaginationResponse;
+import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.dto.user.UserDto;
 import com.uit.realestate.payload.user.UpdateUserRequest;
 
@@ -15,4 +16,8 @@ public interface IUserService {
     IFindUserApartmentAuthorService<IFindUserApartmentAuthorService.Input, PaginationResponse<ApartmentDto>> getFindUserApartmentAuthorService();
 
     IFindUserApartmentFavouriteService<IFindUserApartmentFavouriteService.Input, PaginationResponse<ApartmentDto>> getFindUserApartmentFavouriteService();
+
+    IFindAllUserService<IFindAllUserService.Input, PaginationResponse<UserDto>> getFindAllUserService();
+
+    IFindDetailUserService<Long, UserDetailDto> getFindDetailUserService();
 }

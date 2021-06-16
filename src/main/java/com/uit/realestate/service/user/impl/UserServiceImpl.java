@@ -20,10 +20,16 @@ public class UserServiceImpl implements IUserService {
 
     private final IFindUserApartmentFavouriteService findUserApartmentFavouriteService;
 
-    public UserServiceImpl(IFindUserByIdService findUserByIdService, IUpdateInformationByTokenService updateInformationByTokenService, IFindUserApartmentAuthorService findUserApartmentAuthorService, IFindUserApartmentFavouriteService findUserApartmentFavouriteService) {
+    private final IFindAllUserService findAllUserService;
+
+    private final IFindDetailUserService findDetailUserService;
+
+    public UserServiceImpl(IFindUserByIdService findUserByIdService, IUpdateInformationByTokenService updateInformationByTokenService, IFindUserApartmentAuthorService findUserApartmentAuthorService, IFindUserApartmentFavouriteService findUserApartmentFavouriteService, IFindAllUserService findAllUserService, IFindDetailUserService findDetailUserService) {
         this.findUserByIdService = findUserByIdService;
         this.updateInformationByTokenService = updateInformationByTokenService;
         this.findUserApartmentAuthorService = findUserApartmentAuthorService;
         this.findUserApartmentFavouriteService = findUserApartmentFavouriteService;
+        this.findAllUserService = findAllUserService;
+        this.findDetailUserService = findDetailUserService;
     }
 }

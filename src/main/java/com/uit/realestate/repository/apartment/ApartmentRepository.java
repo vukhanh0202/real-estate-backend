@@ -35,4 +35,18 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
 
     Page<Apartment> findAllByAuthorId(Long userId, Pageable pageable);
 
+    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
+            " FROM apartment ap " +
+            " JOIN apartment_address ad ON ap.id = ad.id " +
+            " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
+            " FULL OUTER JOIN tracking_province tp ON tp.province_id = ad.province_id " +
+            " FULL OUTER JOIN tracking_district td ON td.district_id = ad.district_id " +
+            " WHERE ((tc.user_id = :userId) " +
+            "       OR (tp.user_id = :userId) " +
+            "       OR (td.user_id = :userId)) " +
+            " GROUP BY ap.id " +
+            " ORDER BY rating DESC ",
+            nativeQuery = true)
+    List<Apartment> findRecommendApartmentByUserId(Long userId);
+
 }

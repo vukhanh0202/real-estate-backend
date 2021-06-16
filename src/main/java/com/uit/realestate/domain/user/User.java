@@ -87,8 +87,6 @@ public class User extends SqlEntity {
         favourite.setUser(null);
     }
 
-
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
 
