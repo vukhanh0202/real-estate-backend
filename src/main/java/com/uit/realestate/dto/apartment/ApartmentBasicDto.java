@@ -9,6 +9,8 @@ import com.uit.realestate.dto.response.FileCaption;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -46,4 +48,5 @@ public class ApartmentBasicDto extends BaseDto {
 
     private EApartmentStatus status;
 
+    private List<FileCaption> photos;
 }
