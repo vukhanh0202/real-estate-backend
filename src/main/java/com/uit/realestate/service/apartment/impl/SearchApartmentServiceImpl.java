@@ -66,6 +66,8 @@ public class SearchApartmentServiceImpl extends AbstractBaseService<ISearchApart
                 predicateList.add(builder.equal(root.get("typeApartment"), input.getTypeApartment()));
             if (input.getApartmentStatus() != null)
                 predicateList.add(builder.equal(root.get("status"), input.getApartmentStatus()));
+            if (!input.getSearch().equals(""))
+                predicateList.add(builder.like(builder.lower(root.get("title")), "%" + input.getSearch().toLowerCase() + "%"));
             return builder.and(predicateList.toArray(new Predicate[0]));
         };
     }

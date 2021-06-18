@@ -69,6 +69,7 @@ public class ApartmentController {
                                                   @RequestParam(value = "category_id", required = false) Long categoryId,
                                                   @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
                                                   @RequestParam(value = "user_id", required = false) Long userId,
+                                                  @RequestParam(value = "search", defaultValue = "") String search,
                                                   HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
@@ -84,7 +85,7 @@ public class ApartmentController {
         tracking.trackingProvince(userId, ip, provinceId, AppConstant.DEFAULT_RATING);
 
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId);
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId, search);
         input.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getSearchApartmentService()
@@ -154,8 +155,8 @@ public class ApartmentController {
     @ApiOperation(value = "Get apartment detail")
     @GetMapping(value = "/public/apartment/{id}")
     public ResponseEntity<?> findApartmentDetail(@PathVariable("id") Long id,
-                                             @RequestParam(value = "user_id", required = false) Long userId,
-                                             HttpServletRequest request) {
+                                                 @RequestParam(value = "user_id", required = false) Long userId,
+                                                 HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
             try {
