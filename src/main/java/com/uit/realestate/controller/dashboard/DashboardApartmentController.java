@@ -62,8 +62,8 @@ public class DashboardApartmentController {
                                               @RequestParam(value = "area_from", required = false) Double areaFrom,
                                               @RequestParam(value = "area_to", required = false) Double areaTo,
                                               @RequestParam(value = "category_id", required = false) Long categoryId,
-                                              @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
-                                              @RequestParam(value = "status") EApartmentStatus status,
+                                              @RequestParam(value = "type_apartment", required = false) ETypeApartment typeApartment,
+                                              @RequestParam(value = "status",  required = false) EApartmentStatus status,
                                               @RequestParam(value = "search", defaultValue = "") String search
                                               ) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

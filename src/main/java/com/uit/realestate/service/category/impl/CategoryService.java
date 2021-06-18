@@ -20,10 +20,13 @@ public class CategoryService implements ICategoryService {
 
     private final IDeleteCategoryService deleteCategoryService;
 
-    public CategoryService(IFindAllCategoryService findAllCategoryService, ICreateCategoryService createCategoryService, IUpdateCategoryService updateCategoryService, IDeleteCategoryService deleteCategoryService) {
+    private final IFindAllCategoryPaginationService findAllCategoryPaginationService;
+
+    public CategoryService(IFindAllCategoryService findAllCategoryService, ICreateCategoryService createCategoryService, IUpdateCategoryService updateCategoryService, IDeleteCategoryService deleteCategoryService, IFindAllCategoryPaginationService findAllCategoryPaginationService) {
         this.findAllCategoryService = findAllCategoryService;
         this.createCategoryService = createCategoryService;
         this.updateCategoryService = updateCategoryService;
         this.deleteCategoryService = deleteCategoryService;
+        this.findAllCategoryPaginationService = findAllCategoryPaginationService;
     }
 }

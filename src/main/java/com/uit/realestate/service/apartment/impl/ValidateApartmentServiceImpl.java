@@ -36,7 +36,7 @@ public class ValidateApartmentServiceImpl extends AbstractBaseService<IValidateA
     public Boolean doing(Input input) {
         log.info("Validate Apartment");
         Apartment apartment = apartmentRepository.findById(input.getId()).get();
-        apartment.setStatus(input.getDecision() ? EApartmentStatus.OPEN : EApartmentStatus.CANCEL);
+        apartment.setStatus(input.getDecision() ? EApartmentStatus.OPEN : EApartmentStatus.CLOSE);
         return true;
     }
 
