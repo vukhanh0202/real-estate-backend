@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.dto.BaseDto;
 import com.uit.realestate.dto.response.FileCaption;
+import com.uit.realestate.dto.user.UserDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -64,5 +65,7 @@ public class ApartmentDto extends BaseDto {
 
     @JsonProperty("bathroom_quantity")
     private Long bathroomQuantity;
+
+    private UserDto author;
 
 }

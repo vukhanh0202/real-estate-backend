@@ -36,4 +36,12 @@ public class UserDto extends BaseDto {
         this.avatar = avatar;
         this.email = email;
     }
+
+    public UserDto(Long id, String username,String fullName, FileCaption avatar, String email) {
+        this.id = id;
+        this.username = username;
+        this.fullName = fullName;
+        this.avatar = avatar;
+        this.email = email;
+    }
 }

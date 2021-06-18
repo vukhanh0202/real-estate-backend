@@ -93,6 +93,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
     @Mapping(source = "expiredDate", target = "expiredDate")
+    @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")
     public abstract ApartmentDto toApartmentFullDto(Apartment apartment, @Context Long userId);
 
 

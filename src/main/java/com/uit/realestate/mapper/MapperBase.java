@@ -14,16 +14,16 @@ public interface MapperBase {
 
     @Named("getAudit")
     default UserDto getAudit(User user) {
-        if (user==null) return null;
+        if (user == null) return null;
         Gson gson = new Gson();
-        return new UserDto(user.getId(),user.getUsername(),gson.fromJson(StringEscapeUtils.unescapeHtml4(user.getAvatar()), FileCaption.class),user.getEmail());
+        return new UserDto(user.getId(), user.getUsername(), gson.fromJson(StringEscapeUtils.unescapeHtml4(user.getAvatar()), FileCaption.class), user.getEmail());
     }
 
     @Named("getUserInfo")
     default UserDto getUserInfo(User user) {
-        if (user==null) return null;
+        if (user == null) return null;
         Gson gson = new Gson();
-        return new UserDto(user.getId(),user.getUsername(),gson.fromJson(StringEscapeUtils.unescapeHtml4(user.getAvatar()), FileCaption.class),user.getEmail());
+        return new UserDto(user.getId(), user.getUsername(), user.getFullName(), gson.fromJson(StringEscapeUtils.unescapeHtml4(user.getAvatar()), FileCaption.class), user.getEmail());
     }
 
     @Named("getFile")
@@ -37,7 +37,8 @@ public interface MapperBase {
     default List<FileCaption> getFiles(String file) {
         if (file == null) return null;
         Gson gson = new Gson();
-        return gson.fromJson(StringEscapeUtils.unescapeHtml4(file),  new TypeToken<List<FileCaption>>() {}.getType());
+        return gson.fromJson(StringEscapeUtils.unescapeHtml4(file), new TypeToken<List<FileCaption>>() {
+        }.getType());
     }
 
     @Named("setFile")
