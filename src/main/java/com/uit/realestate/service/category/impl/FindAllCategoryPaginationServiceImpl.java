@@ -32,7 +32,7 @@ public class FindAllCategoryPaginationServiceImpl extends AbstractBaseService<IF
     @Override
     public PaginationResponse<CategoryDto> doing(Input input) {
         log.info("FindAllCategoryServiceImpl: find all category");
-        Page<Category> result = categoryRepository.findAll(input.getPageable());
+        Page<Category> result = categoryRepository.findAllByNameContainingAndIsDeletedFalse(input.getSearch(), input.getPageable());
         return new PaginationResponse(
                 result.getTotalElements()
                 , result.getNumberOfElements()

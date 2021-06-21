@@ -20,6 +20,19 @@ public class UserDetailDto extends BaseDto {
 
     private Long id;
 
+    private String username;
+
+    @JsonProperty("full_name")
+    private String fullName;
+
+    private String email;
+
+    private String phone;
+
+    private FileCaption avatar;
+
+    private String description;
+
     private Integer totalPostApartment;
 
     private Integer totalFavouriteApartment;

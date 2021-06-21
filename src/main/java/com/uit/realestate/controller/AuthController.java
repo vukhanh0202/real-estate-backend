@@ -2,13 +2,18 @@ package com.uit.realestate.controller;
 
 import com.uit.realestate.configuration.config.JwtTokenUtil;
 import com.uit.realestate.dto.auth.UserLoginDto;
+import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.exception.ForbiddenException;
+import com.uit.realestate.payload.auth.ChangePasswordRequest;
+import com.uit.realestate.payload.auth.NewAccountRequest;
+import com.uit.realestate.service.auth.AuthService;
 import com.uit.realestate.service.auth.JwtUserDetailsService;
 import com.uit.realestate.utils.MessageHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,11 +39,14 @@ public class AuthController {
 
     private final MessageHelper messageHelper;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService, MessageHelper messageHelper) {
+    private final AuthService authService;
+
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService, MessageHelper messageHelper, AuthService authService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
         this.messageHelper = messageHelper;
+        this.authService = authService;
     }
 
     @ApiOperation(value = "Login")
@@ -65,4 +73,19 @@ public class AuthController {
             throw new ForbiddenException(messageHelper.getMessage(USER_WRONG,username));
         }
     }
+
+    @ApiOperation(value = "Register")
+    @PostMapping(value = "/register")
+    public ResponseEntity<?> register(@RequestBody NewAccountRequest newAccountRequest){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(authService.register(newAccountRequest)));
+    }
+
+    @ApiOperation(value = "Change Password")
+    @PutMapping(value = "/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(authService.changePassword(changePasswordRequest)));
+    }
+
 }

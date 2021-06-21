@@ -2,6 +2,7 @@ package com.uit.realestate.controller.dashboard;
 
 import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.enums.sort.ESortApartment;
+import com.uit.realestate.constant.enums.sort.ESortUser;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.category.CategoryRequest;
 import com.uit.realestate.service.category.ICategoryService;
@@ -30,7 +31,7 @@ public class DashboardUserController {
     @GetMapping(value = "/search")
     public ResponseEntity<?> findAllUser(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
                                          @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
-                                         @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
+                                         @RequestParam(value = "sort_by", defaultValue = "ID") ESortUser sortBy,
                                          @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection) {
         IFindAllUserService.Input input = new IFindAllUserService.Input(page, size);
         input.createPageable(sortDirection, sortBy.getValue());

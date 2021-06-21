@@ -1,6 +1,7 @@
 package com.uit.realestate.mapper.user;
 
 import com.uit.realestate.domain.user.User;
+import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.dto.user.UserDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.mapper.address.UserAddressMapper;
@@ -37,6 +38,15 @@ public abstract class UserMapper implements MapperBase {
     @BeanMapping(ignoreByDefault = true)
     public abstract List<UserDto> toUserDtoList(List<User> users);
 
+    @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "fullName", target = "fullName")
+    @Mapping(source = "email", target = "email")
+    @Mapping(source = "phone", target = "phone")
+    @Mapping(source = "description", target = "description")
+    @Mapping(source = "createdAt", target = "createdAt")
+    public abstract UserDetailDto toUserDetailDto(User user);
 
     @Named("updateUserAddress")
     @BeforeMapping

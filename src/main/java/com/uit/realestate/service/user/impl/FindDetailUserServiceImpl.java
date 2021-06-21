@@ -9,12 +9,14 @@ import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.apartment.ApartmentMapper;
+import com.uit.realestate.mapper.user.UserMapper;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.user.IFindDetailUserService;
 import com.uit.realestate.service.user.IFindUserApartmentAuthorService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,9 @@ public class FindDetailUserServiceImpl extends AbstractBaseService<Long, UserDet
     private final ApartmentMapper apartmentMapper;
 
     private final ApartmentRepository apartmentRepository;
+
+    @Autowired
+    private UserMapper userMapper;
 
     public FindDetailUserServiceImpl(UserRepository userRepository, ApartmentMapper apartmentMapper, ApartmentRepository apartmentRepository) {
         this.userRepository = userRepository;
@@ -49,7 +54,8 @@ public class FindDetailUserServiceImpl extends AbstractBaseService<Long, UserDet
         log.info("Find detail user with ID: " + userId);
 
         User user = userRepository.findById(userId).get();
-        UserDetailDto result = new UserDetailDto();
+
+        UserDetailDto result = userMapper.toUserDetailDto(user);
         result.setPostApartmentList(apartmentMapper.toApartmentPreviewDtoList(user.getApartments(), userId));
         result.setFavouriteApartmentList(apartmentMapper
                 .toApartmentPreviewDtoList(user.getFavourites()
@@ -57,7 +63,6 @@ public class FindDetailUserServiceImpl extends AbstractBaseService<Long, UserDet
                         .map(Favourite::getApartment)
                         .collect(Collectors.toList()),
                         userId));
-        result.setId(userId);
         result.setTotalFavouriteApartment(result.getFavouriteApartmentList().size());
         result.setTotalPostApartment(result.getPostApartmentList().size());
         result.setTotalRecommendApartment(apartmentRepository.findRecommendApartmentByUserId(userId).size());
