@@ -1,5 +1,6 @@
 package com.uit.realestate.repository.action;
 
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.action.id.ApartmentUserId;
 import org.springframework.data.domain.Page;
@@ -12,5 +13,5 @@ public interface FavouriteRepository extends JpaRepository<Favourite, ApartmentU
 
     Optional<Favourite> findByApartmentIdAndUserId(Long apartmentId, Long userId);
 
-    Page<Favourite> findAllByUserId(Long userId, Pageable pageable);
+    Page<Favourite> findAllByUserIdAndApartment_Status(Long userId, EApartmentStatus status, Pageable pageable);
 }

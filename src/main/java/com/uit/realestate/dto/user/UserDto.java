@@ -9,6 +9,8 @@ import com.uit.realestate.dto.response.FileCaption;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)

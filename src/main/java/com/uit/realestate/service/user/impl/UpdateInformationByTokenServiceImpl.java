@@ -34,17 +34,19 @@ public class UpdateInformationByTokenServiceImpl extends AbstractBaseService<Upd
     public void preExecute(UpdateUserRequest updateUserRequest) {
         User user = userRepository.findById(updateUserRequest.getId()).orElseThrow(() ->
                 new NotFoundException(messageHelper.getMessage(MessageCode.User.NOT_FOUND)));
-        if (updateUserRequest.getAddress() != null){
+        if (updateUserRequest.getAddress() != null) {
             Long districtId = updateUserRequest.getAddress().getDistrictId();
             Long provinceId = updateUserRequest.getAddress().getProvinceId();
-            if (districtId == null){
+            if (districtId == null && user.getUserAddress().getDistrict() != null) {
                 districtId = user.getUserAddress().getDistrict().getId();
             }
-            if (provinceId == null){
+            if (provinceId == null && user.getUserAddress().getProvince() != null) {
                 provinceId = user.getUserAddress().getProvince().getId();
             }
-            if (!districtRepository.findById(districtId).get().getProvince().getId().equals(provinceId)){
-                throw new InvalidException(messageHelper.getMessage(MessageCode.Address.INVALID));
+            if (districtId != null && provinceId != null) {
+                if (!districtRepository.findById(districtId).get().getProvince().getId().equals(provinceId)) {
+                    throw new InvalidException(messageHelper.getMessage(MessageCode.Address.INVALID));
+                }
             }
         }
     }

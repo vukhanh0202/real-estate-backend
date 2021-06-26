@@ -28,6 +28,7 @@ import java.util.Set;
 public class FileController {
 
     private static final String APARTMENT_FILE = "/apartment/";
+    private static final String AVATAR_FILE = "/avatar/";
 
     @Autowired
     private DownloadImageService downloadImageService;
@@ -41,13 +42,27 @@ public class FileController {
      */
     @ApiOperation(value = "Download apartment photo")
     @GetMapping("/public/image/apartment/{id}_{filename}.{extension}")
-    public void downloadAvatar(HttpServletResponse response,
+    public void downloadApartment(HttpServletResponse response,
                                @PathVariable("id") Long id,
                                @PathVariable("filename") String filename,
                                @PathVariable("extension") String extension) {
         log.info("Download apartment photo");
         String fileName = id + "_" + filename + "." + extension;
         downloadImageService.downloadImage(response, APARTMENT_FILE, fileName);
+    }
+
+    /**
+     * Download apartment photo
+     */
+    @ApiOperation(value = "Download avatar photo")
+    @GetMapping("/public/image/avatar/{id}_{filename}.{extension}")
+    public void downloadAvatar(HttpServletResponse response,
+                               @PathVariable("id") Long id,
+                               @PathVariable("filename") String filename,
+                               @PathVariable("extension") String extension) {
+        log.info("Download avatar photo");
+        String fileName = id + "_" + filename + "." + extension;
+        downloadImageService.downloadImage(response, AVATAR_FILE, fileName);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.uit.realestate.service.auth;
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.constant.enums.user.ERoleType;
 import com.uit.realestate.domain.user.User;
+import com.uit.realestate.domain.user.UserAddress;
 import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.user.UserMapper;
@@ -40,6 +41,7 @@ public class AuthService {
         user.setUsername(newAccountRequest.getUsername());
         user.setPassword(pwdBcrypt);
         user.setRole(roleRepository.findById(ERoleType.USER).get());
+        user.setUserAddress(new UserAddress());
         userRepository.save(user);
         return true;
     }

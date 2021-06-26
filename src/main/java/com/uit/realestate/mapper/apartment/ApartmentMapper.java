@@ -45,6 +45,7 @@ public abstract class ApartmentMapper implements MapperBase {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
+
     }
 
     @BeanMapping(qualifiedByName = "toApartmentPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -59,6 +60,8 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
+    @Mapping(source = "highlight", target = "isHighlight")
+    @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")
     public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment, @Context Long userId);
 
     @BeanMapping(ignoreByDefault = true)
@@ -124,6 +127,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
+    @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")
     public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment, @Context Long userId);
 
     @BeanMapping(ignoreByDefault = true)

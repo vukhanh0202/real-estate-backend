@@ -7,4 +7,5 @@ import java.util.Set;
 
 public interface UploadService {
     Set<FileCaption> uploadPhoto(MultipartFile[] files, String prefix, Long id);
+    Set<FileCaption> uploadPhoto(MultipartFile files, String prefix, Long id);
 }

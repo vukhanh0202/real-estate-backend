@@ -206,19 +206,6 @@ public class ApartmentController {
     }
 
     /**
-     * Close Apartment apartment
-     *
-     * @return
-     */
-//    @ApiOperation(value = "Close apartment", authorizations = {@Authorization(value = "JWT")})
-//    @PutMapping(value = "/apartment/{id}/close/")
-//    public ResponseEntity<?> cancelApartment(@PathVariable("id") Long id) {
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(new ApiResponse(apartmentService.getCloseApartmentService()
-//                        .execute(id)));
-//    }
-
-    /**
      * Favourite apartment
      *
      * @return

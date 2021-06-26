@@ -1,6 +1,7 @@
 package com.uit.realestate.service.user.impl;
 
 import com.uit.realestate.constant.MessageCode;
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
 import com.uit.realestate.dto.apartment.ApartmentDto;
@@ -18,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -46,7 +49,9 @@ public class FindUserApartmentAuthorServiceImpl extends AbstractBaseService<IFin
     @Override
     public PaginationResponse<ApartmentDto> doing(Input input) {
         log.info("Find user apartment author from user ID: " + input.getUserId());
-        Page<Apartment> result = apartmentRepository.findAllByAuthorId(input.getUserId(), input.getPageable());
+        Page<Apartment> result = apartmentRepository.findAllByAuthorIdAndStatusIn(input.getUserId(),
+                List.of(EApartmentStatus.OPEN, EApartmentStatus.PENDING),
+                input.getPageable());
         return new PaginationResponse(
                 result.getTotalElements()
                 , result.getNumberOfElements()

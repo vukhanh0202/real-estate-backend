@@ -5,6 +5,7 @@ import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.dto.user.UserDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.mapper.address.UserAddressMapper;
+import com.uit.realestate.payload.user.UpdateAvatarUserRequest;
 import com.uit.realestate.payload.user.UpdateUserRequest;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ public abstract class UserMapper implements MapperBase {
     @Mapping(source = "phone", target = "phone")
     @Mapping(source = "description", target = "description")
     @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(source = "avatar", target = "avatar", qualifiedByName = "getFile")
     public abstract UserDto toUserDto(User user);
 
     @BeanMapping(ignoreByDefault = true)
@@ -60,4 +62,8 @@ public abstract class UserMapper implements MapperBase {
     @Mapping(source = "phone", target = "phone")
     @Mapping(source = "description", target = "description")
     public abstract void updateUser(UpdateUserRequest dto, @MappingTarget User entity);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "photo", target = "avatar", qualifiedByName = "setFile")
+    public abstract void updateAvatarUser(UpdateAvatarUserRequest dto, @MappingTarget User entity);
 }

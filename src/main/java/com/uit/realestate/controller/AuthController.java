@@ -1,6 +1,7 @@
 package com.uit.realestate.controller;
 
 import com.uit.realestate.configuration.config.JwtTokenUtil;
+import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.auth.UserLoginDto;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.exception.ForbiddenException;
@@ -20,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,6 +86,8 @@ public class AuthController {
     @ApiOperation(value = "Change Password")
     @PutMapping(value = "/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        changePasswordRequest.setId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(authService.changePassword(changePasswordRequest)));
     }

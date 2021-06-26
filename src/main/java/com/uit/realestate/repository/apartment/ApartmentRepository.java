@@ -33,7 +33,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             nativeQuery = true)
     Page<Apartment> findRecommendApartmentByUserIdAndIp(Long userId, String ip, Pageable pageable);
 
-    Page<Apartment> findAllByAuthorId(Long userId, Pageable pageable);
+    Page<Apartment> findAllByAuthorIdAndStatusIn(Long userId, List<EApartmentStatus> status, Pageable pageable);
 
     @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +

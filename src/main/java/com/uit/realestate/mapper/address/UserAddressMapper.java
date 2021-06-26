@@ -45,7 +45,7 @@ public abstract class UserAddressMapper implements MapperBase {
     @Named("toUserAddress")
     @BeforeMapping
     protected void toUserAddress(UserAddressRequest userAddressRequest,
-                                      @MappingTarget UserAddress userAddress) {
+                                 @MappingTarget UserAddress userAddress) {
         userAddress.setCountry(countryRepository.findById(userAddressRequest.getCountryCode()).get());
         userAddress.setProvince(provinceRepository.findById(userAddressRequest.getProvinceId()).get());
         userAddress.setDistrict(districtRepository.findById(userAddressRequest.getDistrictId()).get());
@@ -58,11 +58,18 @@ public abstract class UserAddressMapper implements MapperBase {
     @Named("updateAddressExist")
     @BeforeMapping
     protected void updateAddressExist(UserAddressRequest userAddressRequest,
-                                 @MappingTarget UserAddress userAddress) {
-        userAddress.setCountry(countryRepository.findById(userAddressRequest.getCountryCode()).get());
-        userAddress.setProvince(provinceRepository.findById(userAddressRequest.getProvinceId()).get());
-        userAddress.setDistrict(districtRepository.findById(userAddressRequest.getDistrictId()).get());
+                                      @MappingTarget UserAddress userAddress) {
+        if (userAddressRequest.getCountryCode() != null) {
+            userAddress.setCountry(countryRepository.findById(userAddressRequest.getCountryCode()).get());
+        }
+        if (userAddressRequest.getProvinceId() != null) {
+            userAddress.setProvince(provinceRepository.findById(userAddressRequest.getProvinceId()).get());
+        }
+        if (userAddressRequest.getDistrictId() != null) {
+            userAddress.setDistrict(districtRepository.findById(userAddressRequest.getDistrictId()).get());
+        }
     }
+
     @BeanMapping(qualifiedByName = "updateAddressExist", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "address", target = "address")
     public abstract void updateAddress(UserAddressRequest dto, @MappingTarget UserAddress entity);

@@ -1,10 +1,14 @@
 package com.uit.realestate.service.user;
 
 import com.uit.realestate.dto.apartment.ApartmentDto;
+import com.uit.realestate.dto.response.FileCaption;
 import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.dto.user.UserDto;
+import com.uit.realestate.payload.user.UpdateAvatarUserRequest;
 import com.uit.realestate.payload.user.UpdateUserRequest;
+
+import java.util.Set;
 
 
 public interface IUserService {
@@ -20,4 +24,6 @@ public interface IUserService {
     IFindAllUserService<IFindAllUserService.Input, PaginationResponse<UserDto>> getFindAllUserService();
 
     IFindDetailUserService<Long, UserDetailDto> getFindDetailUserService();
+
+    IUpdateAvatarUserService<UpdateAvatarUserRequest, Set<FileCaption>> getUpdateAvatarUserService();
 }

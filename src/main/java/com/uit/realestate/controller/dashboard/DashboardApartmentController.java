@@ -84,6 +84,8 @@ public class DashboardApartmentController {
     @ApiOperation(value = "Add new apartment(auto open)", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/create")
     public ResponseEntity<?> addNewApartment(@RequestBody AddApartmentRequest addApartmentRequest) {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        addApartmentRequest.setAuthorId(userPrincipal.getId());
         addApartmentRequest.setStatus(EApartmentStatus.OPEN);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getAddApartmentService()
@@ -136,6 +138,19 @@ public class DashboardApartmentController {
     public ResponseEntity<?> highlightApartment(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getHighlightApartmentService()
+                        .execute(id)));
+    }
+
+    /**
+     * Close apartment
+     *
+     * @return
+     */
+    @ApiOperation(value = "Close apartment", authorizations = {@Authorization(value = "JWT")})
+    @PostMapping(value = "/close/{id}/")
+    public ResponseEntity<?> closeApartment(@PathVariable("id") Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getCloseApartmentService()
                         .execute(id)));
     }
 }

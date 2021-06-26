@@ -68,4 +68,7 @@ public class ApartmentDto extends BaseDto {
 
     private UserDto author;
 
+    @JsonProperty("is_highlight")
+    private Boolean isHighlight;
+
 }

@@ -26,7 +26,7 @@ public class UploadServiceImpl implements UploadService {
     public Set<FileCaption> uploadPhoto(MultipartFile[] files, String prefix, Long id) {
         try {
             Set<FileCaption> fileNames = new HashSet<>();
-            if(files != null && files.length > 0) {
+            if (files != null && files.length > 0) {
                 Arrays.asList(files).forEach(file -> {
                     File fileClone = new File(app.getSource().getDirectory() + prefix + FileHandler.generateFileName(id, file.getOriginalFilename()));
                     FileCaption photoCaption = FileHandler.formatImage(file.getOriginalFilename(), fileClone);
@@ -51,6 +51,39 @@ public class UploadServiceImpl implements UploadService {
                     }
 
                 });
+            }
+            fileNames.forEach(fileCaption -> {
+                log.info("Upload Success:" + fileCaption.getName());
+            });
+            return new HashSet<>(fileNames);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public Set<FileCaption> uploadPhoto(MultipartFile file, String prefix, Long id) {
+        try {
+            Set<FileCaption> fileNames = new HashSet<>();
+            if (file != null) {
+                File fileClone = new File(app.getSource().getDirectory() + prefix + FileHandler.generateFileName(id, file.getOriginalFilename()));
+                FileCaption photoCaption = FileHandler.formatImage(file.getOriginalFilename(), fileClone);
+                try {
+                    File fileDirectory = new File(app.getSource().getDirectory() + prefix);
+                    if (!fileDirectory.exists()) {
+                        if (fileDirectory.mkdirs()) {
+                            file.transferTo(fileClone.toPath());
+                        } else {
+                            throw new InvalidException("Can not create folder");
+                        }
+                    } else {
+                        file.transferTo(fileClone.toPath());
+                    }
+                    fileNames.add(photoCaption);
+                } catch (Exception e) {
+                    throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
+                }
             }
             fileNames.forEach(fileCaption -> {
                 log.info("Upload Success:" + fileCaption.getName());

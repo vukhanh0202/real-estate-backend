@@ -4,6 +4,7 @@ import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
+import com.uit.realestate.payload.user.UpdateAvatarUserRequest;
 import com.uit.realestate.payload.user.UpdateUserRequest;
 import com.uit.realestate.service.apartment.ISearchApartmentService;
 import com.uit.realestate.service.user.IFindUserApartmentAuthorService;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -46,6 +48,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(userService.getUpdateInformationByTokenService()
                         .execute(updateUserRequest)));
+    }
+
+    @ApiOperation(value = "Update information", authorizations = {@Authorization(value = "JWT")})
+    @PutMapping(value = "/token/update-avatar")
+    public ResponseEntity<?> updateAvatarUser(@RequestParam("file") MultipartFile file){
+        var userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UpdateAvatarUserRequest updateAvatarUserRequest = new UpdateAvatarUserRequest(userPrincipal.getId(), file);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(userService.getUpdateAvatarUserService()
+                        .execute(updateAvatarUserRequest)));
     }
 
     @ApiOperation(value = "Get apartment favourite", authorizations = {@Authorization(value = "JWT")})

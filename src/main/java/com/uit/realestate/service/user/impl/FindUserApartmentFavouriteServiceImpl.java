@@ -1,6 +1,7 @@
 package com.uit.realestate.service.user.impl;
 
 import com.uit.realestate.constant.MessageCode;
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
@@ -53,7 +54,8 @@ public class FindUserApartmentFavouriteServiceImpl extends AbstractBaseService<I
     @Override
     public PaginationResponse<ApartmentDto> doing(Input input) {
         log.info("Find user apartment favourite from user ID: " + input.getUserId());
-        Page<Favourite> result = favouriteRepository.findAllByUserId(input.getUserId(), input.getPageable());
+        Page<Favourite> result = favouriteRepository.findAllByUserIdAndApartment_Status(input.getUserId(), EApartmentStatus.OPEN,
+                input.getPageable());
         return new PaginationResponse(
                 result.getTotalElements()
                 , result.getNumberOfElements()
