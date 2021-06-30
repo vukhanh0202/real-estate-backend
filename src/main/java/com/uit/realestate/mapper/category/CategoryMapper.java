@@ -1,5 +1,6 @@
 package com.uit.realestate.mapper.category;
 
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.apartment.Category;
 import com.uit.realestate.dto.category.CategoryDto;
 import com.uit.realestate.mapper.MapperBase;
@@ -16,7 +17,7 @@ public abstract class CategoryMapper implements MapperBase {
     @Named("toCategoryDto")
     @BeforeMapping
     protected void toCategoryDto(Category category, @MappingTarget CategoryDto categoryDto) {
-        categoryDto.setTotalItem(category.getApartments().size());
+        categoryDto.setTotalItem(category.getApartments().stream().filter(apartment -> apartment.getStatus().equals(EApartmentStatus.OPEN)).count());
     }
 
     @BeanMapping(qualifiedByName = "toCategoryDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

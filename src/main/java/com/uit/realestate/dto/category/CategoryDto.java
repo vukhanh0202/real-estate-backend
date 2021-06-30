@@ -14,5 +14,5 @@ public class CategoryDto {
 
     private String name;
 
-    private Integer totalItem;
+    private Long totalItem;
 }

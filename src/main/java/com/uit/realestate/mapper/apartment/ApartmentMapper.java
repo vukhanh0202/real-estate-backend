@@ -95,7 +95,6 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
-    @Mapping(source = "expiredDate", target = "expiredDate")
     @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")
     public abstract ApartmentDto toApartmentFullDto(Apartment apartment, @Context Long userId);
 
@@ -152,7 +151,6 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "area", target = "area")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "typeApartment", target = "typeApartment")
-    @Mapping(source = "expiredDate", target = "expiredDate")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "authorId", target = "author.id")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "setFiles")
@@ -180,7 +178,6 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "area", target = "area")
     @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "typeApartment", target = "typeApartment")
-    @Mapping(source = "expiredDate", target = "expiredDate")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "setFiles")
     public abstract void updateApartment(UpdateApartmentRequest dto, @MappingTarget Apartment apartment);
 

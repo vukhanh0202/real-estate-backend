@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.SqlEntity;
-import com.uit.realestate.domain.action.Comment;
 import com.uit.realestate.domain.action.Favourite;
-import com.uit.realestate.domain.apartment.join.ApartmentTag;
 import com.uit.realestate.domain.user.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -67,12 +65,6 @@ public class Apartment extends SqlEntity {
         this.apartmentAddress = apartmentAddress;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "apartment")
-    private Set<ApartmentTag> apartmentTags = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "apartment")
-    private List<Comment> comments = new ArrayList<>();
-
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
             orphanRemoval = true, mappedBy = "apartment")
     private List<Favourite> favourites = new ArrayList<>();
@@ -99,5 +91,19 @@ public class Apartment extends SqlEntity {
             apartmentDetail.setApartment(this);
         }
         this.apartmentDetail = apartmentDetail;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Apartment apartment = (Apartment) o;
+        return Objects.equals(id, apartment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id);
     }
 }

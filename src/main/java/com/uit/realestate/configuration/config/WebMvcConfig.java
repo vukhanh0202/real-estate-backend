@@ -19,7 +19,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         this.properties = properties;
     }
 
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry

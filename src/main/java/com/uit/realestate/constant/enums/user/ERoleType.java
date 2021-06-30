@@ -7,5 +7,4 @@ public enum ERoleType {
     MEMBER,
     MANAGER,
     CONTENT_MANAGER
-
 }

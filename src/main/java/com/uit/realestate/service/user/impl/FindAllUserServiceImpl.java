@@ -28,7 +28,8 @@ public class FindAllUserServiceImpl extends AbstractBaseService<IFindAllUserServ
     @Override
     public PaginationResponse<UserDto> doing(Input input) {
         log.info("Find all User");
-        Page<User> result = userRepository.findAll(input.getPageable());
+        Page<User> result = userRepository.findByUsernameContainingOrFullNameContainingOrEmailContaining(input.getSearch(),
+                input.getSearch(), input.getSearch(), input.getPageable());
         return new PaginationResponse(
                 result.getTotalElements()
                 , result.getNumberOfElements()

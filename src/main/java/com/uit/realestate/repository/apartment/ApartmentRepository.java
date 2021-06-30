@@ -29,7 +29,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "       OR (td.ip = :ip OR td.user_id = :userId)) " +
             "       AND ap.status = 'OPEN' " +
             " GROUP BY ap.id " +
-            " ORDER BY rating DESC ",
+            " ORDER BY rating DESC, ap.created_at DESC ",
             nativeQuery = true)
     Page<Apartment> findRecommendApartmentByUserIdAndIp(Long userId, String ip, Pageable pageable);
 
@@ -45,7 +45,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "       OR (tp.user_id = :userId) " +
             "       OR (td.user_id = :userId)) " +
             " GROUP BY ap.id " +
-            " ORDER BY rating DESC ",
+            " ORDER BY rating DESC, ap.created_at DESC ",
             nativeQuery = true)
     List<Apartment> findRecommendApartmentByUserId(Long userId);
 

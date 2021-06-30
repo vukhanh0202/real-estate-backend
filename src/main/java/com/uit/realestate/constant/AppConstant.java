@@ -10,7 +10,7 @@ public interface AppConstant {
      * Index of current page default.
      */
     String PAGE_NUMBER_DEFAULT = "1";
-    String PAGE_SIZE_DEFAULT = "10";
+    String PAGE_SIZE_DEFAULT = "6";
 
 
     /**

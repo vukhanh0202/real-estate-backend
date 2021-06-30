@@ -31,4 +31,6 @@ public interface IApartmentService {
     IFavouriteApartmentService<IFavouriteApartmentService.Input, Boolean> getFavouriteApartmentService();
 
     IHighlightApartmentService<Long, Boolean> getHighlightApartmentService();
+
+    IFindSimilarApartmentService<IFindSimilarApartmentService.Input, PaginationResponse<ApartmentBasicDto>> getFindSimilarApartmentService();
 }

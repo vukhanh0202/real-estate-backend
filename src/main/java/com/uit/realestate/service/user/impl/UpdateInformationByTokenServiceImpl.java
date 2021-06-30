@@ -34,7 +34,7 @@ public class UpdateInformationByTokenServiceImpl extends AbstractBaseService<Upd
     public void preExecute(UpdateUserRequest updateUserRequest) {
         User user = userRepository.findById(updateUserRequest.getId()).orElseThrow(() ->
                 new NotFoundException(messageHelper.getMessage(MessageCode.User.NOT_FOUND)));
-        if (updateUserRequest.getAddress() != null) {
+        if (updateUserRequest.getAddress().getDistrictId() != null) {
             Long districtId = updateUserRequest.getAddress().getDistrictId();
             Long provinceId = updateUserRequest.getAddress().getProvinceId();
             if (districtId == null && user.getUserAddress().getDistrict() != null) {
@@ -49,12 +49,16 @@ public class UpdateInformationByTokenServiceImpl extends AbstractBaseService<Upd
                 }
             }
         }
+        if (updateUserRequest.getEmail()!= null &&userRepository.findByEmail(updateUserRequest.getEmail()).isPresent() && !user.getEmail().equals(updateUserRequest.getEmail())){
+            throw new InvalidException(messageHelper.getMessage(MessageCode.User.EMAIL_EXIST));
+        }
     }
 
     @Override
     public Boolean doing(UpdateUserRequest updateUserRequest) {
         log.info("Update information user from user ID");
         User user = userRepository.findById(updateUserRequest.getId()).get();
+
         userMapper.updateUser(updateUserRequest, user);
         userRepository.save(user);
         return true;

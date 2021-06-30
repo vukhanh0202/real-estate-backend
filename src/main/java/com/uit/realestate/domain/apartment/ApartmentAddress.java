@@ -19,7 +19,7 @@ public class ApartmentAddress {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "id",foreignKey = @ForeignKey(name = "none"))
+    @JoinColumn(name = "id")
     private Apartment apartment;
 
     @ManyToOne(fetch = FetchType.LAZY)

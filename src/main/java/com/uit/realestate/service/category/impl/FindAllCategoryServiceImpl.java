@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -32,7 +33,16 @@ public class FindAllCategoryServiceImpl extends AbstractBaseService<Void, List<C
     @Override
     public List<CategoryDto> doing(Void unused) {
         log.info("FindAllCategoryServiceImpl: find all category");
-
-        return categoryMapper.toCategoryDtoList(categoryRepository.findAllByIsDeletedFalse());
+        List<CategoryDto> result = categoryMapper.toCategoryDtoList(categoryRepository.findAllByIsDeletedFalse());
+        result.sort((o1, o2) -> {
+            // sort DESC
+            if (o2.getTotalItem() > (o1.getTotalItem())) {
+                return 1;
+            } else if (o1.getTotalItem() > (o2.getTotalItem())) {
+                return -1;
+            }
+            return 0;
+        });
+        return result;
     }
 }

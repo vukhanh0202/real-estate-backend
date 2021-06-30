@@ -20,11 +20,11 @@ public abstract class UserMapper implements MapperBase {
     @Autowired
     private UserAddressMapper userAddressMapper;
 
-//    @Named("toUserDto")
-//    @BeforeMapping
-//    protected void toApartmentPreviewDto(User user, @MappingTarget UserDto userDto) {
-//        userDto.setAddressDto(userAddressMapper.toUserAddressDto(user.getUserAddress()));
-//    }
+    @Named("toUserDto")
+    @BeforeMapping
+    protected void toApartmentPreviewDto(User user, @MappingTarget UserDto userDto) {
+        userDto.setAddressDto(userAddressMapper.toUserAddressDto(user.getUserAddress()));
+    }
 
     @BeanMapping(qualifiedByName = "toUserDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")

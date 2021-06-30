@@ -3,7 +3,6 @@ package com.uit.realestate.domain.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uit.realestate.constant.enums.user.EGender;
 import com.uit.realestate.domain.SqlEntity;
-import com.uit.realestate.domain.action.Comment;
 import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.tracking.TrackingCategory;
@@ -86,9 +85,6 @@ public class User extends SqlEntity {
         favourites.remove(favourite);
         favourite.setUser(null);
     }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
     private List<Apartment> apartments = new ArrayList<>();

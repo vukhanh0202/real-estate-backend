@@ -8,9 +8,10 @@ public interface IFindAllUserService<Input, Output> extends IService<Input, Outp
 
     @Data
     class Input extends PaginationRequest {
-
-        public Input(Integer page, Integer size) {
+        private String search;
+        public Input(Integer page, Integer size, String search) {
             super(page, size);
+            this.search = search;
         }
     }
 }

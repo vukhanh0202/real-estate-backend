@@ -22,15 +22,10 @@ public class CloseApartmentServiceImpl extends AbstractBaseService<Long, Boolean
     ApartmentRepository apartmentRepository;
 
     @Override
-    public void preExecute(Long id) {
-        Apartment apartment = apartmentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.Apartment.NOT_FOUND)));
-    }
-
-    @Override
     public Boolean doing(Long id) {
         log.info("Close Apartment");
-        Apartment apartment = apartmentRepository.findById(id).get();
+        Apartment apartment = apartmentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.Apartment.NOT_FOUND)));
         apartment.setStatus(EApartmentStatus.CLOSE);
         apartmentRepository.save(apartment);
         return true;

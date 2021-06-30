@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,7 +87,7 @@ public class ApartmentController {
 
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId, search);
-        input.createPageable(sortDirection, sortBy.getValue());
+        input.createPageable(Sort.by(sortDirection, sortBy.getValue()));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getSearchApartmentService()
                         .execute(input)));
@@ -116,6 +117,32 @@ public class ApartmentController {
         input.createPageable();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getFindRecommendApartmentService()
+                        .execute(input)));
+    }
+
+    /**
+     * Get similar apartment
+     *
+     * @return
+     */
+    @ApiOperation(value = "Get similar apartment ")
+    @GetMapping(value = "/public/apartment/similar")
+    public ResponseEntity<?> findSimilarApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
+                                                    @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                                    @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
+                                                    HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
+            try {
+                ip = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+        IFindSimilarApartmentService.Input input = new IFindSimilarApartmentService.Input(page, size, userId, ip);
+        input.createPageable();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getFindSimilarApartmentService()
                         .execute(input)));
     }
 
@@ -178,6 +205,7 @@ public class ApartmentController {
      */
     @ApiOperation(value = "Add new apartment", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/apartment/create")
+    @PreAuthorize("@securityService.hasRoles('USER', 'ADMIN')")
     public ResponseEntity<?> addNewApartment(@RequestBody AddApartmentRequest addApartmentRequest) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         addApartmentRequest.setStatus(EApartmentStatus.PENDING);
@@ -195,6 +223,7 @@ public class ApartmentController {
      */
     @ApiOperation(value = "Update apartment", authorizations = {@Authorization(value = "JWT")})
     @PutMapping(value = "/apartment/{id}/update")
+    @PreAuthorize("@securityService.hasRoles('USER', 'ADMIN')")
     public ResponseEntity<?> updateApartment(@PathVariable("id") Long id,
                                              @RequestBody UpdateApartmentRequest updateApartmentRequest) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -206,12 +235,27 @@ public class ApartmentController {
     }
 
     /**
+     * Delete apartment
+     *
+     * @return
+     */
+    @ApiOperation(value = "Delete apartment", authorizations = {@Authorization(value = "JWT")})
+    @DeleteMapping(value = "/delete/{id}/")
+    @PreAuthorize("@securityService.hasRoles('USER', 'ADMIN')")
+    public ResponseEntity<?> deleteApartmentApartment(@PathVariable("id") Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.getCloseApartmentService()
+                        .execute(id)));
+    }
+
+    /**
      * Favourite apartment
      *
      * @return
      */
     @ApiOperation(value = "Favourite apartment", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/apartment/{apartmentId}/favourite")
+    @PreAuthorize("@securityService.hasRoles('USER', 'ADMIN')")
     public ResponseEntity<?> favouriteApartment(@PathVariable("apartmentId") Long apartmentId,
                                                 HttpServletRequest request) {
         String ip = request.getRemoteAddr();

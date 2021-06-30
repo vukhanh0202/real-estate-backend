@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,6 +31,7 @@ public class DashboardCategoryController {
 
     @ApiOperation(value = "Find All Category", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> findAllCategory(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
                                              @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
                                              @RequestParam(value = "sort_by", defaultValue = "ID") ESortCategory sortBy,
@@ -44,6 +46,7 @@ public class DashboardCategoryController {
 
     @ApiOperation(value = "Create Category", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/create")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> createCategory(@RequestBody CategoryRequest categoryRequest){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(categoryService.getCreateCategoryService()
@@ -52,6 +55,7 @@ public class DashboardCategoryController {
 
     @ApiOperation(value = "Update Category", authorizations = {@Authorization(value = "JWT")})
     @PutMapping(value = "/update/{id}")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> updateCategory(@PathVariable("id") Long id,
                                             @RequestBody CategoryRequest categoryRequest){
         categoryRequest.setId(id);
@@ -62,6 +66,7 @@ public class DashboardCategoryController {
 
     @ApiOperation(value = "Delete Category", authorizations = {@Authorization(value = "JWT")})
     @DeleteMapping(value = "/delete/{id}")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> deleteCategory(@PathVariable("id") Long id){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(categoryService.getDeleteCategoryService()

@@ -5,6 +5,7 @@ public interface MessageCode {
         String USER_WRONG = "message.user.Wrong";
         String NOT_FOUND = "message.user.NotFound";
         String EXIST = "message.user.Exist";
+        String EMAIL_EXIST = "message.user.EmailExist";
     }
     interface Token {
         String INVALID_TOKEN = "message.token.InvalidToken";

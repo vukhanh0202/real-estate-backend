@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +52,7 @@ public class DashboardApartmentController {
      */
     @ApiOperation(value = "Search apartment", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/search")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> findAllApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
                                               @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
                                               @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
@@ -69,7 +71,8 @@ public class DashboardApartmentController {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, status, userPrincipal.getId(), search);
-        input.createPageable(sortDirection, sortBy.getValue());
+        input.createPageable(Sort.by(ESortApartment.HIGHLIGHT.getValue()).descending()
+                .and(Sort.by(sortDirection, sortBy.getValue())));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getSearchApartmentService()
                         .execute(input)));
@@ -83,6 +86,7 @@ public class DashboardApartmentController {
      */
     @ApiOperation(value = "Add new apartment(auto open)", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/create")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> addNewApartment(@RequestBody AddApartmentRequest addApartmentRequest) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         addApartmentRequest.setAuthorId(userPrincipal.getId());
@@ -100,6 +104,7 @@ public class DashboardApartmentController {
      */
     @ApiOperation(value = "Update apartment", authorizations = {@Authorization(value = "JWT")})
     @PutMapping(value = "/{id}/update")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> updateApartment(@PathVariable("id") Long id,
                                              @RequestBody UpdateApartmentRequest updateApartmentRequest) {
         updateApartmentRequest.setIsAdmin(true);
@@ -121,6 +126,7 @@ public class DashboardApartmentController {
      */
     @ApiOperation(value = "Validate apartment", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/{id}/validate")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> validateApartment(@PathVariable("id") Long id,
                                                @RequestParam(value = "decision") Boolean decision) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -135,6 +141,7 @@ public class DashboardApartmentController {
      */
     @ApiOperation(value = "Highlight apartment", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/validate/highlight/{id}/")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> highlightApartment(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getHighlightApartmentService()
@@ -148,6 +155,7 @@ public class DashboardApartmentController {
      */
     @ApiOperation(value = "Close apartment", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/close/{id}/")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> closeApartment(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getCloseApartmentService()

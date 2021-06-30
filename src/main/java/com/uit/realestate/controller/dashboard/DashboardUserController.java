@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,11 +30,14 @@ public class DashboardUserController {
 
     @ApiOperation(value = "Find All User", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/search")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> findAllUser(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
                                          @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
                                          @RequestParam(value = "sort_by", defaultValue = "ID") ESortUser sortBy,
-                                         @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection) {
-        IFindAllUserService.Input input = new IFindAllUserService.Input(page, size);
+                                         @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
+                                         @RequestParam(value = "search", defaultValue = "") String search
+                ) {
+        IFindAllUserService.Input input = new IFindAllUserService.Input(page, size, search);
         input.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(userService.getFindAllUserService()
@@ -42,6 +46,7 @@ public class DashboardUserController {
 
     @ApiOperation(value = "Find Apartment Of User", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/apartment/{id}")
+    @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> findApartmentOfUser(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(userService.getFindDetailUserService()
