@@ -1,18 +1,15 @@
 package com.uit.realestate.controller.dashboard;
 
 import com.uit.realestate.constant.AppConstant;
-import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.constant.enums.sort.ESortUser;
 import com.uit.realestate.dto.response.ApiResponse;
-import com.uit.realestate.payload.category.CategoryRequest;
-import com.uit.realestate.service.category.ICategoryService;
 import com.uit.realestate.service.user.IFindAllUserService;
-import com.uit.realestate.service.user.IUserService;
+import com.uit.realestate.service.user.IFindDetailUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +20,12 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Api(value = "Category Dashboard APIs")
 @RequestMapping("/dashboard/user")
+@RequiredArgsConstructor
 public class DashboardUserController {
 
-    @Autowired
-    private IUserService userService;
+    private final IFindAllUserService findAllUserService;
+
+    private final IFindDetailUserService findDetailUserService;
 
     @ApiOperation(value = "Find All User", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/search")
@@ -40,8 +39,7 @@ public class DashboardUserController {
         IFindAllUserService.Input input = new IFindAllUserService.Input(page, size, search);
         input.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(userService.getFindAllUserService()
-                        .execute(input)));
+                .body(new ApiResponse(findAllUserService.execute(input)));
     }
 
     @ApiOperation(value = "Find Apartment Of User", authorizations = {@Authorization(value = "JWT")})
@@ -49,8 +47,7 @@ public class DashboardUserController {
     @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> findApartmentOfUser(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(userService.getFindDetailUserService()
-                        .execute(id)));
+                .body(new ApiResponse(findDetailUserService.execute(id)));
     }
 
 }

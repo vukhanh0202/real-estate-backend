@@ -4,22 +4,20 @@ import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.exception.NotFoundException;
-import com.uit.realestate.mapper.apartment.ApartmentMapper;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.apartment.ICloseApartmentService;
-import com.uit.realestate.service.apartment.IValidateApartmentService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CloseApartmentServiceImpl extends AbstractBaseService<Long, Boolean>
-        implements ICloseApartmentService<Long, Boolean> {
+        implements ICloseApartmentService {
 
-    @Autowired
-    ApartmentRepository apartmentRepository;
+    private final ApartmentRepository apartmentRepository;
 
     @Override
     public Boolean doing(Long id) {

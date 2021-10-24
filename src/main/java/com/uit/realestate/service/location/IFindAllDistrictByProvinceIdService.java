@@ -1,6 +1,9 @@
 package com.uit.realestate.service.location;
 
+import com.uit.realestate.dto.location.DistrictDto;
 import com.uit.realestate.service.IService;
 
-public interface IFindAllDistrictByProvinceIdService<Input, Output> extends IService<Input, Output> {
+import java.util.List;
+
+public interface IFindAllDistrictByProvinceIdService extends IService<Long, List<DistrictDto>> {
 }

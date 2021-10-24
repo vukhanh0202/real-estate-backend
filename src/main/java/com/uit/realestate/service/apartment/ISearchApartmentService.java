@@ -3,11 +3,13 @@ package com.uit.realestate.service.apartment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
+import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.dto.response.PaginationRequest;
+import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.service.IService;
 import lombok.Data;
 
-public interface ISearchApartmentService<Input, Output> extends IService<Input, Output> {
+public interface ISearchApartmentService extends IService<ISearchApartmentService.Input, PaginationResponse<ApartmentDto>> {
 
     /**
      * Param input.

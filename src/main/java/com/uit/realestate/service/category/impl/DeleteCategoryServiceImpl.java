@@ -2,29 +2,21 @@ package com.uit.realestate.service.category.impl;
 
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.domain.apartment.Category;
-import com.uit.realestate.dto.category.CategoryDto;
 import com.uit.realestate.exception.NotFoundException;
-import com.uit.realestate.mapper.category.CategoryMapper;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.category.IDeleteCategoryService;
-import com.uit.realestate.service.category.IFindAllCategoryService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DeleteCategoryServiceImpl extends AbstractBaseService<Long, Boolean>
-        implements IDeleteCategoryService<Long, Boolean> {
+        implements IDeleteCategoryService {
 
     private final CategoryRepository categoryRepository;
-
-    public DeleteCategoryServiceImpl(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
 
     @Override
     public Boolean doing(Long categoryId) {

@@ -10,25 +10,21 @@ import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.user.IUpdateInformationByTokenService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UpdateInformationByTokenServiceImpl extends AbstractBaseService<UpdateUserRequest, Boolean>
-        implements IUpdateInformationByTokenService<UpdateUserRequest, Boolean> {
+        implements IUpdateInformationByTokenService {
 
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
 
     private final DistrictRepository districtRepository;
-
-    public UpdateInformationByTokenServiceImpl(UserRepository userRepository, UserMapper userMapper, DistrictRepository districtRepository) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.districtRepository = districtRepository;
-    }
 
     @Override
     public void preExecute(UpdateUserRequest updateUserRequest) {

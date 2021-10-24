@@ -5,8 +5,8 @@ import com.uit.realestate.dto.response.FileCaption;
 import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.service.file.UploadService;
 import com.uit.realestate.utils.FileHandler;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,10 +17,10 @@ import java.util.Set;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UploadServiceImpl implements UploadService {
 
-    @Autowired
-    private ApplicationProperties app;
+    private final ApplicationProperties app;
 
     @Override
     public Set<FileCaption> uploadPhoto(MultipartFile[] files, String prefix, Long id) {

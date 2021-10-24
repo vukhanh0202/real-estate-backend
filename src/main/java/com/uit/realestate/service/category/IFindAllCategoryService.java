@@ -1,6 +1,9 @@
 package com.uit.realestate.service.category;
 
+import com.uit.realestate.dto.category.CategoryDto;
 import com.uit.realestate.service.IService;
 
-public interface IFindAllCategoryService<Input, Output> extends IService<Input, Output> {
+import java.util.List;
+
+public interface IFindAllCategoryService extends IService<Void, List<CategoryDto>> {
 }

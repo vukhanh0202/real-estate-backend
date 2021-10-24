@@ -2,29 +2,25 @@ package com.uit.realestate.service.apartment.impl;
 
 import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.MessageCode;
-import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
 import com.uit.realestate.exception.NotFoundException;
-import com.uit.realestate.mapper.apartment.ApartmentMapper;
 import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.apartment.IFavouriteApartmentService;
-import com.uit.realestate.service.apartment.IValidateApartmentService;
 import com.uit.realestate.service.tracking.TrackingService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FavouriteApartmentServiceImpl extends AbstractBaseService<IFavouriteApartmentService.Input, Boolean>
-        implements IFavouriteApartmentService<IFavouriteApartmentService.Input, Boolean> {
-
-    private final ApartmentMapper apartmentMapper;
+        implements IFavouriteApartmentService {
 
     private final ApartmentRepository apartmentRepository;
 
@@ -33,14 +29,6 @@ public class FavouriteApartmentServiceImpl extends AbstractBaseService<IFavourit
     private final FavouriteRepository favouriteRepository;
 
     private final TrackingService tracking;
-
-    public FavouriteApartmentServiceImpl(ApartmentMapper apartmentMapper, ApartmentRepository apartmentRepository, UserRepository userRepository, FavouriteRepository favouriteRepository, TrackingService tracking) {
-        this.apartmentMapper = apartmentMapper;
-        this.apartmentRepository = apartmentRepository;
-        this.userRepository = userRepository;
-        this.favouriteRepository = favouriteRepository;
-        this.tracking = tracking;
-    }
 
     @Override
     public Boolean doing(Input input) {

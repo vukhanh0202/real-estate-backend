@@ -1,19 +1,9 @@
 package com.uit.realestate.mapper.apartment;
 
-import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.apartment.ApartmentAddress;
-import com.uit.realestate.domain.apartment.ApartmentDetail;
-import com.uit.realestate.domain.user.UserAddress;
-import com.uit.realestate.dto.address.UserAddressDto;
 import com.uit.realestate.dto.apartment.ApartmentAddressDto;
-import com.uit.realestate.dto.apartment.ApartmentDetailDto;
 import com.uit.realestate.mapper.MapperBase;
-import com.uit.realestate.mapper.location.CountryMapper;
-import com.uit.realestate.mapper.location.DistrictMapper;
-import com.uit.realestate.mapper.location.ProvinceMapper;
 import com.uit.realestate.payload.address.ApartmentAddressRequest;
-import com.uit.realestate.payload.apartment.AddApartmentRequest;
-import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.location.CountryRepository;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.location.ProvinceRepository;

@@ -1,6 +1,7 @@
 package com.uit.realestate.service.user;
 
+import com.uit.realestate.dto.user.UserDto;
 import com.uit.realestate.service.IService;
 
-public interface IFindUserByIdService<Input, Output> extends IService<Input, Output> {
+public interface IFindUserByIdService extends IService<Long, UserDto> {
 }

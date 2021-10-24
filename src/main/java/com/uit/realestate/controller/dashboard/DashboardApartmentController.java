@@ -9,14 +9,12 @@ import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
-import com.uit.realestate.service.apartment.IApartmentService;
-import com.uit.realestate.service.apartment.ISearchApartmentService;
-import com.uit.realestate.service.apartment.IValidateApartmentService;
+import com.uit.realestate.service.apartment.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +26,20 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Api(value = "Apartment Dashboard APIs")
 @RequestMapping("/dashboard/apartment")
+@RequiredArgsConstructor
 public class DashboardApartmentController {
 
-    @Autowired
-    private IApartmentService apartmentService;
+    private final ISearchApartmentService searchApartmentService;
+
+    private final IAddApartmentService addApartmentService;
+
+    private final IUpdateApartmentService updateApartmentService;
+
+    private final IValidateApartmentService validateApartmentService;
+
+    private final IHighlightApartmentService highlightApartmentService;
+
+    private final ICloseApartmentService closeApartmentService;
 
     /**
      * Search apartment admin
@@ -74,8 +82,7 @@ public class DashboardApartmentController {
         input.createPageable(Sort.by(ESortApartment.HIGHLIGHT.getValue()).descending()
                 .and(Sort.by(sortDirection, sortBy.getValue())));
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getSearchApartmentService()
-                        .execute(input)));
+                .body(new ApiResponse(searchApartmentService.execute(input)));
     }
 
     /**
@@ -92,8 +99,7 @@ public class DashboardApartmentController {
         addApartmentRequest.setAuthorId(userPrincipal.getId());
         addApartmentRequest.setStatus(EApartmentStatus.OPEN);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getAddApartmentService()
-                        .execute(addApartmentRequest)));
+                .body(new ApiResponse(addApartmentService.execute(addApartmentRequest)));
     }
 
     /**
@@ -113,8 +119,7 @@ public class DashboardApartmentController {
         updateApartmentRequest.setId(id);
         updateApartmentRequest.setIsAdmin(true);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getUpdateApartmentService()
-                        .execute(updateApartmentRequest)));
+                .body(new ApiResponse(updateApartmentService.execute(updateApartmentRequest)));
     }
 
 
@@ -130,8 +135,7 @@ public class DashboardApartmentController {
     public ResponseEntity<?> validateApartment(@PathVariable("id") Long id,
                                                @RequestParam(value = "decision") Boolean decision) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getValidateApartmentService()
-                        .execute(new IValidateApartmentService.Input(id, decision))));
+                .body(new ApiResponse(validateApartmentService.execute(new IValidateApartmentService.Input(id, decision))));
     }
 
     /**
@@ -144,8 +148,7 @@ public class DashboardApartmentController {
     @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> highlightApartment(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getHighlightApartmentService()
-                        .execute(id)));
+                .body(new ApiResponse(highlightApartmentService.execute(id)));
     }
 
     /**
@@ -158,7 +161,6 @@ public class DashboardApartmentController {
     @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> closeApartment(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getCloseApartmentService()
-                        .execute(id)));
+                .body(new ApiResponse(closeApartmentService.execute(id)));
     }
 }

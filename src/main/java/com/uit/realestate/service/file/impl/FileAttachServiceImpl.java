@@ -2,8 +2,8 @@ package com.uit.realestate.service.file.impl;
 
 import com.uit.realestate.configuration.property.ApplicationProperties;
 import com.uit.realestate.service.file.FileAttachService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +14,10 @@ import java.nio.file.Paths;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FileAttachServiceImpl implements FileAttachService {
 
-    @Autowired
-    private ApplicationProperties app;
+    private final ApplicationProperties app;
 
     @Override
     public void downloadFile(HttpServletResponse response, String prefix, String filename, String extension) {

@@ -1,9 +1,10 @@
 package com.uit.realestate.service.apartment;
 
+import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.service.IService;
 import lombok.Data;
 
-public interface IGetApartmentDetailService<Input, Output> extends IService<Input, Output> {
+public interface IGetApartmentDetailService extends IService<IGetApartmentDetailService.Input, ApartmentDto> {
 
     @Data
     class Input{

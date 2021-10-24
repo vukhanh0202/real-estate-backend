@@ -6,31 +6,25 @@ import com.uit.realestate.domain.user.User;
 import com.uit.realestate.domain.user.UserAddress;
 import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
-import com.uit.realestate.mapper.user.UserMapper;
 import com.uit.realestate.payload.auth.ChangePasswordRequest;
 import com.uit.realestate.payload.auth.NewAccountRequest;
 import com.uit.realestate.repository.user.RoleRepository;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.utils.MessageHelper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final MessageHelper messageHelper;
 
-    @Autowired
-    private MessageHelper messageHelper;
-
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     public Boolean register(NewAccountRequest newAccountRequest) {
         if (userRepository.findByUsername(newAccountRequest.getUsername()).isPresent()) {

@@ -1,6 +1,9 @@
 package com.uit.realestate.service.apartment;
 
+import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.service.IService;
 
-public interface IFindLatestNewApartmentService<Input, Output> extends IService<Input, Output> {
+import java.util.List;
+
+public interface IFindLatestNewApartmentService extends IService<Long, List<ApartmentBasicDto>> {
 }

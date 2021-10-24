@@ -2,6 +2,7 @@ package com.uit.realestate.service.file.impl;
 
 import com.uit.realestate.configuration.property.ApplicationProperties;
 import com.uit.realestate.service.file.DownloadImageService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -15,13 +16,10 @@ import java.nio.file.Paths;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DownloadImageServiceImpl implements DownloadImageService {
 
-    @Autowired
-    private ApplicationProperties app;
-
-    @Autowired
-    MessageSource messageSource;
+    private final ApplicationProperties app;
 
     @Override
     public void downloadImage(HttpServletResponse response, String prefix, String fileName) {

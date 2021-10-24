@@ -13,8 +13,8 @@ import com.uit.realestate.service.tracking.TrackingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +29,30 @@ import java.net.UnknownHostException;
 @RestController
 @Slf4j
 @Api(value = "Apartment APIs")
+@RequiredArgsConstructor
 public class ApartmentController {
 
-    @Autowired
-    private IApartmentService apartmentService;
+    private final TrackingService tracking;
 
-    @Autowired
-    private TrackingService tracking;
+    private final ISearchApartmentService searchApartmentService;
+
+    private final IFindRecommendApartmentService findRecommendApartmentService;
+
+    private final IFindSimilarApartmentService findSimilarApartmentService;
+
+    private final IFindLatestNewApartmentService findLatestNewApartmentService;
+
+    private final IFindHighlightApartmentService findHighlightApartmentService;
+
+    private final IGetApartmentDetailService getApartmentDetailService;
+
+    private final IAddApartmentService addApartmentService;
+
+    private final IUpdateApartmentService updateApartmentService;
+
+    private final ICloseApartmentService closeApartmentService;
+
+    private final IFavouriteApartmentService favouriteApartmentService;
 
     /**
      * Search apartment
@@ -89,8 +106,7 @@ public class ApartmentController {
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId, search);
         input.createPageable(Sort.by(sortDirection, sortBy.getValue()));
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getSearchApartmentService()
-                        .execute(input)));
+                .body(new ApiResponse(searchApartmentService.execute(input)));
     }
 
 
@@ -116,8 +132,7 @@ public class ApartmentController {
         IFindRecommendApartmentService.Input input = new IFindRecommendApartmentService.Input(page, size, userId, ip);
         input.createPageable();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getFindRecommendApartmentService()
-                        .execute(input)));
+                .body(new ApiResponse(findRecommendApartmentService.execute(input)));
     }
 
     /**
@@ -142,8 +157,7 @@ public class ApartmentController {
         IFindSimilarApartmentService.Input input = new IFindSimilarApartmentService.Input(page, size, userId, ip);
         input.createPageable();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getFindSimilarApartmentService()
-                        .execute(input)));
+                .body(new ApiResponse(findSimilarApartmentService.execute(input)));
     }
 
     /**
@@ -155,8 +169,7 @@ public class ApartmentController {
     @GetMapping(value = "/public/apartment/latest-new")
     public ResponseEntity<?> findLatestNewApartment(@RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getFindLatestNewApartmentService()
-                        .execute(userId)));
+                .body(new ApiResponse(findLatestNewApartmentService.execute(userId)));
     }
 
     /**
@@ -168,8 +181,7 @@ public class ApartmentController {
     @GetMapping(value = "/public/apartment/highlight")
     public ResponseEntity<?> findHighlightApartment(@RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getFindHighlightApartmentService()
-                        .execute(userId)));
+                .body(new ApiResponse(findHighlightApartmentService.execute(userId)));
     }
 
     /**
@@ -193,8 +205,7 @@ public class ApartmentController {
             }
         }
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getGetApartmentDetailService()
-                        .execute(new IGetApartmentDetailService.Input(id, ip, userId))));
+                .body(new ApiResponse(getApartmentDetailService.execute(new IGetApartmentDetailService.Input(id, ip, userId))));
     }
 
     /**
@@ -211,8 +222,7 @@ public class ApartmentController {
         addApartmentRequest.setStatus(EApartmentStatus.PENDING);
         addApartmentRequest.setAuthorId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getAddApartmentService()
-                        .execute(addApartmentRequest)));
+                .body(new ApiResponse(addApartmentService.execute(addApartmentRequest)));
     }
 
     /**
@@ -230,8 +240,7 @@ public class ApartmentController {
         updateApartmentRequest.setId(id);
         updateApartmentRequest.setAuthorId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getUpdateApartmentService()
-                        .execute(updateApartmentRequest)));
+                .body(new ApiResponse(updateApartmentService.execute(updateApartmentRequest)));
     }
 
     /**
@@ -244,8 +253,7 @@ public class ApartmentController {
     @PreAuthorize("@securityService.hasRoles('USER', 'ADMIN')")
     public ResponseEntity<?> deleteApartmentApartment(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getCloseApartmentService()
-                        .execute(id)));
+                .body(new ApiResponse(closeApartmentService.execute(id)));
     }
 
     /**
@@ -268,7 +276,6 @@ public class ApartmentController {
         }
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.getFavouriteApartmentService()
-                        .execute(new IFavouriteApartmentService.Input(userPrincipal.getId(), apartmentId, ip))));
+                .body(new ApiResponse(favouriteApartmentService.execute(new IFavouriteApartmentService.Input(userPrincipal.getId(), apartmentId, ip))));
     }
 }

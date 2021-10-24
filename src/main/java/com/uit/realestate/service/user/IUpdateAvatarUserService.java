@@ -1,10 +1,14 @@
 package com.uit.realestate.service.user;
 
+import com.uit.realestate.dto.response.FileCaption;
 import com.uit.realestate.dto.response.PaginationRequest;
+import com.uit.realestate.payload.user.UpdateAvatarUserRequest;
 import com.uit.realestate.service.IService;
 import lombok.Data;
 
-public interface IUpdateAvatarUserService<Input, Output> extends IService<Input, Output> {
+import java.util.Set;
+
+public interface IUpdateAvatarUserService extends IService<UpdateAvatarUserRequest, Set<FileCaption>> {
 
     @Data
     class Input extends PaginationRequest {

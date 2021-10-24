@@ -7,20 +7,19 @@ import com.uit.realestate.mapper.user.UserMapper;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.user.IFindUserByIdService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FindUserByIdServiceImpl extends AbstractBaseService<Long, UserDto>
-        implements IFindUserByIdService<Long, UserDto> {
+        implements IFindUserByIdService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     @Override
     public void preExecute(Long userId) {

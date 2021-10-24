@@ -3,26 +3,24 @@ package com.uit.realestate.service.apartment.impl;
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.apartment.Apartment;
-import com.uit.realestate.domain.user.User;
 import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.apartment.ApartmentMapper;
-import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.service.AbstractBaseService;
-import com.uit.realestate.service.apartment.IAddApartmentService;
 import com.uit.realestate.service.apartment.IUpdateApartmentService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UpdateApartmentServiceImpl extends AbstractBaseService<UpdateApartmentRequest, Boolean>
-        implements IUpdateApartmentService<UpdateApartmentRequest, Boolean> {
+        implements IUpdateApartmentService {
 
     private final ApartmentMapper apartmentMapper;
 
@@ -31,13 +29,6 @@ public class UpdateApartmentServiceImpl extends AbstractBaseService<UpdateApartm
     private final CategoryRepository categoryRepository;
 
     private final DistrictRepository districtRepository;
-
-    public UpdateApartmentServiceImpl(ApartmentMapper apartmentMapper, ApartmentRepository apartmentRepository, CategoryRepository categoryRepository, DistrictRepository districtRepository) {
-        this.apartmentMapper = apartmentMapper;
-        this.apartmentRepository = apartmentRepository;
-        this.categoryRepository = categoryRepository;
-        this.districtRepository = districtRepository;
-    }
 
     @Override
     public void preExecute(UpdateApartmentRequest updateApartmentRequest) {

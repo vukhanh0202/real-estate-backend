@@ -3,7 +3,7 @@ package com.uit.realestate.service.apartment;
 import com.uit.realestate.service.IService;
 import lombok.Data;
 
-public interface IFavouriteApartmentService<Input, Output> extends IService<Input, Output> {
+public interface IFavouriteApartmentService extends IService<IFavouriteApartmentService.Input, Boolean> {
 
     /**
      * Param input.

@@ -1,10 +1,11 @@
 package com.uit.realestate.service.user;
 
 import com.uit.realestate.dto.response.PaginationRequest;
+import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.service.IService;
 import lombok.Data;
 
-public interface IFindDetailUserService<Input, Output> extends IService<Input, Output> {
+public interface IFindDetailUserService extends IService<Long, UserDetailDto> {
 
     @Data
     class Input extends PaginationRequest {

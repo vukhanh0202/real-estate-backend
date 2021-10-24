@@ -6,8 +6,8 @@ import com.uit.realestate.domain.tracking.TrackingProvince;
 import com.uit.realestate.repository.tracking.TrackingCategoryRepository;
 import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
 import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +18,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TrackingService {
 
-    @Autowired
-    private TrackingCategoryRepository trackingCategoryRepository;
-    @Autowired
-    private TrackingProvinceRepository trackingProvinceRepository;
-    @Autowired
-    private TrackingDistrictRepository trackingDistrictRepository;
+    private final TrackingCategoryRepository trackingCategoryRepository;
+    private final TrackingProvinceRepository trackingProvinceRepository;
+    private final TrackingDistrictRepository trackingDistrictRepository;
 
     public void trackingCategory(Long userId, String ip, Long targetId, Long rating) {
         if (targetId == null) return;

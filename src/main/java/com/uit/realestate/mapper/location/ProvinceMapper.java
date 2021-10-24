@@ -1,8 +1,6 @@
 package com.uit.realestate.mapper.location;
 
-import com.uit.realestate.domain.location.Country;
 import com.uit.realestate.domain.location.Province;
-import com.uit.realestate.dto.location.CountryDto;
 import com.uit.realestate.dto.location.ProvinceDto;
 import com.uit.realestate.mapper.MapperBase;
 import org.mapstruct.BeanMapping;

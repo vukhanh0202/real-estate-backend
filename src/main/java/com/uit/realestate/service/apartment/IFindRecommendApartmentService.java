@@ -1,10 +1,12 @@
 package com.uit.realestate.service.apartment;
 
+import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.response.PaginationRequest;
+import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.service.IService;
 import lombok.Data;
 
-public interface IFindRecommendApartmentService<Input, Output> extends IService<Input, Output> {
+public interface IFindRecommendApartmentService extends IService<IFindRecommendApartmentService.Input, PaginationResponse<ApartmentBasicDto>> {
 
     @Data
     class Input extends PaginationRequest {

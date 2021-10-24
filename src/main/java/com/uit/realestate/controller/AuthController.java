@@ -12,9 +12,9 @@ import com.uit.realestate.service.auth.JwtUserDetailsService;
 import com.uit.realestate.utils.MessageHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +31,7 @@ import static com.uit.realestate.constant.MessageCode.User.USER_WRONG;
 @Slf4j
 @RequestMapping("/auth")
 @Api(value = "Auth APIs")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -42,14 +43,6 @@ public class AuthController {
     private final MessageHelper messageHelper;
 
     private final AuthService authService;
-
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService, MessageHelper messageHelper, AuthService authService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.userDetailsService = userDetailsService;
-        this.messageHelper = messageHelper;
-        this.authService = authService;
-    }
 
     @ApiOperation(value = "Login")
     @RequestMapping(value = "/login", method = RequestMethod.POST)

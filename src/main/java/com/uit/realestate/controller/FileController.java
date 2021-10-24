@@ -1,6 +1,5 @@
 package com.uit.realestate.controller;
 
-import com.google.common.collect.Lists;
 import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.dto.response.FileCaption;
@@ -9,32 +8,29 @@ import com.uit.realestate.service.file.UploadService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Locale;
 import java.util.Set;
 
 @RestController
 @Slf4j
 @Api(value = "Files APIs")
+@RequiredArgsConstructor
 public class FileController {
 
     private static final String APARTMENT_FILE = "/apartment/";
     private static final String AVATAR_FILE = "/avatar/";
 
-    @Autowired
-    private DownloadImageService downloadImageService;
+    private final DownloadImageService downloadImageService;
 
-    @Autowired
-    private UploadService uploadService;
+    private final UploadService uploadService;
 
 
     /**

@@ -3,7 +3,7 @@ spring:
     driver: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/real-estate
     username: postgres
-    password: postgres
+    password: 123
     initialSize: 5
     minIdle: 5
     maxActive: 20
@@ -37,6 +37,6 @@ app-config:
 jwt:
   secret: JWTSuperSecretKey
 server:
-  port: 8082
+  port: 8089
   servlet:
     context-path: /api

@@ -7,23 +7,20 @@ import com.uit.realestate.mapper.user.UserMapper;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.user.IFindAllUserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FindAllUserServiceImpl extends AbstractBaseService<IFindAllUserService.Input, PaginationResponse<UserDto>>
-        implements IFindAllUserService<IFindAllUserService.Input, PaginationResponse<UserDto>> {
+        implements IFindAllUserService {
 
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
-
-    public FindAllUserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
 
     @Override
     public PaginationResponse<UserDto> doing(Input input) {

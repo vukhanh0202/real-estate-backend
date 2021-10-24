@@ -1,22 +1,15 @@
 package com.uit.realestate.mapper.address;
 
-import com.uit.realestate.domain.apartment.ApartmentAddress;
-import com.uit.realestate.domain.user.User;
 import com.uit.realestate.domain.user.UserAddress;
 import com.uit.realestate.dto.address.UserAddressDto;
-import com.uit.realestate.dto.user.UserDto;
 import com.uit.realestate.mapper.MapperBase;
-import com.uit.realestate.payload.address.ApartmentAddressRequest;
 import com.uit.realestate.payload.address.UserAddressRequest;
-import com.uit.realestate.payload.user.UpdateUserRequest;
 import com.uit.realestate.repository.location.CountryRepository;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.location.ProvinceRepository;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @Mapper(componentModel = "spring")

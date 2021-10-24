@@ -1,6 +1,9 @@
 package com.uit.realestate.service.location;
 
+import com.uit.realestate.dto.location.CountryDto;
 import com.uit.realestate.service.IService;
 
-public interface IFindAllCountryService<Input, Output> extends IService<Input, Output> {
+import java.util.List;
+
+public interface IFindAllCountryService extends IService<Void, List<CountryDto>> {
 }

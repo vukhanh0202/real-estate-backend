@@ -4,7 +4,6 @@ import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.user.ERoleType;
-import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
 import com.uit.realestate.dto.apartment.ApartmentDto;
@@ -15,29 +14,23 @@ import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.AbstractBaseService;
 import com.uit.realestate.service.apartment.IGetApartmentDetailService;
 import com.uit.realestate.service.tracking.TrackingService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class GetApartmentDetailServiceImpl extends AbstractBaseService<IGetApartmentDetailService.Input, ApartmentDto>
-        implements IGetApartmentDetailService<IGetApartmentDetailService.Input, ApartmentDto> {
+        implements IGetApartmentDetailService {
 
-    @Autowired
-    private TrackingService tracking;
+    private final TrackingService tracking;
 
-    @Autowired
-    ApartmentMapper apartmentMapper;
+    private final ApartmentMapper apartmentMapper;
 
-    @Autowired
-    ApartmentRepository apartmentRepository;
+    private final ApartmentRepository apartmentRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void preExecute(Input input) {
