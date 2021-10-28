@@ -71,4 +71,7 @@ public class ApartmentDto extends BaseDto {
     @JsonProperty("is_highlight")
     private Boolean isHighlight;
 
+    @JsonProperty("floor_quantity")
+    private Long floorQuantity;
+
 }

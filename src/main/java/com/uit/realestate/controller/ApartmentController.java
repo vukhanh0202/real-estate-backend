@@ -87,6 +87,10 @@ public class ApartmentController {
                                                   @RequestParam(value = "category_id", required = false) Long categoryId,
                                                   @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
                                                   @RequestParam(value = "user_id", required = false) Long userId,
+                                                  @RequestParam(value = "house_direction", required = false) Long houseDirection,
+                                                  @RequestParam(value = "bedroom_quantity", required = false) Long bedroomQuantity,
+                                                  @RequestParam(value = "bathroom_quantity", required = false) Long bathroomQuantity,
+                                                  @RequestParam(value = "floor_quantity", required = false) Long floorQuantity,
                                                   @RequestParam(value = "search", defaultValue = "") String search,
                                                   HttpServletRequest request) {
         String ip = request.getRemoteAddr();
@@ -103,7 +107,8 @@ public class ApartmentController {
         tracking.trackingProvince(userId, ip, provinceId, AppConstant.DEFAULT_RATING);
 
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId, search);
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId, search,
+                houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
         input.createPageable(Sort.by(sortDirection, sortBy.getValue()));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(searchApartmentService.execute(input)));

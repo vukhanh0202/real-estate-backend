@@ -74,11 +74,16 @@ public class DashboardApartmentController {
                                               @RequestParam(value = "category_id", required = false) Long categoryId,
                                               @RequestParam(value = "type_apartment", required = false) ETypeApartment typeApartment,
                                               @RequestParam(value = "status",  required = false) EApartmentStatus status,
+                                              @RequestParam(value = "house_direction", required = false) Long houseDirection,
+                                              @RequestParam(value = "bedroom_quantity", required = false) Long bedroomQuantity,
+                                              @RequestParam(value = "bathroom_quantity", required = false) Long bathroomQuantity,
+                                              @RequestParam(value = "floor_quantity", required = false) Long floorQuantity,
                                               @RequestParam(value = "search", defaultValue = "") String search
                                               ) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, status, userPrincipal.getId(), search);
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, status, userPrincipal.getId(), search,
+                houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
         input.createPageable(Sort.by(ESortApartment.HIGHLIGHT.getValue()).descending()
                 .and(Sort.by(sortDirection, sortBy.getValue())));
         return ResponseEntity.status(HttpStatus.OK)

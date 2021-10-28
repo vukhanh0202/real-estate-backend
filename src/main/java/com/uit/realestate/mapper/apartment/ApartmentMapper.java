@@ -59,6 +59,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
+    @Mapping(source = "apartmentDetail.floorQuantity", target = "floorQuantity")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
     @Mapping(source = "highlight", target = "isHighlight")
     @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")

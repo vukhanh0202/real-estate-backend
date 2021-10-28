@@ -8,6 +8,7 @@ import com.uit.realestate.dto.response.PaginationRequest;
 import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.service.IService;
 import lombok.Data;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface ISearchApartmentService extends IService<ISearchApartmentService.Input, PaginationResponse<ApartmentDto>> {
 
@@ -28,25 +29,14 @@ public interface ISearchApartmentService extends IService<ISearchApartmentServic
         private EApartmentStatus apartmentStatus;
         private Long userId;
         private String search;
-
-        public Input(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
-                     Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment,Long userId,String search) {
-            super(page, size);
-            this.districtId = districtId;
-            this.provinceId = provinceId;
-            this.priceFrom = priceFrom;
-            this.priceTo = priceTo;
-            this.areaFrom = areaFrom;
-            this.areaTo = areaTo;
-            this.categoryId = categoryId;
-            this.typeApartment = typeApartment;
-            this.userId = userId;
-            this.search = search;
-        }
+        private Long houseDirection;
+        private Long bedroomQuantity;
+        private Long bathroomQuantity;
+        private Long floorQuantity;
 
         public Input(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
                      Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment, EApartmentStatus status,
-                     Long userId, String search) {
+                     Long userId, String search, Long houseDirection, Long bedroomQuantity, Long bathroomQuantity, Long floorQuantity) {
             super(page, size);
             this.districtId = districtId;
             this.provinceId = provinceId;
@@ -59,6 +49,10 @@ public interface ISearchApartmentService extends IService<ISearchApartmentServic
             this.apartmentStatus = status;
             this.userId = userId;
             this.search = search;
+            this.houseDirection = houseDirection;
+            this.bedroomQuantity = bedroomQuantity;
+            this.bathroomQuantity = bathroomQuantity;
+            this.floorQuantity = floorQuantity;
         }
     }
 }

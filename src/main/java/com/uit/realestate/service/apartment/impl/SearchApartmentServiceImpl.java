@@ -66,6 +66,29 @@ public class SearchApartmentServiceImpl extends AbstractBaseService<ISearchApart
                 predicateList.add(builder.equal(root.get("status"), input.getApartmentStatus()));
             if (!input.getSearch().equals(""))
                 predicateList.add(builder.like(builder.lower(root.get("title")), "%" + input.getSearch().toLowerCase() + "%"));
+            // Need to search house direction
+            final Long defaultQuantity = 3L;
+            if (input.getBedroomQuantity() != null){
+                if (input.getBedroomQuantity() > defaultQuantity){
+                    predicateList.add(builder.greaterThan(root.get("apartmentDetail").get("bedroomQuantity"), defaultQuantity));
+                }else{
+                    predicateList.add(builder.equal(root.get("apartmentDetail").get("bedroomQuantity"), input.getBedroomQuantity()));
+                }
+            }
+            if (input.getBathroomQuantity() != null){
+                if (input.getBathroomQuantity() > defaultQuantity){
+                    predicateList.add(builder.greaterThan(root.get("apartmentDetail").get("bathroomQuantity"), defaultQuantity));
+                }else{
+                    predicateList.add(builder.equal(root.get("apartmentDetail").get("bathroomQuantity"), input.getBathroomQuantity()));
+                }
+            }
+            if (input.getFloorQuantity() != null){
+                if (input.getFloorQuantity() > defaultQuantity){
+                    predicateList.add(builder.greaterThan(root.get("apartmentDetail").get("floorQuantity"), defaultQuantity));
+                }else{
+                    predicateList.add(builder.equal(root.get("apartmentDetail").get("floorQuantity"), input.getFloorQuantity()));
+                }
+            }
             return builder.and(predicateList.toArray(new Predicate[0]));
         };
     }
