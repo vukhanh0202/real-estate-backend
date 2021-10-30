@@ -1,12 +1,15 @@
 package com.uit.realestate.mapper.user;
 
 import com.uit.realestate.domain.user.User;
+import com.uit.realestate.domain.user.UserTarget;
 import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.dto.user.UserDto;
+import com.uit.realestate.dto.user.UserTargetDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.mapper.address.UserAddressMapper;
 import com.uit.realestate.payload.user.UpdateAvatarUserRequest;
 import com.uit.realestate.payload.user.UpdateUserRequest;
+import com.uit.realestate.service.user.IAddUserTargetByTokenService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -66,4 +69,18 @@ public abstract class UserMapper implements MapperBase {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "photo", target = "avatar", qualifiedByName = "setFile")
     public abstract void updateAvatarUser(UpdateAvatarUserRequest dto, @MappingTarget User entity);
+
+    @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "districtId", target = "district.id")
+    @Mapping(source = "provinceId", target = "province.id")
+    @Mapping(source = "price", target = "price")
+    @Mapping(source = "houseDirection", target = "houseDirection")
+    @Mapping(source = "floorQuantity", target = "floorQuantity")
+    @Mapping(source = "bedroomQuantity", target = "bedroomQuantity")
+    @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
+    public abstract UserTarget toUserTarget(IAddUserTargetByTokenService.Input userTargetDto);
+
+    public abstract UserTargetDto toUserTargetDto(UserTarget userTarget);
+
+    public abstract List<UserTargetDto> toUserTargetDtoList(List<UserTarget> userTargets);
 }

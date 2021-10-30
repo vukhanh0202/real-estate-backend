@@ -36,6 +36,10 @@ public class UserController {
 
     private final IFindUserApartmentAuthorService findUserApartmentAuthorService;
 
+    private final IAddUserTargetByTokenService addUserTargetByTokenService;
+
+    private final IFindUserTargetByTokenService findUserTargetByTokenService;
+
     @ApiOperation(value = "Find Info User By Token", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/token")
     public ResponseEntity<?> findUserToken(){
@@ -88,5 +92,22 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(findUserApartmentAuthorService.execute(input)));
+    }
+
+    @ApiOperation(value = "Add user target", authorizations = {@Authorization(value = "JWT")})
+    @PostMapping(value = "/token/target")
+    public ResponseEntity<?> addUserTarget(@RequestBody IAddUserTargetByTokenService.Input body){
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        body.setUserId(userPrincipal.getId());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(addUserTargetByTokenService.execute(body)));
+    }
+
+    @ApiOperation(value = "Find user target", authorizations = {@Authorization(value = "JWT")})
+    @GetMapping(value = "/token/target")
+    public ResponseEntity<?> findUserTarget(){
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(findUserTargetByTokenService.execute(userPrincipal.getId())));
     }
 }

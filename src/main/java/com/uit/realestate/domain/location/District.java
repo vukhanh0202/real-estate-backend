@@ -3,6 +3,7 @@ package com.uit.realestate.domain.location;
 import com.uit.realestate.domain.apartment.ApartmentAddress;
 import com.uit.realestate.domain.tracking.TrackingDistrict;
 import com.uit.realestate.domain.user.UserAddress;
+import com.uit.realestate.domain.user.UserTarget;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -26,7 +27,7 @@ public class District{
     private String shortName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_id", foreignKey = @javax.persistence.ForeignKey(name = "none"))
+    @JoinColumn(name = "province_id")
     private Province province;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "district")
@@ -37,6 +38,9 @@ public class District{
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "district")
     private List<UserAddress> userAddresses = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "district")
+    private List<UserTarget> userTargets = new ArrayList<>();
 
     public District(Long id) {
         this.id = id;

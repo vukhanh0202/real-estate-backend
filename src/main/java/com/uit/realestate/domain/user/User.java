@@ -89,6 +89,26 @@ public class User extends SqlEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
     private List<Apartment> apartments = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,
+            orphanRemoval = true, mappedBy = "user")
+    private List<UserTarget> userTargets = new ArrayList<>();
+
+    //Constructors, getters and setters removed for brevity
+    public User addTarget(UserTarget target) {
+        if (userTargets == null){
+            userTargets = new ArrayList<>();
+        }
+        userTargets.add(target);
+        target.setUser(this);
+        return this;
+    }
+
+    public User removeTarget(UserTarget target) {
+        userTargets.remove(target);
+        target.setUser(null);
+        return this;
+    }
+
     public User(Long id) {
         this.id = id;
     }

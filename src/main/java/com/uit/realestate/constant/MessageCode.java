@@ -23,4 +23,13 @@ public interface MessageCode {
     interface Address {
         String INVALID = "message.address.Invalid";
     }
+
+    interface Province {
+        String INVALID = "message.province.Invalid";
+    }
+
+    interface District {
+        String NOT_HAVE_PROVINCE = "message.district.NotHaveProvince";
+        String INVALID = "message.district.Invalid";
+    }
 }
