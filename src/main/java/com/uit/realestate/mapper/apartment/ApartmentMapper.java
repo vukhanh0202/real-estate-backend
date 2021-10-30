@@ -2,6 +2,7 @@ package com.uit.realestate.mapper.apartment;
 
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
+import com.uit.realestate.dto.apartment.ApartmentCompareDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
@@ -181,5 +182,39 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "typeApartment", target = "typeApartment")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "setFiles")
     public abstract void updateApartment(UpdateApartmentRequest dto, @MappingTarget Apartment apartment);
+
+
+    //*************************************************
+    //********** Mapper AddApartmentRequest To Apartment (Entity) **********
+    //*************************************************
+    @Named("toApartmentCompareDto")
+    @BeforeMapping
+    protected void toApartmentCompareDto(Apartment apartment, @MappingTarget ApartmentCompareDto apartmentCompareDto) {
+        apartmentCompareDto.setAddress(apartment.getApartmentAddress().getAddress() + ", "
+                + apartment.getApartmentAddress().getDistrict().getName() + ", "
+                + apartment.getApartmentAddress().getProvince().getName() + ", "
+                + apartment.getApartmentAddress().getCountry().getName());
+
+    }
+    @BeanMapping(qualifiedByName = "toApartmentCompareDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(source = "totalPrice", target = "totalPrice")
+    @Mapping(source = "area", target = "area")
+    @Mapping(source = "typeApartment", target = "typeApartment")
+    @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
+    @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
+    @Mapping(source = "apartmentDetail.floorQuantity", target = "floorQuantity")
+    @Mapping(source = "apartmentDetail.frontBuilding", target = "frontBuilding")
+    @Mapping(source = "apartmentDetail.houseDirection", target = "houseDirection")
+    @Mapping(source = "apartmentDetail.balconyDirection", target = "balconyDirection")
+    @Mapping(source = "apartmentDetail.toiletQuantity", target = "toiletQuantity")
+    @Mapping(source = "apartmentDetail.furniture", target = "furniture")
+    @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
+    public abstract ApartmentCompareDto toApartmentCompareDto(Apartment apartment);
+
+    @BeanMapping(ignoreByDefault = true)
+    public abstract List<ApartmentCompareDto> toApartmentCompareDtoList(List<Apartment> apartmentList);
 
 }

@@ -18,6 +18,8 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
 
     List<Apartment> findTop4ByHighlightTrueAndStatusOrderByUpdatedAtDesc(EApartmentStatus status);
 
+    List<Apartment> findAllByIdIn(List<Long> ids);
+
     @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +
             " JOIN apartment_address ad ON ap.id = ad.id " +

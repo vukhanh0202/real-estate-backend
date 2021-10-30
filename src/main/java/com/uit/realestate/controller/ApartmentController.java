@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -53,6 +54,8 @@ public class ApartmentController {
     private final ICloseApartmentService closeApartmentService;
 
     private final IFavouriteApartmentService favouriteApartmentService;
+
+    private final ICompareApartmentService compareApartmentService;
 
     /**
      * Search apartment
@@ -282,5 +285,12 @@ public class ApartmentController {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(favouriteApartmentService.execute(new IFavouriteApartmentService.Input(userPrincipal.getId(), apartmentId, ip))));
+    }
+
+    @ApiOperation(value = "Compare apartment")
+    @GetMapping(value = "/public/apartment/compare")
+    public ResponseEntity<?> compareApartment(@RequestParam(value = "apartment_list") List<Long> apartmentIds) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(compareApartmentService.execute(apartmentIds)));
     }
 }
