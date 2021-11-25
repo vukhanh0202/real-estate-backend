@@ -5,11 +5,13 @@ import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.data.UserPrincipal;
+import com.uit.realestate.dto.SuitabilityDto;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.service.apartment.*;
 import com.uit.realestate.service.tracking.TrackingService;
+import com.uit.realestate.utils.CalculatorPercentSuitability;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -117,7 +119,16 @@ public class ApartmentController {
                 .body(new ApiResponse(searchApartmentService.execute(input)));
     }
 
-
+    @ApiOperation(value = "test")
+    @GetMapping(value = "/public/test")
+    public ResponseEntity<?> test(@RequestParam(value = "value") String value) {
+        SuitabilityDto suitabilityDto = new SuitabilityDto();
+        suitabilityDto.setDistrictId(1L);
+        suitabilityDto.setProvinceId(1L);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(CalculatorPercentSuitability.calculatorPercent(suitabilityDto, value,value,"",
+                        "",1L, 1L, 1L)));
+    }
     /**
      * Get recommend apartment
      *

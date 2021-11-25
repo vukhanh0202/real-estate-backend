@@ -3,6 +3,7 @@ package com.uit.realestate.dto.user;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.dto.location.DistrictDto;
 import com.uit.realestate.dto.location.ProvinceDto;
 import lombok.Data;
@@ -24,4 +25,7 @@ public class UserTargetDto {
     private Long bedroomQuantity;
     @JsonProperty("bathroom_quantity")
     private Long bathroomQuantity;
+    @JsonProperty("type_apartment")
+    private ETypeApartment typeApartment;
+    private Double area;
 }

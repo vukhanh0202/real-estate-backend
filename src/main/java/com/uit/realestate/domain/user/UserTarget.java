@@ -1,5 +1,6 @@
 package com.uit.realestate.domain.user;
 
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.SqlEntity;
 import com.uit.realestate.domain.location.District;
 import com.uit.realestate.domain.location.Province;
@@ -39,5 +40,10 @@ public class UserTarget extends SqlEntity {
     private Long bedroomQuantity;
 
     private Long bathroomQuantity;
+
+    @Enumerated(EnumType.STRING)
+    private ETypeApartment typeApartment;
+
+    private Double area;
 
 }
