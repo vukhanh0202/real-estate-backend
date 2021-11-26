@@ -125,9 +125,10 @@ public class ApartmentController {
         SuitabilityDto suitabilityDto = new SuitabilityDto();
         suitabilityDto.setDistrictId(1L);
         suitabilityDto.setProvinceId(1L);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(CalculatorPercentSuitability.calculatorPercent(suitabilityDto, value,value,"",
-                        "",1L, 1L, 1L)));
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(new ApiResponse(CalculatorPercentSuitability.calculatorPercent(suitabilityDto, value,value,"",
+//                        "",1L, 1L, 1L)));
+        return null;
     }
     /**
      * Get recommend apartment

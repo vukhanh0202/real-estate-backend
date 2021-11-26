@@ -16,4 +16,9 @@ public interface SuitabilityConstant {
      * Range price (The smaller the more accurate)
      */
     Long DEFAULT_RANGE_PRICE = 500L;
+
+    /**
+     * Range Area (The smaller the more accurate)
+     */
+    Long DEFAULT_RANGE_AREA = 10L;
 }

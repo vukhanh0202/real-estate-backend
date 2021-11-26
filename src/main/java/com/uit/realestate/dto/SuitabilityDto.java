@@ -3,6 +3,7 @@ package com.uit.realestate.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,7 +28,7 @@ public class SuitabilityDto extends BaseDto {
     private Double area;
 
     @JsonProperty("type_apartment")
-    private String typeApartment;
+    private ETypeApartment typeApartment;
 
     @JsonProperty("bedroom_quantity")
     private Long bedroomQuantity;

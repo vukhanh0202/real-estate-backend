@@ -29,6 +29,8 @@ public class Suitability extends SqlEntity {
 
     private String price;
 
+    private String area;
+
     private String category;
 
     private Long floorQuantity;
