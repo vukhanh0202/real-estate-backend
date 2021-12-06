@@ -26,6 +26,7 @@ public class CalculatorPercentSuitability {
         result = addValueByKey(result, calculate(suitabilityDto.getBedroomQuantity(), bedroomQuantity));
         result = addValueByKey(result, calculate(suitabilityDto.getBathroomQuantity(), bathroomQuantity));
         result = addValueByKey(result, calculateArea(suitabilityDto.getArea(), area));
+        result = addValueByKey(result, calculatePrice(suitabilityDto.getTotalPrice(), price));
         Long score = result.get(suitability);
         Long scoreTotal = result.get(total);
         if (scoreTotal == 0L) {
@@ -42,31 +43,54 @@ public class CalculatorPercentSuitability {
         return result;
     }
 
-    private static Map<String, Long> calculatePrice(Long id, String json) {
-        return null;
-    }
-
-    private static Map<String, Long> calculateArea(Double area, String areas) {
-        Long score = 0L, scoreTotal = 0L;
-        if (areas != null) {
-            List<Double> areaList = Arrays.stream(areas.split(",")).map(Double::valueOf).collect(Collectors.toList());
-            for (Double item : areaList) {
-                if (Math.abs(area - item) >= SuitabilityConstant.DEFAULT_RANGE_AREA) {
+    private static Map<String, Long> calculatePrice(Double price, String prices) {
+        long score = 0L, scoreTotal = 0L;
+        long rangPrice = (long) (price * 0.1);
+        if (rangPrice < SuitabilityConstant.DEFAULT_ACCURACY_PRICE) {
+            rangPrice = SuitabilityConstant.DEFAULT_ACCURACY_PRICE;
+        }
+        if (prices != null) {
+            List<Double> priceList = Arrays.stream(prices.split(",")).map(Double::valueOf).collect(Collectors.toList());
+            for (Double item : priceList) {
+                if (Math.abs(price - item) >= rangPrice) {
                     score = 0L;
                 } else {
-                    score = Math.round(SuitabilityConstant.DEFAULT_RANGE_AREA - Math.abs(area - item));
+                    score = Math.round(rangPrice - Math.abs(price - item));
                 }
-                scoreTotal += SuitabilityConstant.DEFAULT_RANGE_AREA;
+                scoreTotal += rangPrice;
             }
         }
         Map<String, Long> result = new HashMap<>();
-        result.put(suitability, score);
-        result.put(total, scoreTotal);
+        result.put(suitability, score * SuitabilityConstant.DEFAULT_ACCURACY_PRICE / rangPrice);
+        result.put(total, scoreTotal * SuitabilityConstant.DEFAULT_ACCURACY_PRICE / rangPrice);
+        return result;
+    }
+
+    private static Map<String, Long> calculateArea(Double area, String areas) {
+        long score = 0L, scoreTotal = 0L;
+        long rangArea = (long) (area * 0.1);
+        if (rangArea < SuitabilityConstant.DEFAULT_ACCURACY_AREA) {
+            rangArea = SuitabilityConstant.DEFAULT_ACCURACY_AREA;
+        }
+        if (areas != null) {
+            List<Double> areaList = Arrays.stream(areas.split(",")).map(Double::valueOf).collect(Collectors.toList());
+            for (Double item : areaList) {
+                if (Math.abs(area - item) >= rangArea) {
+                    score = 0L;
+                } else {
+                    score = Math.round(rangArea - Math.abs(area - item));
+                }
+                scoreTotal += rangArea;
+            }
+        }
+        Map<String, Long> result = new HashMap<>();
+        result.put(suitability, score * SuitabilityConstant.DEFAULT_ACCURACY_AREA / rangArea);
+        result.put(total, scoreTotal * SuitabilityConstant.DEFAULT_ACCURACY_AREA / rangArea);
         return result;
     }
 
     private static Map<String, Long> calculate(Long id, String json) {
-        Long suitableTemp = 0L, totalTemp = 0L;
+        long suitableTemp = 0L, totalTemp = 0L;
         if (json != null) {
             Map<String, Object> result = castJsonToMap(json);
             Set<Long> districtList = result.keySet().stream().map(Long::valueOf).collect(Collectors.toSet());

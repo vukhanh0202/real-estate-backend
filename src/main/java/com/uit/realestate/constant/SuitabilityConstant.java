@@ -13,12 +13,13 @@ public interface SuitabilityConstant {
     Long DEFAULT_ACCURACY = 5L;
 
     /**
-     * Range price (The smaller the more accurate)
+     * Must <= DEFAULT_RANGE_PRICE
      */
-    Long DEFAULT_RANGE_PRICE = 500L;
+    Long DEFAULT_ACCURACY_PRICE = 10L;
 
     /**
      * Range Area (The smaller the more accurate)
      */
-    Long DEFAULT_RANGE_AREA = 10L;
+    Long DEFAULT_ACCURACY_AREA = 10L;
+
 }
