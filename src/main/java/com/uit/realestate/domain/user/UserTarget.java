@@ -23,17 +23,11 @@ public class UserTarget extends SqlEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "district_id")
-    private District district;
+    private Long district;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_id")
-    private Province province;
+    private Long province;
 
     private Double price;
-
-    private String houseDirection;
 
     private Long floorQuantity;
 
@@ -41,9 +35,8 @@ public class UserTarget extends SqlEntity {
 
     private Long bathroomQuantity;
 
-    @Enumerated(EnumType.STRING)
-    private ETypeApartment typeApartment;
-
     private Double area;
+
+    private Long category;
 
 }

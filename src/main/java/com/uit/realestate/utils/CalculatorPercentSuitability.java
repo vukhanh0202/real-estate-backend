@@ -3,6 +3,8 @@ package com.uit.realestate.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uit.realestate.constant.SuitabilityConstant;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
+import com.uit.realestate.domain.user.UserTarget;
 import com.uit.realestate.dto.SuitabilityDto;
 
 import java.util.*;
@@ -13,20 +15,26 @@ public class CalculatorPercentSuitability {
     private static final String suitability = "SUITABILITY";
     private static final String total = "TOTAL";
 
-    public static double calculatorPercent(SuitabilityDto suitabilityDto, String district, String province, String price,
-                                           String category, Long floorQuantity, Long bedroomQuantity, Long bathroomQuantity,
-                                           String area) {
+    public static double calculatorPercent(SuitabilityDto suitabilityDto, List<UserTarget> userTargets) {
         Map<String, Long> result = new HashMap<>();
         result.put(suitability, 0L);
         result.put(total, 0L);
-        result = addValueByKey(result, calculate(suitabilityDto.getDistrictId(), district));
-        result = addValueByKey(result, calculate(suitabilityDto.getProvinceId(), province));
-        result = addValueByKey(result, calculate(suitabilityDto.getCategoryId(), category));
-        result = addValueByKey(result, calculate(suitabilityDto.getFloorQuantity(), floorQuantity));
-        result = addValueByKey(result, calculate(suitabilityDto.getBedroomQuantity(), bedroomQuantity));
-        result = addValueByKey(result, calculate(suitabilityDto.getBathroomQuantity(), bathroomQuantity));
-        result = addValueByKey(result, calculateArea(suitabilityDto.getArea(), area));
-        result = addValueByKey(result, calculatePrice(suitabilityDto.getTotalPrice(), price));
+        result = addValueByKey(result, calculate(suitabilityDto.getDistrictId(),
+                userTargets.stream().map(UserTarget::getDistrict).collect(Collectors.toList())));
+        result = addValueByKey(result, calculate(suitabilityDto.getProvinceId(),
+                userTargets.stream().map(UserTarget::getProvince).collect(Collectors.toList())));
+        result = addValueByKey(result, calculate(suitabilityDto.getCategoryId(),
+                userTargets.stream().map(UserTarget::getCategory).collect(Collectors.toList())));
+        result = addValueByKey(result, calculate(suitabilityDto.getFloorQuantity(),
+                userTargets.stream().map(UserTarget::getFloorQuantity).collect(Collectors.toList())));
+        result = addValueByKey(result, calculate(suitabilityDto.getBedroomQuantity(),
+                userTargets.stream().map(UserTarget::getBedroomQuantity).collect(Collectors.toList())));
+        result = addValueByKey(result, calculate(suitabilityDto.getBathroomQuantity(),
+                userTargets.stream().map(UserTarget::getBathroomQuantity).collect(Collectors.toList())));
+        result = addValueByKey(result, calculateArea(suitabilityDto.getArea(),
+                userTargets.stream().map(UserTarget::getArea).collect(Collectors.toList())));
+        result = addValueByKey(result, calculatePrice(suitabilityDto.getTotalPrice(),
+                userTargets.stream().map(UserTarget::getPrice).collect(Collectors.toList())));
         Long score = result.get(suitability);
         Long scoreTotal = result.get(total);
         if (scoreTotal == 0L) {
@@ -43,15 +51,14 @@ public class CalculatorPercentSuitability {
         return result;
     }
 
-    private static Map<String, Long> calculatePrice(Double price, String prices) {
+    private static Map<String, Long> calculatePrice(Double price, List<Double> prices) {
         long score = 0L, scoreTotal = 0L;
         long rangPrice = (long) (price * 0.1);
         if (rangPrice < SuitabilityConstant.DEFAULT_ACCURACY_PRICE) {
             rangPrice = SuitabilityConstant.DEFAULT_ACCURACY_PRICE;
         }
-        if (prices != null) {
-            List<Double> priceList = Arrays.stream(prices.split(",")).map(Double::valueOf).collect(Collectors.toList());
-            for (Double item : priceList) {
+        if (!prices.isEmpty()) {
+            for (Double item : prices) {
                 if (Math.abs(price - item) >= rangPrice) {
                     score = 0L;
                 } else {
@@ -66,15 +73,14 @@ public class CalculatorPercentSuitability {
         return result;
     }
 
-    private static Map<String, Long> calculateArea(Double area, String areas) {
+    private static Map<String, Long> calculateArea(Double area, List<Double> areas) {
         long score = 0L, scoreTotal = 0L;
         long rangArea = (long) (area * 0.1);
         if (rangArea < SuitabilityConstant.DEFAULT_ACCURACY_AREA) {
             rangArea = SuitabilityConstant.DEFAULT_ACCURACY_AREA;
         }
-        if (areas != null) {
-            List<Double> areaList = Arrays.stream(areas.split(",")).map(Double::valueOf).collect(Collectors.toList());
-            for (Double item : areaList) {
+        if (!areas.isEmpty()) {
+            for (Double item : areas) {
                 if (Math.abs(area - item) >= rangArea) {
                     score = 0L;
                 } else {
@@ -89,16 +95,14 @@ public class CalculatorPercentSuitability {
         return result;
     }
 
-    private static Map<String, Long> calculate(Long id, String json) {
+    private static Map<String, Long> calculate(Long id, List<Long> arr) {
         long suitableTemp = 0L, totalTemp = 0L;
-        if (json != null) {
-            Map<String, Object> result = castJsonToMap(json);
-            Set<Long> districtList = result.keySet().stream().map(Long::valueOf).collect(Collectors.toSet());
-            for (Long item : districtList) {
+        if (!arr.isEmpty()) {
+             for (Long item : arr) {
                 if (item.equals(id)) {
-                    suitableTemp += Long.parseLong(String.valueOf(result.get(item.toString())));
+                    suitableTemp += SuitabilityConstant.DEFAULT_ACCURACY;
                 }
-                totalTemp += Long.parseLong(String.valueOf(result.get(item.toString())));
+                totalTemp += SuitabilityConstant.DEFAULT_ACCURACY;
             }
         }
         Map<String, Long> result = new HashMap<>();
@@ -107,16 +111,35 @@ public class CalculatorPercentSuitability {
         return result;
     }
 
-    private static Map<String, Long> calculate(Long expected, Long present) {
+//    private static Map<String, Long> calculate(Long expected, Long present) {
+//        long score, scoreTotal;
+//        if (expected == null || present == null) {
+//            score = 0L;
+//            scoreTotal = 0L;
+//        } else {
+//            if (Math.abs(expected - present) >= SuitabilityConstant.DEFAULT_ACCURACY) {
+//                score = 0L;
+//            } else {
+//                score = SuitabilityConstant.DEFAULT_ACCURACY - Math.abs(expected - present);
+//            }
+//            scoreTotal = SuitabilityConstant.DEFAULT_ACCURACY;
+//        }
+//        Map<String, Long> result = new HashMap<>();
+//        result.put(suitability, score);
+//        result.put(total, scoreTotal);
+//        return result;
+//    }
+
+    private static Map<String, Long> calculate(ETypeApartment expected, ETypeApartment present) {
         long score, scoreTotal;
         if (expected == null || present == null) {
             score = 0L;
             scoreTotal = 0L;
         } else {
-            if (Math.abs(expected - present) >= SuitabilityConstant.DEFAULT_ACCURACY) {
-                score = 0L;
+            if (present.equals(expected)) {
+                score = SuitabilityConstant.DEFAULT_ACCURACY;
             } else {
-                score = SuitabilityConstant.DEFAULT_ACCURACY - Math.abs(expected - present);
+                score = 0L;
             }
             scoreTotal = SuitabilityConstant.DEFAULT_ACCURACY;
         }

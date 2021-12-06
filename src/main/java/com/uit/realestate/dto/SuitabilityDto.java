@@ -27,9 +27,6 @@ public class SuitabilityDto extends BaseDto {
 
     private Double area;
 
-    @JsonProperty("type_apartment")
-    private ETypeApartment typeApartment;
-
     @JsonProperty("bedroom_quantity")
     private Long bedroomQuantity;
 

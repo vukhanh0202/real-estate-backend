@@ -45,9 +45,6 @@ public class Province {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "province")
     private List<TrackingProvince> trackingProvinces = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "province")
-    private List<UserTarget> userTargets = new ArrayList<>();
-
     public Province(Long id) {
         this.id = id;
     }

@@ -21,16 +21,12 @@ public interface IAddUserTargetByTokenService extends IService<IAddUserTargetByT
         @JsonProperty("province_id")
         private Long provinceId;
         private Double price;
-        @JsonProperty("house_direction")
-        private String houseDirection;
         @JsonProperty("floor_quantity")
         private Long floorQuantity;
         @JsonProperty("bedroom_quantity")
         private Long bedroomQuantity;
         @JsonProperty("bathroom_quantity")
         private Long bathroomQuantity;
-        @JsonProperty("type_apartment")
-        private ETypeApartment typeApartment;
         private Double area;
     }
 }

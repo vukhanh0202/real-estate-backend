@@ -39,9 +39,6 @@ public class District{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "district")
     private List<UserAddress> userAddresses = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "district")
-    private List<UserTarget> userTargets = new ArrayList<>();
-
     public District(Long id) {
         this.id = id;
     }

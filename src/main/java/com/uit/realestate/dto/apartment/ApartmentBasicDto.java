@@ -54,6 +54,9 @@ public class ApartmentBasicDto extends BaseDto {
 
     private UserDto author;
 
+    @JsonProperty("percent_suitable")
+    private Double percentSuitable;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

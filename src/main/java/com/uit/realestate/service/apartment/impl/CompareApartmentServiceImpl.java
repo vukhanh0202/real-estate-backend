@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CompareApartmentServiceImpl extends AbstractBaseService<List<Long>, List<ApartmentCompareDto>>
+public class CompareApartmentServiceImpl extends AbstractBaseService<ICompareApartmentService.Input, List<ApartmentCompareDto>>
         implements ICompareApartmentService {
 
     private final ApartmentMapper apartmentMapper;
@@ -24,8 +24,8 @@ public class CompareApartmentServiceImpl extends AbstractBaseService<List<Long>,
     private final ApartmentRepository apartmentRepository;
 
     @Override
-    public void preExecute(List<Long> apartmentIds) {
-        apartmentIds.forEach(item -> {
+    public void preExecute(ICompareApartmentService.Input input) {
+        input.getIds().forEach(item -> {
             if (!apartmentRepository.existsById(item)) {
                 throw new NotFoundException(messageHelper.getMessage(MessageCode.Apartment.NOT_FOUND));
             }
@@ -33,8 +33,8 @@ public class CompareApartmentServiceImpl extends AbstractBaseService<List<Long>,
     }
 
     @Override
-    public List<ApartmentCompareDto> doing(List<Long> apartmentIds) {
+    public List<ApartmentCompareDto> doing(ICompareApartmentService.Input input) {
         log.info("Compare Apartment");
-        return apartmentMapper.toApartmentCompareDtoList(apartmentRepository.findAllByIdIn(apartmentIds));
+        return apartmentMapper.toApartmentCompareDtoList(apartmentRepository.findAllByIdIn(input.getIds()), input.getUserId());
     }
 }

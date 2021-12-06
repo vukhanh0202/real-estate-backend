@@ -74,11 +74,9 @@ public abstract class UserMapper implements MapperBase {
     @Mapping(source = "districtId", target = "district.id")
     @Mapping(source = "provinceId", target = "province.id")
     @Mapping(source = "price", target = "price")
-    @Mapping(source = "houseDirection", target = "houseDirection")
     @Mapping(source = "floorQuantity", target = "floorQuantity")
     @Mapping(source = "bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
-    @Mapping(source = "typeApartment", target = "typeApartment")
     @Mapping(source = "area", target = "area")
     public abstract UserTarget toUserTarget(IAddUserTargetByTokenService.Input userTargetDto);
 

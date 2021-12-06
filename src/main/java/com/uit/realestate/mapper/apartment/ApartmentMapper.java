@@ -1,6 +1,7 @@
 package com.uit.realestate.mapper.apartment;
 
 import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.domain.user.UserTarget;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentCompareDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
@@ -9,6 +10,8 @@ import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
+import com.uit.realestate.repository.user.UserTargetRepository;
+import com.uit.realestate.utils.CalculatorPercentSuitability;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,6 +34,24 @@ public abstract class ApartmentMapper implements MapperBase {
     @Autowired
     private FavouriteRepository favouriteRepository;
 
+    @Autowired
+    private SuitabilityMapper suitabilityMapper;
+
+    @Autowired
+    private UserTargetRepository userTargetRepository;
+
+    private Double getPercentSuitable(Apartment apartment, Long userId){
+        if (userId != null){
+            List<UserTarget> userTarget = userTargetRepository.findAllByUserId(userId);
+            if (userTarget.isEmpty()){
+                return null;
+            }
+            return CalculatorPercentSuitability
+                    .calculatorPercent(suitabilityMapper.toSuitabilityDto(apartment), userTarget);
+        }
+        return null;
+    }
+
     //*************************************************
     //********** Mapper Apartment To ApartmentBasicDto (Search) **********
     //*************************************************
@@ -46,7 +67,7 @@ public abstract class ApartmentMapper implements MapperBase {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
-
+        dto.setPercentSuitable(getPercentSuitable(apartment, userId));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -85,6 +106,7 @@ public abstract class ApartmentMapper implements MapperBase {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
+        dto.setPercentSuitable(getPercentSuitable(apartment, userId));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentFullDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -113,6 +135,7 @@ public abstract class ApartmentMapper implements MapperBase {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
+        dto.setPercentSuitable(getPercentSuitable(apartment, userId));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -144,7 +167,6 @@ public abstract class ApartmentMapper implements MapperBase {
         apartment.setApartmentAddress(apartmentAddressMapper.toApartmentAddress(addApartmentRequest.getApartmentAddress()));
         apartment.setApartmentDetail(apartmentDetailMapper.toApartmentDetail(addApartmentRequest.getApartmentDetail()));
         apartment.setPrice((double) Math.round(addApartmentRequest.getTotalPrice() / addApartmentRequest.getArea()));
-
     }
 
     @BeanMapping(qualifiedByName = "toApartment", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -189,12 +211,12 @@ public abstract class ApartmentMapper implements MapperBase {
     //*************************************************
     @Named("toApartmentCompareDto")
     @BeforeMapping
-    protected void toApartmentCompareDto(Apartment apartment, @MappingTarget ApartmentCompareDto apartmentCompareDto) {
+    protected void toApartmentCompareDto(Apartment apartment, @MappingTarget ApartmentCompareDto apartmentCompareDto, @Context Long userId) {
         apartmentCompareDto.setAddress(apartment.getApartmentAddress().getAddress() + ", "
                 + apartment.getApartmentAddress().getDistrict().getName() + ", "
                 + apartment.getApartmentAddress().getProvince().getName() + ", "
                 + apartment.getApartmentAddress().getCountry().getName());
-
+        apartmentCompareDto.setPercentSuitable(getPercentSuitable(apartment, userId));
     }
     @BeanMapping(qualifiedByName = "toApartmentCompareDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
@@ -212,9 +234,9 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "apartmentDetail.toiletQuantity", target = "toiletQuantity")
     @Mapping(source = "apartmentDetail.furniture", target = "furniture")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
-    public abstract ApartmentCompareDto toApartmentCompareDto(Apartment apartment);
+    public abstract ApartmentCompareDto toApartmentCompareDto(Apartment apartment, @Context Long userId);
 
     @BeanMapping(ignoreByDefault = true)
-    public abstract List<ApartmentCompareDto> toApartmentCompareDtoList(List<Apartment> apartmentList);
+    public abstract List<ApartmentCompareDto> toApartmentCompareDtoList(List<Apartment> apartmentList, @Context Long userId);
 
 }

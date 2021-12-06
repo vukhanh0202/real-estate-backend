@@ -59,4 +59,7 @@ public class ApartmentCompareDto{
     private Integer toiletQuantity;
 
     private String furniture;
+
+    @JsonProperty("percent_suitable")
+    private Double percentSuitable;
 }
