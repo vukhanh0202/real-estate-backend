@@ -33,4 +33,10 @@ public class UserTargetDto {
     private ETypeApartment typeApartment;
     private String area;
     private Long category;
+    @JsonProperty("district_name")
+    private String districtName;
+    @JsonProperty("province_name")
+    private String provinceName;
+    @JsonProperty("category_name")
+    private String categoryName;
 }

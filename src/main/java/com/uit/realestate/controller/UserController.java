@@ -40,6 +40,10 @@ public class UserController {
 
     private final IFindUserTargetByTokenService findUserTargetByTokenService;
 
+    private final IRemoveUserTargetByTokenService removeUserTargetByTokenService;
+
+    private final IUpdateUserTargetByTokenService updateUserTargetByTokenService;
+
     @ApiOperation(value = "Find Info User By Token", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/token")
     public ResponseEntity<?> findUserToken(){
@@ -103,11 +107,25 @@ public class UserController {
                 .body(new ApiResponse(addUserTargetByTokenService.execute(body)));
     }
 
+    @ApiOperation(value = "Update user target", authorizations = {@Authorization(value = "JWT")})
+    @PutMapping(value = "/token/target")
+    public ResponseEntity<?> updateUserTarget(@RequestBody IUpdateUserTargetByTokenService.Input body){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(updateUserTargetByTokenService.execute(body)));
+    }
+
     @ApiOperation(value = "Find user target", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/token/target")
     public ResponseEntity<?> findUserTarget(){
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(findUserTargetByTokenService.execute(userPrincipal.getId())));
+    }
+
+    @ApiOperation(value = "Remove user target", authorizations = {@Authorization(value = "JWT")})
+    @DeleteMapping(value = "/token/target")
+    public ResponseEntity<?> removeUserTarget(@RequestParam(value = "id") Long id){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(removeUserTargetByTokenService.execute(id)));
     }
 }

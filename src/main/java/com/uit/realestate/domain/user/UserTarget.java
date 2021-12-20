@@ -1,13 +1,11 @@
 package com.uit.realestate.domain.user;
 
-import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.SqlEntity;
-import com.uit.realestate.domain.location.District;
-import com.uit.realestate.domain.location.Province;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -39,4 +37,24 @@ public class UserTarget extends SqlEntity {
 
     private Long category;
 
+    @Override
+    public String toString() {
+        return "UserTarget{" +
+                "id=" + id +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        UserTarget that = (UserTarget) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id);
+    }
 }

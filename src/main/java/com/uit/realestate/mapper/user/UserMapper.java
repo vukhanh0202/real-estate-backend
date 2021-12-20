@@ -9,7 +9,11 @@ import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.mapper.address.UserAddressMapper;
 import com.uit.realestate.payload.user.UpdateAvatarUserRequest;
 import com.uit.realestate.payload.user.UpdateUserRequest;
+import com.uit.realestate.repository.category.CategoryRepository;
+import com.uit.realestate.repository.location.DistrictRepository;
+import com.uit.realestate.repository.location.ProvinceRepository;
 import com.uit.realestate.service.user.IAddUserTargetByTokenService;
+import com.uit.realestate.service.user.IUpdateUserTargetByTokenService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,10 +27,33 @@ public abstract class UserMapper implements MapperBase {
     @Autowired
     private UserAddressMapper userAddressMapper;
 
+    @Autowired
+    private DistrictRepository districtRepository;
+
+    @Autowired
+    private ProvinceRepository provinceRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Named("toUserDto")
     @BeforeMapping
     protected void toApartmentPreviewDto(User user, @MappingTarget UserDto userDto) {
         userDto.setAddressDto(userAddressMapper.toUserAddressDto(user.getUserAddress()));
+    }
+
+    @Named("toUserTargetDto")
+    @BeforeMapping
+    protected void toUserTargetDto(UserTarget userTarget, @MappingTarget UserTargetDto dto) {
+        if (userTarget.getDistrict() != null){
+            dto.setDistrictName(districtRepository.findById(userTarget.getDistrict()).orElse(null).getName());
+        }
+        if (userTarget.getProvince() != null){
+            dto.setProvinceName(provinceRepository.findById(userTarget.getProvince()).orElse(null).getName());
+        }
+        if (userTarget.getCategory() != null){
+            dto.setCategoryName(categoryRepository.findById(userTarget.getCategory()).orElse(null).getName());
+        }
     }
 
     @BeanMapping(qualifiedByName = "toUserDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -71,15 +98,28 @@ public abstract class UserMapper implements MapperBase {
     public abstract void updateAvatarUser(UpdateAvatarUserRequest dto, @MappingTarget User entity);
 
     @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "districtId", target = "district.id")
-    @Mapping(source = "provinceId", target = "province.id")
+    @Mapping(source = "districtId", target = "district")
+    @Mapping(source = "provinceId", target = "province")
     @Mapping(source = "price", target = "price")
     @Mapping(source = "floorQuantity", target = "floorQuantity")
     @Mapping(source = "bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "area", target = "area")
+    @Mapping(source = "category", target = "category")
     public abstract UserTarget toUserTarget(IAddUserTargetByTokenService.Input userTargetDto);
 
+    @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "districtId", target = "district")
+    @Mapping(source = "provinceId", target = "province")
+    @Mapping(source = "price", target = "price")
+    @Mapping(source = "floorQuantity", target = "floorQuantity")
+    @Mapping(source = "bedroomQuantity", target = "bedroomQuantity")
+    @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
+    @Mapping(source = "area", target = "area")
+    @Mapping(source = "category", target = "category")
+    public abstract void updateUserTarget(IUpdateUserTargetByTokenService.Input dto, @MappingTarget UserTarget entity);
+
+    @BeanMapping(qualifiedByName = "toUserTargetDto")
     public abstract UserTargetDto toUserTargetDto(UserTarget userTarget);
 
     public abstract List<UserTargetDto> toUserTargetDtoList(List<UserTarget> userTargets);

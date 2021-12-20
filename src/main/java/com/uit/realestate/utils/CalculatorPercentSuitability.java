@@ -20,21 +20,21 @@ public class CalculatorPercentSuitability {
         result.put(suitability, 0L);
         result.put(total, 0L);
         result = addValueByKey(result, calculate(suitabilityDto.getDistrictId(),
-                userTargets.stream().map(UserTarget::getDistrict).collect(Collectors.toList())));
+                userTargets.stream().map(UserTarget::getDistrict).filter(Objects::nonNull).collect(Collectors.toList())));
         result = addValueByKey(result, calculate(suitabilityDto.getProvinceId(),
-                userTargets.stream().map(UserTarget::getProvince).collect(Collectors.toList())));
+                userTargets.stream().map(UserTarget::getProvince).filter(Objects::nonNull).collect(Collectors.toList())));
         result = addValueByKey(result, calculate(suitabilityDto.getCategoryId(),
-                userTargets.stream().map(UserTarget::getCategory).collect(Collectors.toList())));
-        result = addValueByKey(result, calculate(suitabilityDto.getFloorQuantity(),
-                userTargets.stream().map(UserTarget::getFloorQuantity).collect(Collectors.toList())));
-        result = addValueByKey(result, calculate(suitabilityDto.getBedroomQuantity(),
-                userTargets.stream().map(UserTarget::getBedroomQuantity).collect(Collectors.toList())));
-        result = addValueByKey(result, calculate(suitabilityDto.getBathroomQuantity(),
-                userTargets.stream().map(UserTarget::getBathroomQuantity).collect(Collectors.toList())));
+                userTargets.stream().map(UserTarget::getCategory).filter(Objects::nonNull).collect(Collectors.toList())));
+        result = addValueByKey(result, calculateAccuracy(suitabilityDto.getFloorQuantity(),
+                userTargets.stream().map(UserTarget::getFloorQuantity).filter(Objects::nonNull).collect(Collectors.toList())));
+        result = addValueByKey(result, calculateAccuracy(suitabilityDto.getBedroomQuantity(),
+                userTargets.stream().map(UserTarget::getBedroomQuantity).filter(Objects::nonNull).collect(Collectors.toList())));
+        result = addValueByKey(result, calculateAccuracy(suitabilityDto.getBathroomQuantity(),
+                userTargets.stream().map(UserTarget::getBathroomQuantity).filter(Objects::nonNull).collect(Collectors.toList())));
         result = addValueByKey(result, calculateArea(suitabilityDto.getArea(),
-                userTargets.stream().map(UserTarget::getArea).collect(Collectors.toList())));
+                userTargets.stream().map(UserTarget::getArea).filter(Objects::nonNull).collect(Collectors.toList())));
         result = addValueByKey(result, calculatePrice(suitabilityDto.getTotalPrice(),
-                userTargets.stream().map(UserTarget::getPrice).collect(Collectors.toList())));
+                userTargets.stream().map(UserTarget::getPrice).filter(Objects::nonNull).collect(Collectors.toList())));
         Long score = result.get(suitability);
         Long scoreTotal = result.get(total);
         if (scoreTotal == 0L) {
@@ -111,51 +111,22 @@ public class CalculatorPercentSuitability {
         return result;
     }
 
-//    private static Map<String, Long> calculate(Long expected, Long present) {
-//        long score, scoreTotal;
-//        if (expected == null || present == null) {
-//            score = 0L;
-//            scoreTotal = 0L;
-//        } else {
-//            if (Math.abs(expected - present) >= SuitabilityConstant.DEFAULT_ACCURACY) {
-//                score = 0L;
-//            } else {
-//                score = SuitabilityConstant.DEFAULT_ACCURACY - Math.abs(expected - present);
-//            }
-//            scoreTotal = SuitabilityConstant.DEFAULT_ACCURACY;
-//        }
-//        Map<String, Long> result = new HashMap<>();
-//        result.put(suitability, score);
-//        result.put(total, scoreTotal);
-//        return result;
-//    }
-
-    private static Map<String, Long> calculate(ETypeApartment expected, ETypeApartment present) {
-        long score, scoreTotal;
-        if (expected == null || present == null) {
-            score = 0L;
-            scoreTotal = 0L;
-        } else {
-            if (present.equals(expected)) {
-                score = SuitabilityConstant.DEFAULT_ACCURACY;
-            } else {
-                score = 0L;
+    private static Map<String, Long> calculateAccuracy(Long expected, List<Long> presents) {
+        long score = 0L, scoreTotal = 0L;
+        if (expected != null && !presents.isEmpty()) {
+            for (Long item : presents) {
+                if (Math.abs(expected - item) >= SuitabilityConstant.DEFAULT_ACCURACY) {
+                    score += 0L;
+                } else {
+                    score += SuitabilityConstant.DEFAULT_ACCURACY - Math.abs(expected - item);
+                }
+                scoreTotal += SuitabilityConstant.DEFAULT_ACCURACY;
             }
-            scoreTotal = SuitabilityConstant.DEFAULT_ACCURACY;
         }
         Map<String, Long> result = new HashMap<>();
         result.put(suitability, score);
         result.put(total, scoreTotal);
         return result;
-    }
-
-    private static Map<String, Object> castJsonToMap(String json) {
-        try {
-            return new ObjectMapper().readValue(json, HashMap.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return new HashMap<>();
-        }
     }
 
 }

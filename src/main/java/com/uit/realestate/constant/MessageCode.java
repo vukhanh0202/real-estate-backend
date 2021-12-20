@@ -32,4 +32,8 @@ public interface MessageCode {
         String NOT_HAVE_PROVINCE = "message.district.NotHaveProvince";
         String INVALID = "message.district.Invalid";
     }
+
+    interface UserTarget {
+        String NOT_FOUND = "message.userTarget.NotFound";
+    }
 }
