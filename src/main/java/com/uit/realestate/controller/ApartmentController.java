@@ -57,6 +57,8 @@ public class ApartmentController {
 
     private final ICompareApartmentService compareApartmentService;
 
+    private final ISearchAllApartmentService searchAllApartmentService;
+
     /**
      * Search apartment
      *
@@ -115,6 +117,18 @@ public class ApartmentController {
         input.createPageable(Sort.by(sortDirection, sortBy.getValue()));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(searchApartmentService.execute(input)));
+    }
+
+    /**
+     * Search all apartment no pagination
+     * @param search
+     * @return
+     */
+    @ApiOperation(value = "Search apartment")
+    @GetMapping(value = "/public/apartment/search/all")
+    public ResponseEntity<?> findAllApartmentOpen(@RequestParam(value = "search", defaultValue = "") String search) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(searchAllApartmentService.execute(search)));
     }
 
     /**

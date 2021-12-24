@@ -14,6 +14,22 @@ import java.util.List;
 
 public interface ApartmentRepository extends JpaRepository<Apartment, Long>, JpaSpecificationExecutor<Apartment> {
 
+    List<Apartment> findAllByStatusAndPriceBetweenAndAreaBetween(EApartmentStatus status, Double priceFrom, Double priceTo, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByStatusAndPriceBetweenAndAreaGreaterThan(EApartmentStatus status, Double priceFrom, Double priceTo, Double areaFrom);
+    List<Apartment> findAllByStatusAndPriceGreaterThanAndAreaBetween(EApartmentStatus status, Double priceFrom, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByStatusAndPriceGreaterThanAndAreaGreaterThan(EApartmentStatus status,Double priceFrom, Double areaFrom);
+
+    List<Apartment> findAllByStatusAndAreaBetween(EApartmentStatus status, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByStatusAndAreaGreaterThan(EApartmentStatus status, Double areaFrom);
+    List<Apartment> findAllByStatusAndPriceBetween(EApartmentStatus status, Double priceFrom, Double priceTo);
+    List<Apartment> findAllByStatusAndPriceGreaterThan(EApartmentStatus status, Double priceFrom);
+    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndAreaBetween(Long provinceId, EApartmentStatus status, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndAreaGreaterThan(Long provinceId, EApartmentStatus status, Double areaFrom);
+    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndPriceBetween(Long provinceId, EApartmentStatus status, Double priceFrom, Double priceTo);
+    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndPriceGreaterThan(Long provinceId, EApartmentStatus status, Double priceFrom);
+
+    List<Apartment> findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus status, String title);
+
     List<Apartment> findTop4ByStatusOrderByCreatedAtDesc(EApartmentStatus status);
 
     List<Apartment> findTop4ByHighlightTrueAndStatusOrderByUpdatedAtDesc(EApartmentStatus status);

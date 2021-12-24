@@ -1,6 +1,11 @@
 package com.uit.realestate.constant;
 
 public interface MessageCode {
+
+    interface System {
+        String INVALID = "message.system.Invalid";
+    }
+
     interface User {
         String USER_WRONG = "message.user.Wrong";
         String NOT_FOUND = "message.user.NotFound";
@@ -26,6 +31,14 @@ public interface MessageCode {
 
     interface Province {
         String INVALID = "message.province.Invalid";
+    }
+
+    interface Area {
+        String INVALID = "message.area.Invalid";
+    }
+
+    interface Price {
+        String INVALID = "message.price.Invalid";
     }
 
     interface District {

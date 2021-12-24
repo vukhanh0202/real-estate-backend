@@ -5,6 +5,7 @@ import com.uit.realestate.domain.user.UserTarget;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentCompareDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
+import com.uit.realestate.dto.apartment.ApartmentSearchDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
@@ -91,6 +92,31 @@ public abstract class ApartmentMapper implements MapperBase {
     @IterableMapping(qualifiedByName = "toApartmentPreviewDtoList")
     public abstract List<ApartmentDto> toApartmentPreviewDtoList(List<Apartment> apartmentList, @Context Long userId);
 
+
+    //*************************************************
+    //********** Mapper Apartment To ApartmentSearchDto (Search All) **********
+    //*************************************************
+    @Named("toApartmentSearchDto")
+    @BeforeMapping
+    protected void toApartmentSearchDto(Apartment apartment, @MappingTarget ApartmentSearchDto dto) {
+        if (apartment.getApartmentAddress() != null) {
+            dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
+                    + ", " + apartment.getApartmentAddress().getProvince().getName());
+            dto.setAddressDetail(apartmentAddressMapper.toApartmentAddressDto(apartment.getApartmentAddress()));
+        }
+    }
+
+    @BeanMapping(qualifiedByName = "toApartmentSearchDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Named("toApartmentSearchDtoList")
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "totalPrice", target = "totalPrice")
+    @Mapping(source = "area", target = "area")
+    public abstract ApartmentSearchDto toApartmentSearchDto(Apartment apartment);
+
+    @BeanMapping(ignoreByDefault = true)
+    @IterableMapping(qualifiedByName = "toApartmentSearchDtoList")
+    public abstract List<ApartmentSearchDto> toApartmentSearchDtoList(List<Apartment> apartmentList);
 
     //*************************************************
     //********** Mapper Apartment To ApartmentFullDto (Detail) **********

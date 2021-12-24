@@ -32,4 +32,9 @@ public interface AppConstant {
      * Default disable favourite rating
      */
     Long DEFAULT_DISABLE_FAVOURITE_RATING = -5L;
+
+
+    Long DEFAULT_MAX_VALUE_PRICE = 10000000000L;
+
+    Long DEFAULT_MAX_VALUE_AREA = 1000L;
 }
