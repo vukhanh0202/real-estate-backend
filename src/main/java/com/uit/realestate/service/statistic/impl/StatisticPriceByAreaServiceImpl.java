@@ -42,10 +42,10 @@ public class StatisticPriceByAreaServiceImpl implements IStatisticApartmentServi
         if (criteria.getFrom() == null || criteria.getTo() == null) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Price.INVALID));
         }
-        Double areaFrom = Math.ceil(statistic.getFrom());
-        Double areaTo = Math.floor(statistic.getTo());
-        Double priceFrom = Math.ceil(criteria.getFrom());
-        Double priceTo = Math.floor(criteria.getTo());
+        Double areaFrom = Math.ceil(criteria.getFrom());
+        Double areaTo = Math.floor(criteria.getTo());
+        Double priceFrom = Math.ceil(statistic.getFrom());
+        Double priceTo = Math.floor(statistic.getTo());
         Long gap;
         List<Apartment> apartments;
         if (areaTo == -1 && priceTo == -1) {
@@ -57,7 +57,7 @@ public class StatisticPriceByAreaServiceImpl implements IStatisticApartmentServi
             apartments = apartmentRepository.findAllByStatusAndPriceBetweenAndAreaGreaterThan(EApartmentStatus.OPEN, priceFrom, priceTo, areaFrom);
         } else if (priceTo == -1) {
             isGreaterMaxValue = true;
-            gap = Math.round((AppConstant.DEFAULT_MAX_VALUE_PRICE - areaFrom) / 10);
+            gap = Math.round((AppConstant.DEFAULT_MAX_VALUE_AREA - areaFrom) / 10);
             apartments = apartmentRepository.findAllByStatusAndPriceGreaterThanAndAreaBetween(EApartmentStatus.OPEN, priceFrom, areaFrom, areaTo);
         } else {
             gap = Math.round((areaTo - areaFrom) / 10);

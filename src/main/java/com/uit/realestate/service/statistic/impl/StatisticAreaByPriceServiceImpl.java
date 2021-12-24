@@ -104,18 +104,21 @@ public class StatisticAreaByPriceServiceImpl implements IStatisticApartmentServi
 
 
         TotalStatisticDto totalStatisticDto = new TotalStatisticDto();
-        int sizeApartments = apartments.size();
-        totalStatisticDto.setTotalApartment(df.format(sizeApartments) + " BĐS");
+        int sizeApartmentsDivide = apartments.size();
+        if (sizeApartmentsDivide == 0){
+            sizeApartmentsDivide = 1;
+        }
+        totalStatisticDto.setTotalApartment(df.format(apartments.size()) + " BĐS");
         var totalPrice = (long) apartments.stream().mapToDouble(Apartment::getTotalPrice).sum();
         UnitDto unitForTotalPrice = CalculatorUnit.calculatorUnit(totalPrice);
         totalStatisticDto.setTotalPrice(df.format(totalPrice / unitForTotalPrice.getUnit()) + unitForTotalPrice.getUnitCoinStr());
-        UnitDto unitForAveragePrice = CalculatorUnit.calculatorUnit(totalPrice / sizeApartments);
-        totalStatisticDto.setAveragePrice(df.format((totalPrice / sizeApartments) / unitForAveragePrice.getUnit()) + unitForAveragePrice.getUnitCoinStr());
+        UnitDto unitForAveragePrice = CalculatorUnit.calculatorUnit(totalPrice / sizeApartmentsDivide);
+        totalStatisticDto.setAveragePrice(df.format((totalPrice / sizeApartmentsDivide) / unitForAveragePrice.getUnit()) + unitForAveragePrice.getUnitCoinStr());
         var totalArea = (long) apartments.stream().mapToDouble(Apartment::getArea).sum();
         UnitDto unitForTotalSquare = CalculatorUnit.calculatorUnit(totalArea);
         totalStatisticDto.setTotalSquare(df.format(totalArea / unitForTotalSquare.getUnit()) + unitForTotalSquare.getUnitAreaStr());
-        UnitDto unitForAverageSquare = CalculatorUnit.calculatorUnit(totalArea / sizeApartments);
-        totalStatisticDto.setAverageSquare(df.format((totalArea / sizeApartments) / unitForAverageSquare.getUnit()) + unitForAverageSquare.getUnitAreaStr());
+        UnitDto unitForAverageSquare = CalculatorUnit.calculatorUnit(totalArea / sizeApartmentsDivide);
+        totalStatisticDto.setAverageSquare(df.format((totalArea / sizeApartmentsDivide) / unitForAverageSquare.getUnit()) + unitForAverageSquare.getUnitAreaStr());
         result.setTotalStatisticDto(totalStatisticDto);
         return result;
     }

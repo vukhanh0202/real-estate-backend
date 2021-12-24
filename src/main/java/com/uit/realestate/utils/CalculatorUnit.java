@@ -28,7 +28,6 @@ public class CalculatorUnit {
             unit = 1000000L;
             unitCoinStr = " Triệu VNĐ";
             unitAreaStr = " Triệu m2";
-
         } else if (gap < 1000000000000L) {
             unit = 1000000000L;
             unitCoinStr = " Tỷ VNĐ";
