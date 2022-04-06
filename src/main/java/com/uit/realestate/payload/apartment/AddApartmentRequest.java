@@ -6,12 +6,14 @@ import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.dto.response.FileCaption;
 import com.uit.realestate.payload.address.ApartmentAddressRequest;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
+@Builder
 public class AddApartmentRequest {
 
     private String title;

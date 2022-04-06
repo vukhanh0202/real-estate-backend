@@ -36,7 +36,10 @@ app-config:
     directory: ${DIRECTORY_DATA_TRAIN:image-store/}
 jwt:
   secret: JWTSuperSecretKey
+
+scrapingUrl-propzy: https://propzy.vn/mua/bat-dong-san/hcm
+
 server:
-  port: 8089
+  port: 8080
   servlet:
     context-path: /api

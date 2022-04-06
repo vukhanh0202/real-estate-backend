@@ -37,4 +37,7 @@ public interface AppConstant {
     Long DEFAULT_MAX_VALUE_PRICE = 10000000000L;
 
     Long DEFAULT_MAX_VALUE_AREA = 1000L;
+
+    Long ADMIN_ID_ACCOUNT = -1L;
+
 }

@@ -1,9 +1,11 @@
 package com.uit.realestate.payload.apartment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class ApartmentDetailRequest {
 
     private String description;

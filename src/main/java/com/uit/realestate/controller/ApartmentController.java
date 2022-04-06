@@ -5,11 +5,14 @@ import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.data.UserPrincipal;
+import com.uit.realestate.dialogflow.DialogRequest;
+import com.uit.realestate.dialogflow.DialogResponse;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.service.apartment.*;
 import com.uit.realestate.service.tracking.TrackingService;
+import com.uit.realestate.utils.JsonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -26,12 +29,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 @Api(value = "Apartment APIs")
 @RequiredArgsConstructor
-public class ApartmentController {
+public class ApartmentController{
 
     private final TrackingService tracking;
 
@@ -58,6 +62,14 @@ public class ApartmentController {
     private final ICompareApartmentService compareApartmentService;
 
     private final ISearchAllApartmentService searchAllApartmentService;
+
+
+    @ApiOperation(value = "Search apartment")
+    @PostMapping(value = "/public/dialog")
+    public Object testDialog(@RequestBody String rq) {
+        DialogRequest dialogRequest = JsonUtils.unmarshal(rq, DialogRequest.class);
+        return new DialogResponse("Key from server: " + dialogRequest.getQueryResult().getParameters()).convertText();
+    }
 
     /**
      * Search apartment
