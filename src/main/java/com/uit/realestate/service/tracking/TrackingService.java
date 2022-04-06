@@ -1,5 +1,6 @@
 package com.uit.realestate.service.tracking;
 
+import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.domain.tracking.TrackingCategory;
 import com.uit.realestate.domain.tracking.TrackingDistrict;
 import com.uit.realestate.domain.tracking.TrackingProvince;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +26,19 @@ public class TrackingService {
     private final TrackingCategoryRepository trackingCategoryRepository;
     private final TrackingProvinceRepository trackingProvinceRepository;
     private final TrackingDistrictRepository trackingDistrictRepository;
+
+    public void tracking(Long userId, String ip, Map<ETrackingType, Long> mapTargetId, Long rating) {
+        for (ETrackingType trackingType : mapTargetId.keySet()) {
+            switch (trackingType) {
+                case CATEGORY:
+                    trackingCategory(userId, ip, mapTargetId.get(trackingType), rating);
+                case DISTRICT:
+                    trackingDistrict(userId, ip, mapTargetId.get(trackingType), rating);
+                case PROVINCE:
+                    trackingProvince(userId, ip, mapTargetId.get(trackingType), rating);
+            }
+        }
+    }
 
     public void trackingCategory(Long userId, String ip, Long targetId, Long rating) {
         if (targetId == null) return;
@@ -79,7 +94,7 @@ public class TrackingService {
 
         List<TrackingProvince> trackingProvinces = trackingProvinceRepository
                 .findAll(getTrackingProvinceSpecification(ip, targetId));
-        trackingProvinces =  trackingProvinces.stream().filter(trackingProvince -> {
+        trackingProvinces = trackingProvinces.stream().filter(trackingProvince -> {
             if (userId == null) {
                 return trackingProvince.getUser() == null;
             } else {

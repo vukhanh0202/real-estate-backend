@@ -1,14 +1,6 @@
 package com.uit.realestate.utils;
 
-import com.uit.realestate.domain.user.UserTarget;
-import com.uit.realestate.dto.SuitabilityDto;
 import com.uit.realestate.dto.statistic.UnitDto;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class CalculatorUnit {
 

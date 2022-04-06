@@ -1,6 +1,7 @@
 package com.uit.realestate.controller;
 
 import com.uit.realestate.constant.AppConstant;
+import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.sort.ESortApartment;
@@ -8,10 +9,12 @@ import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dialogflow.DialogRequest;
 import com.uit.realestate.dialogflow.DialogResponse;
 import com.uit.realestate.dto.response.ApiResponse;
-import com.uit.realestate.payload.apartment.AddApartmentRequest;
-import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
-import com.uit.realestate.service.apartment.*;
+import com.uit.realestate.payload.CatchInfoRequest;
+import com.uit.realestate.payload.CatchInfoRequestExt;
+import com.uit.realestate.payload.apartment.*;
+import com.uit.realestate.service.apartment.ApartmentService;
 import com.uit.realestate.service.tracking.TrackingService;
+import com.uit.realestate.utils.IPUtils;
 import com.uit.realestate.utils.JsonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,8 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,34 +37,11 @@ import java.util.Map;
 @Slf4j
 @Api(value = "Apartment APIs")
 @RequiredArgsConstructor
-public class ApartmentController{
+public class ApartmentController {
 
-    private final TrackingService tracking;
+    private final ApartmentService apartmentService;
 
-    private final ISearchApartmentService searchApartmentService;
-
-    private final IFindRecommendApartmentService findRecommendApartmentService;
-
-    private final IFindSimilarApartmentService findSimilarApartmentService;
-
-    private final IFindLatestNewApartmentService findLatestNewApartmentService;
-
-    private final IFindHighlightApartmentService findHighlightApartmentService;
-
-    private final IGetApartmentDetailService getApartmentDetailService;
-
-    private final IAddApartmentService addApartmentService;
-
-    private final IUpdateApartmentService updateApartmentService;
-
-    private final ICloseApartmentService closeApartmentService;
-
-    private final IFavouriteApartmentService favouriteApartmentService;
-
-    private final ICompareApartmentService compareApartmentService;
-
-    private final ISearchAllApartmentService searchAllApartmentService;
-
+    private final TrackingService trackingService;
 
     @ApiOperation(value = "Search apartment")
     @PostMapping(value = "/public/dialog")
@@ -110,29 +89,25 @@ public class ApartmentController{
                                                   @RequestParam(value = "floor_quantity", required = false) Long floorQuantity,
                                                   @RequestParam(value = "search", defaultValue = "") String search,
                                                   HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
-            try {
-                ip = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
         log.info("Tracking User");
-        tracking.trackingCategory(userId, ip, categoryId, AppConstant.DEFAULT_RATING);
-        tracking.trackingDistrict(userId, ip, districtId, AppConstant.DEFAULT_RATING);
-        tracking.trackingProvince(userId, ip, provinceId, AppConstant.DEFAULT_RATING);
+        Map<ETrackingType, Long> map = Map.ofEntries(
+                new AbstractMap.SimpleEntry<>(ETrackingType.CATEGORY, categoryId),
+                new AbstractMap.SimpleEntry<>(ETrackingType.DISTRICT, districtId),
+                new AbstractMap.SimpleEntry<>(ETrackingType.PROVINCE, provinceId)
+        );
+        trackingService.tracking(userId, IPUtils.getIp(request), map, AppConstant.DEFAULT_RATING);
 
-        ISearchApartmentService.Input input = new ISearchApartmentService.Input(page, size, districtId, provinceId,
+        SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId, search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
-        input.createPageable(Sort.by(sortDirection, sortBy.getValue()));
+        req.createPageable(Sort.by(sortDirection, sortBy.getValue()));
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(searchApartmentService.execute(input)));
+                .body(new ApiResponse(apartmentService.searchApartment(req)));
     }
 
     /**
      * Search all apartment no pagination
+     *
      * @param search
      * @return
      */
@@ -140,7 +115,7 @@ public class ApartmentController{
     @GetMapping(value = "/public/apartment/search/all")
     public ResponseEntity<?> findAllApartmentOpen(@RequestParam(value = "search", defaultValue = "") String search) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(searchAllApartmentService.execute(search)));
+                .body(new ApiResponse(apartmentService.searchAllApartment(search)));
     }
 
     /**
@@ -154,18 +129,10 @@ public class ApartmentController{
                                                     @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
                                                     @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
                                                     HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
-            try {
-                ip = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
-        IFindRecommendApartmentService.Input input = new IFindRecommendApartmentService.Input(page, size, userId, ip);
-        input.createPageable();
+        CatchInfoRequestExt req = new CatchInfoRequestExt(userId, IPUtils.getIp(request), page, size);
+        req.createPageable();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findRecommendApartmentService.execute(input)));
+                .body(new ApiResponse(apartmentService.findRecommendApartment(req)));
     }
 
     /**
@@ -176,21 +143,14 @@ public class ApartmentController{
     @ApiOperation(value = "Get similar apartment ")
     @GetMapping(value = "/public/apartment/similar")
     public ResponseEntity<?> findSimilarApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
-                                                    @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
-                                                    @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
-                                                    HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
-            try {
-                ip = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
-        IFindSimilarApartmentService.Input input = new IFindSimilarApartmentService.Input(page, size, userId, ip);
-        input.createPageable();
+                                                  @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                                  @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
+                                                  HttpServletRequest request) {
+
+        CatchInfoRequestExt req = new CatchInfoRequestExt(userId, IPUtils.getIp(request), page, size);
+        req.createPageable();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findSimilarApartmentService.execute(input)));
+                .body(new ApiResponse(apartmentService.findSimilarApartment(req)));
     }
 
     /**
@@ -202,7 +162,7 @@ public class ApartmentController{
     @GetMapping(value = "/public/apartment/latest-new")
     public ResponseEntity<?> findLatestNewApartment(@RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findLatestNewApartmentService.execute(userId)));
+                .body(new ApiResponse(apartmentService.findLatestApartment(new CatchInfoRequest(userId))));
     }
 
     /**
@@ -214,7 +174,7 @@ public class ApartmentController{
     @GetMapping(value = "/public/apartment/highlight")
     public ResponseEntity<?> findHighlightApartment(@RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findHighlightApartmentService.execute(userId)));
+                .body(new ApiResponse(apartmentService.findHighLightApartment(new CatchInfoRequest(userId))));
     }
 
     /**
@@ -229,16 +189,8 @@ public class ApartmentController{
     public ResponseEntity<?> findApartmentDetail(@PathVariable("id") Long id,
                                                  @RequestParam(value = "user_id", required = false) Long userId,
                                                  HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
-            try {
-                ip = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(getApartmentDetailService.execute(new IGetApartmentDetailService.Input(id, ip, userId))));
+                .body(new ApiResponse(apartmentService.getApartmentDetail(new DetailApartmentRequest(id, IPUtils.getIp(request), userId))));
     }
 
     /**
@@ -255,7 +207,7 @@ public class ApartmentController{
         addApartmentRequest.setStatus(EApartmentStatus.PENDING);
         addApartmentRequest.setAuthorId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(addApartmentService.execute(addApartmentRequest)));
+                .body(new ApiResponse(apartmentService.addApartment(addApartmentRequest)));
     }
 
     /**
@@ -273,7 +225,7 @@ public class ApartmentController{
         updateApartmentRequest.setId(id);
         updateApartmentRequest.setAuthorId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(updateApartmentService.execute(updateApartmentRequest)));
+                .body(new ApiResponse(apartmentService.updateApartment(updateApartmentRequest)));
     }
 
     /**
@@ -286,7 +238,7 @@ public class ApartmentController{
     @PreAuthorize("@securityService.hasRoles('USER', 'ADMIN')")
     public ResponseEntity<?> deleteApartmentApartment(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(closeApartmentService.execute(id)));
+                .body(new ApiResponse(apartmentService.closeApartmentService(id)));
     }
 
     /**
@@ -299,17 +251,10 @@ public class ApartmentController{
     @PreAuthorize("@securityService.hasRoles('USER', 'ADMIN')")
     public ResponseEntity<?> favouriteApartment(@PathVariable("apartmentId") Long apartmentId,
                                                 HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        if (request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
-            try {
-                ip = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(favouriteApartmentService.execute(new IFavouriteApartmentService.Input(userPrincipal.getId(), apartmentId, ip))));
+                .body(new ApiResponse(apartmentService
+                        .favouriteApartment(new FavouriteApartmentRequest(userPrincipal.getId(), apartmentId, IPUtils.getIp(request)))));
     }
 
     @ApiOperation(value = "Compare apartment")
@@ -317,6 +262,6 @@ public class ApartmentController{
     public ResponseEntity<?> compareApartment(@RequestParam(value = "apartment_list") List<Long> apartmentIds,
                                               @RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(compareApartmentService.execute(new ICompareApartmentService.Input(apartmentIds, userId))));
+                .body(new ApiResponse(apartmentService.compareApartment(new CompareApartmentRequest(apartmentIds, userId))));
     }
 }
