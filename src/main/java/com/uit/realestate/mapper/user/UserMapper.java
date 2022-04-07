@@ -7,13 +7,13 @@ import com.uit.realestate.dto.user.UserDto;
 import com.uit.realestate.dto.user.UserTargetDto;
 import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.mapper.address.UserAddressMapper;
+import com.uit.realestate.payload.user.AddUserTargetRequest;
 import com.uit.realestate.payload.user.UpdateAvatarUserRequest;
 import com.uit.realestate.payload.user.UpdateUserRequest;
+import com.uit.realestate.payload.user.UpdateUserTargetRequest;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.location.ProvinceRepository;
-import com.uit.realestate.service.user.IAddUserTargetByTokenService;
-import com.uit.realestate.service.user.IUpdateUserTargetByTokenService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -106,7 +106,7 @@ public abstract class UserMapper implements MapperBase {
     @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "category", target = "category")
-    public abstract UserTarget toUserTarget(IAddUserTargetByTokenService.Input userTargetDto);
+    public abstract UserTarget toUserTarget(AddUserTargetRequest userTargetDto);
 
     @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "districtId", target = "district")
@@ -117,7 +117,7 @@ public abstract class UserMapper implements MapperBase {
     @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "category", target = "category")
-    public abstract void updateUserTarget(IUpdateUserTargetByTokenService.Input dto, @MappingTarget UserTarget entity);
+    public abstract void updateUserTarget(UpdateUserTargetRequest dto, @MappingTarget UserTarget entity);
 
     @BeanMapping(qualifiedByName = "toUserTargetDto")
     public abstract UserTargetDto toUserTargetDto(UserTarget userTarget);

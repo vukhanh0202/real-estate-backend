@@ -3,8 +3,8 @@ package com.uit.realestate.controller.dashboard;
 import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.enums.sort.ESortUser;
 import com.uit.realestate.dto.response.ApiResponse;
-import com.uit.realestate.service.user.IFindAllUserService;
-import com.uit.realestate.service.user.IFindDetailUserService;
+import com.uit.realestate.payload.user.FindAllUserRequest;
+import com.uit.realestate.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class DashboardUserController {
 
-    private final IFindAllUserService findAllUserService;
-
-    private final IFindDetailUserService findDetailUserService;
+    private final UserService userService;
 
     @ApiOperation(value = "Find All User", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/search")
@@ -36,10 +34,10 @@ public class DashboardUserController {
                                          @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
                                          @RequestParam(value = "search", defaultValue = "") String search
                 ) {
-        IFindAllUserService.Input input = new IFindAllUserService.Input(page, size, search);
-        input.createPageable(sortDirection, sortBy.getValue());
+        FindAllUserRequest req = new FindAllUserRequest(page, size, search);
+        req.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findAllUserService.execute(input)));
+                .body(new ApiResponse(userService.findAll(req)));
     }
 
     @ApiOperation(value = "Find Apartment Of User", authorizations = {@Authorization(value = "JWT")})
@@ -47,7 +45,7 @@ public class DashboardUserController {
     @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> findApartmentOfUser(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findDetailUserService.execute(id)));
+                .body(new ApiResponse(userService.findDetail(id)));
     }
 
 }

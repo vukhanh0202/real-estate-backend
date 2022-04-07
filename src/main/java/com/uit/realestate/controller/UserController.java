@@ -4,8 +4,7 @@ import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
-import com.uit.realestate.payload.user.UpdateAvatarUserRequest;
-import com.uit.realestate.payload.user.UpdateUserRequest;
+import com.uit.realestate.payload.user.*;
 import com.uit.realestate.service.user.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,30 +25,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final IFindUserByIdService findUserByIdService;
-
-    private final IUpdateInformationByTokenService updateInformationByTokenService;
-
-    private final IUpdateAvatarUserService updateAvatarUserService;
-
-    private final IFindUserApartmentFavouriteService findUserApartmentFavouriteService;
-
-    private final IFindUserApartmentAuthorService findUserApartmentAuthorService;
-
-    private final IAddUserTargetByTokenService addUserTargetByTokenService;
-
-    private final IFindUserTargetByTokenService findUserTargetByTokenService;
-
-    private final IRemoveUserTargetByTokenService removeUserTargetByTokenService;
-
-    private final IUpdateUserTargetByTokenService updateUserTargetByTokenService;
+    private final UserService userService;
 
     @ApiOperation(value = "Find Info User By Token", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "/token")
     public ResponseEntity<?> findUserToken(){
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findUserByIdService.execute(userPrincipal.getId())));
+                .body(new ApiResponse(userService.findUserById(userPrincipal.getId())));
     }
 
     @ApiOperation(value = "Update information", authorizations = {@Authorization(value = "JWT")})
@@ -58,7 +41,7 @@ public class UserController {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         updateUserRequest.setId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(updateInformationByTokenService.execute(updateUserRequest)));
+                .body(new ApiResponse(userService.updateInformation(updateUserRequest)));
     }
 
     @ApiOperation(value = "Update information", authorizations = {@Authorization(value = "JWT")})
@@ -67,7 +50,7 @@ public class UserController {
         var userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UpdateAvatarUserRequest updateAvatarUserRequest = new UpdateAvatarUserRequest(userPrincipal.getId(), file);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(updateAvatarUserService.execute(updateAvatarUserRequest)));
+                .body(new ApiResponse(userService.updateAvatar(updateAvatarUserRequest)));
     }
 
     @ApiOperation(value = "Get apartment favourite", authorizations = {@Authorization(value = "JWT")})
@@ -77,11 +60,11 @@ public class UserController {
                                                    @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
                                                    @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection){
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        IFindUserApartmentFavouriteService.Input input = new IFindUserApartmentFavouriteService.Input(page, size, userPrincipal.getId());
-        input.createPageable(sortDirection, sortBy.getValue());
+        FindUserApartmentFavouriteRequest req = new FindUserApartmentFavouriteRequest(page, size, userPrincipal.getId());
+        req.createPageable(sortDirection, sortBy.getValue());
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findUserApartmentFavouriteService.execute(input)));
+                .body(new ApiResponse(userService.findByUserFavourite(req)));
     }
 
     @ApiOperation(value = "Get apartment author", authorizations = {@Authorization(value = "JWT")})
@@ -91,27 +74,27 @@ public class UserController {
                                                 @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
                                                 @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection){
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        IFindUserApartmentAuthorService.Input input = new IFindUserApartmentAuthorService.Input(page, size, userPrincipal.getId());
-        input.createPageable(sortDirection, sortBy.getValue());
+        FindUserApartmentAuthorRequest req = new FindUserApartmentAuthorRequest(page, size, userPrincipal.getId());
+        req.createPageable(sortDirection, sortBy.getValue());
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findUserApartmentAuthorService.execute(input)));
+                .body(new ApiResponse(userService.findByAuthor(req)));
     }
 
     @ApiOperation(value = "Add user target", authorizations = {@Authorization(value = "JWT")})
     @PostMapping(value = "/token/target")
-    public ResponseEntity<?> addUserTarget(@RequestBody IAddUserTargetByTokenService.Input body){
+    public ResponseEntity<?> addUserTarget(@RequestBody AddUserTargetRequest req){
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        body.setUserId(userPrincipal.getId());
+        req.setUserId(userPrincipal.getId());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(addUserTargetByTokenService.execute(body)));
+                .body(new ApiResponse(userService.addUserTarget(req)));
     }
 
     @ApiOperation(value = "Update user target", authorizations = {@Authorization(value = "JWT")})
     @PutMapping(value = "/token/target")
-    public ResponseEntity<?> updateUserTarget(@RequestBody IUpdateUserTargetByTokenService.Input body){
+    public ResponseEntity<?> updateUserTarget(@RequestBody UpdateUserTargetRequest req){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(updateUserTargetByTokenService.execute(body)));
+                .body(new ApiResponse(userService.updateUserTarget(req)));
     }
 
     @ApiOperation(value = "Find user target", authorizations = {@Authorization(value = "JWT")})
@@ -119,13 +102,13 @@ public class UserController {
     public ResponseEntity<?> findUserTarget(){
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findUserTargetByTokenService.execute(userPrincipal.getId())));
+                .body(new ApiResponse(userService.findUserTarget(userPrincipal.getId())));
     }
 
     @ApiOperation(value = "Remove user target", authorizations = {@Authorization(value = "JWT")})
     @DeleteMapping(value = "/token/target")
     public ResponseEntity<?> removeUserTarget(@RequestParam(value = "id") Long id){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(removeUserTargetByTokenService.execute(id)));
+                .body(new ApiResponse(userService.removeUserTarget(id)));
     }
 }
