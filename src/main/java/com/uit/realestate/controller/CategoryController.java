@@ -1,6 +1,7 @@
 package com.uit.realestate.controller;
 
 import com.uit.realestate.dto.response.ApiResponse;
+import com.uit.realestate.service.category.CategoryService;
 import com.uit.realestate.service.category.IFindAllCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final IFindAllCategoryService findAllCategoryService;
+    private final CategoryService categoryService;
 
     @ApiOperation(value = "Find All Category")
     @GetMapping(value = "/public/all-category")
     public ResponseEntity<?> findAllCategory(){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findAllCategoryService.execute()));
+                .body(new ApiResponse(categoryService.findAll()));
     }
 }

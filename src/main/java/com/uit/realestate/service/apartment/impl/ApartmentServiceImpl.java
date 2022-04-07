@@ -140,11 +140,11 @@ public class ApartmentServiceImpl implements ApartmentService {
         log.info("Find recommend apartment");
         Page<Apartment> result = apartmentRepository
                 .findRecommendApartmentByUserIdAndIp(req.getUserId(), req.getIp(), req.getPageable());
-        return new PaginationResponse(
+        return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
-                , apartmentMapper.toApartmentPreviewDtoList(result.getContent(), req.getUserId()));
+                , apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId()));
     }
 
     @Override
@@ -154,7 +154,7 @@ public class ApartmentServiceImpl implements ApartmentService {
                 .findRecommendApartmentByUserIdAndIp(req.getUserId(), req.getIp(), req.getPageable());
         List<ApartmentBasicDto> contents = apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId());
         Collections.shuffle(contents);
-        return new PaginationResponse(
+        return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
@@ -224,7 +224,7 @@ public class ApartmentServiceImpl implements ApartmentService {
 
         Page<Apartment> result = apartmentRepository.findAll(ApartmentSpecification.of(req), req.getPageable());
 
-        return new PaginationResponse(
+        return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1

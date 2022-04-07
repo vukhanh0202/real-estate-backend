@@ -4,10 +4,8 @@ import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.enums.sort.ESortCategory;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.payload.category.CategoryRequest;
-import com.uit.realestate.service.category.ICreateCategoryService;
-import com.uit.realestate.service.category.IDeleteCategoryService;
-import com.uit.realestate.service.category.IFindAllCategoryPaginationService;
-import com.uit.realestate.service.category.IUpdateCategoryService;
+import com.uit.realestate.payload.category.FindAllCategoryRequest;
+import com.uit.realestate.service.category.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -26,13 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class DashboardCategoryController {
 
-    private final IFindAllCategoryPaginationService findAllCategoryPaginationService;
-
-    private final ICreateCategoryService createCategoryService;
-
-    private final IUpdateCategoryService updateCategoryService;
-
-    private final IDeleteCategoryService deleteCategoryService;
+    private final CategoryService categoryService;
 
     @ApiOperation(value = "Find All Category", authorizations = {@Authorization(value = "JWT")})
     @GetMapping(value = "")
@@ -42,10 +34,10 @@ public class DashboardCategoryController {
                                              @RequestParam(value = "sort_by", defaultValue = "ID") ESortCategory sortBy,
                                              @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
                                              @RequestParam(value = "search", defaultValue = "") String search){
-        IFindAllCategoryPaginationService.Input input = new IFindAllCategoryPaginationService.Input(search, page, size);
-        input.createPageable(sortDirection, sortBy.getValue());
+        FindAllCategoryRequest req = new FindAllCategoryRequest(search, page, size);
+        req.createPageable(sortDirection, sortBy.getValue());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findAllCategoryPaginationService.execute(input)));
+                .body(new ApiResponse(categoryService.findAll(req)));
     }
 
     @ApiOperation(value = "Create Category", authorizations = {@Authorization(value = "JWT")})
@@ -53,7 +45,7 @@ public class DashboardCategoryController {
     @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> createCategory(@RequestBody CategoryRequest categoryRequest){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(createCategoryService.execute(categoryRequest)));
+                .body(new ApiResponse(categoryService.createCategory(categoryRequest)));
     }
 
     @ApiOperation(value = "Update Category", authorizations = {@Authorization(value = "JWT")})
@@ -63,7 +55,7 @@ public class DashboardCategoryController {
                                             @RequestBody CategoryRequest categoryRequest){
         categoryRequest.setId(id);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(updateCategoryService.execute(categoryRequest)));
+                .body(new ApiResponse(categoryService.updateCategory(categoryRequest)));
     }
 
     @ApiOperation(value = "Delete Category", authorizations = {@Authorization(value = "JWT")})
@@ -71,6 +63,6 @@ public class DashboardCategoryController {
     @PreAuthorize("@securityService.hasRoles('ADMIN')")
     public ResponseEntity<?> deleteCategory(@PathVariable("id") Long id){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(deleteCategoryService.execute(id)));
+                .body(new ApiResponse(categoryService.deleteCategory(id)));
     }
 }
