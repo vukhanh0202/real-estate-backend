@@ -2,7 +2,6 @@ package com.uit.realestate.controller;
 
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.service.category.CategoryService;
-import com.uit.realestate.service.category.IFindAllCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;

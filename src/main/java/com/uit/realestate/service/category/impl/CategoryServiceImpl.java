@@ -69,7 +69,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public PaginationResponse<CategoryDto> findAll(FindAllCategoryRequest req) {
-        log.info("FindAllCategoryServiceImpl: find all category");
         Page<Category> result = categoryRepository.findAllByNameContainingAndIsDeletedFalse(req.getSearch(), req.getPageable());
 
         return new PaginationResponse<>(
@@ -81,7 +80,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> findAll() {
-        log.info("FindAllCategoryServiceImpl: find all category");
         List<CategoryDto> result = categoryMapper.toCategoryDtoList(categoryRepository.findAllByIsDeletedFalse());
         result.sort((o1, o2) -> {
             // sort DESC
