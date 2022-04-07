@@ -2,8 +2,10 @@ package com.uit.realestate.service.location.impl;
 
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.domain.location.District;
+import com.uit.realestate.dto.location.DistrictDto;
 import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
+import com.uit.realestate.mapper.location.DistrictMapper;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.service.location.DistrictService;
 import com.uit.realestate.service.location.ProvinceService;
@@ -12,12 +14,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class DistrictServiceImpl implements DistrictService {
 
     private final DistrictRepository districtRepository;
+    private final DistrictMapper districtMapper;
 
     private final ProvinceService provinceService;
 
@@ -35,5 +40,10 @@ public class DistrictServiceImpl implements DistrictService {
         if (!district.getProvince().getId().equals(provinceId)) {
             throw new InvalidException(messageHelper.getMessage(MessageCode.Address.INVALID));
         }
+    }
+
+    @Override
+    public List<DistrictDto> findAllDistrictByProvince(Long provinceId) {
+        return districtMapper.toProvinceDtoList(districtRepository.findAllByProvince_Id(provinceId));
     }
 }

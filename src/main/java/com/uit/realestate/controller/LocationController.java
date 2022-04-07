@@ -1,9 +1,7 @@
 package com.uit.realestate.controller;
 
 import com.uit.realestate.dto.response.ApiResponse;
-import com.uit.realestate.service.location.IFindAllCountryService;
-import com.uit.realestate.service.location.IFindAllDistrictByProvinceIdService;
-import com.uit.realestate.service.location.IFindAllProvinceByCountryCodeService;
+import com.uit.realestate.service.location.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -22,30 +20,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class LocationController {
 
-    private final IFindAllCountryService findAllCountryService;
+    private final CountryService countryService;
 
-    private final IFindAllProvinceByCountryCodeService findAllProvinceByCountryCodeService;
+    private final ProvinceService provinceService;
 
-    private final IFindAllDistrictByProvinceIdService findAllDistrictByProvinceIdService;
+    private final DistrictService districtService;
 
     @ApiOperation(value = "Find All Country")
     @GetMapping(value = "/country")
     public ResponseEntity<?> findAllCountry(){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findAllCountryService.execute()));
+                .body(new ApiResponse(countryService.findAll()));
     }
 
     @ApiOperation(value = "Find All province by country code")
     @GetMapping(value = "/province/country")
     public ResponseEntity<?> findAllProvinceByCountryCode(@RequestParam(value = "country_code", defaultValue = "VN") String countryCode){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findAllProvinceByCountryCodeService.execute(countryCode)));
+                .body(new ApiResponse(provinceService.findAllProvinceByCountryCode(countryCode)));
     }
 
     @ApiOperation(value = "Find All district by province id")
     @GetMapping(value = "/district/province")
     public ResponseEntity<?> findAllDistrictByProvinceId(@RequestParam(value = "province_id") Long provinceId){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(findAllDistrictByProvinceIdService.execute(provinceId)));
+                .body(new ApiResponse(districtService.findAllDistrictByProvince(provinceId)));
     }
 }
