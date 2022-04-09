@@ -43,22 +43,14 @@ public class ApartmentCompareDto{
     @JsonProperty("floor_quantity")
     private Long floorQuantity;
 
-    @JsonProperty("front_building")
-    private String frontBuilding;
-
-    @JsonProperty("entrance_building")
-    private String entranceBuilding;
-
     @JsonProperty("house_building")
     private String houseDirection;
-
-    @JsonProperty("balcony_direction")
-    private String balconyDirection;
 
     @JsonProperty("toilet_quantity")
     private Integer toiletQuantity;
 
-    private String furniture;
+    @JsonProperty("more_info")
+    private List<String> moreInfo;
 
     @JsonProperty("percent_suitable")
     private Double percentSuitable;

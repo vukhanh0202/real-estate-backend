@@ -4,23 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class ApartmentDetailRequest {
 
     private String description;
 
-    @JsonProperty("front_building")
-    private String frontBuilding;
-
-    @JsonProperty("entrance_building")
-    private String entranceBuilding;
-
     @JsonProperty("house_direction")
     private String houseDirection;
-
-    @JsonProperty("balcony_direction")
-    private String balconyDirection;
 
     @JsonProperty("floor_quantity")
     private Integer floorQuantity;
@@ -34,5 +27,6 @@ public class ApartmentDetailRequest {
     @JsonProperty("toilet_quantity")
     private Integer toiletQuantity;
 
-    private String furniture;
+    @JsonProperty("more_info")
+    private List<String> moreInfo;
 }

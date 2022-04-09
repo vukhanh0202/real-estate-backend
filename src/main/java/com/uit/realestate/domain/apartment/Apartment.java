@@ -45,10 +45,6 @@ public class Apartment extends SqlEntity {
     @Enumerated(EnumType.STRING)
     private EApartmentStatus status = EApartmentStatus.PENDING;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "UTC")
-    private Date expiredDate;
-
     @OneToOne(mappedBy = "apartment",cascade = CascadeType.ALL,
             orphanRemoval = true,fetch = FetchType.LAZY)
     private ApartmentAddress apartmentAddress;

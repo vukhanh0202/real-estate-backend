@@ -7,6 +7,8 @@ import com.uit.realestate.dto.BaseDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,17 +17,8 @@ public class ApartmentDetailDto{
 
     private String description;
 
-    @JsonProperty("front_building")
-    private String frontBuilding;
-
-    @JsonProperty("entrance_building")
-    private String entranceBuilding;
-
     @JsonProperty("house_building")
     private String houseDirection;
-
-    @JsonProperty("balcony_direction")
-    private String balconyDirection;
 
     @JsonProperty("floor_quantity")
     private Integer floorQuantity;
@@ -39,6 +32,7 @@ public class ApartmentDetailDto{
     @JsonProperty("toilet_quantity")
     private Integer toiletQuantity;
 
-    private String furniture;
+    @JsonProperty("more_info")
+    private List<String> moreInfo;
 
 }

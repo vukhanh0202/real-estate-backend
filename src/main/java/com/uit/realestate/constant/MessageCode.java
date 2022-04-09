@@ -2,6 +2,8 @@ package com.uit.realestate.constant;
 
 public interface MessageCode {
 
+    String ERROR = "message.error";
+
     interface System {
         String INVALID = "message.system.Invalid";
     }

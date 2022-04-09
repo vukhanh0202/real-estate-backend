@@ -17,15 +17,12 @@ public abstract class ApartmentDetailMapper implements MapperBase {
 
     @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "description", target = "description")
-    @Mapping(source = "frontBuilding", target = "frontBuilding")
-    @Mapping(source = "entranceBuilding", target = "entranceBuilding")
     @Mapping(source = "houseDirection", target = "houseDirection")
-    @Mapping(source = "balconyDirection", target = "balconyDirection")
     @Mapping(source = "floorQuantity", target = "floorQuantity")
     @Mapping(source = "bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "toiletQuantity", target = "toiletQuantity")
-    @Mapping(source = "furniture", target = "furniture")
+    @Mapping(source = "moreInfo", target = "moreInfo")
     public abstract ApartmentDetailDto toApartmentDetailDto(ApartmentDetail apartmentDetail);
 
 
@@ -35,15 +32,12 @@ public abstract class ApartmentDetailMapper implements MapperBase {
 
     @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "description", target = "description")
-    @Mapping(source = "frontBuilding", target = "frontBuilding")
-    @Mapping(source = "entranceBuilding", target = "entranceBuilding")
     @Mapping(source = "houseDirection", target = "houseDirection")
-    @Mapping(source = "balconyDirection", target = "balconyDirection")
     @Mapping(source = "floorQuantity", target = "floorQuantity")
     @Mapping(source = "bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "toiletQuantity", target = "toiletQuantity")
-    @Mapping(source = "furniture", target = "furniture")
+    @Mapping(source = "moreInfo", target = "moreInfo")
     public abstract ApartmentDetail toApartmentDetail(ApartmentDetailRequest apartmentDetailRequest);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

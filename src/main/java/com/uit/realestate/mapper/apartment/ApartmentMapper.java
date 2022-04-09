@@ -254,11 +254,9 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "apartmentDetail.floorQuantity", target = "floorQuantity")
-    @Mapping(source = "apartmentDetail.frontBuilding", target = "frontBuilding")
     @Mapping(source = "apartmentDetail.houseDirection", target = "houseDirection")
-    @Mapping(source = "apartmentDetail.balconyDirection", target = "balconyDirection")
     @Mapping(source = "apartmentDetail.toiletQuantity", target = "toiletQuantity")
-    @Mapping(source = "apartmentDetail.furniture", target = "furniture")
+    @Mapping(source = "apartmentDetail.moreInfo", target = "moreInfo")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
     public abstract ApartmentCompareDto toApartmentCompareDto(Apartment apartment, @Context Long userId);
 

@@ -1,9 +1,11 @@
 package com.uit.realestate.domain.apartment;
 
+import com.uit.realestate.repository.converter.ListToStringConverter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @NoArgsConstructor
 @Entity
@@ -22,13 +24,7 @@ public class ApartmentDetail {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String frontBuilding;
-
-    private String entranceBuilding;
-
     private String houseDirection;
-
-    private String balconyDirection;
 
     private Integer floorQuantity;
 
@@ -38,6 +34,8 @@ public class ApartmentDetail {
 
     private Integer toiletQuantity;
 
-    private String furniture;
+    @Column
+    @Convert(converter = ListToStringConverter.class)
+    private List<String> moreInfo;
 
 }

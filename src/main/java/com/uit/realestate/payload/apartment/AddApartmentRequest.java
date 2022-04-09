@@ -31,9 +31,6 @@ public class AddApartmentRequest {
     @JsonProperty("type_apartment")
     private ETypeApartment typeApartment;
 
-    @JsonProperty("expired_date")
-    private Date expiredDate;
-
     @JsonProperty("apartment_address")
     private ApartmentAddressRequest apartmentAddress;
 
