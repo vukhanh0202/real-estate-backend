@@ -13,6 +13,7 @@ import com.uit.realestate.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class DistrictServiceImpl implements DistrictService {
 
     private final DistrictRepository districtRepository;
