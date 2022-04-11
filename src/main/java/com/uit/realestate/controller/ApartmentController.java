@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -90,11 +91,10 @@ public class ApartmentController {
                                                   @RequestParam(value = "search", defaultValue = "") String search,
                                                   HttpServletRequest request) {
         log.info("Tracking User");
-        Map<ETrackingType, Long> map = Map.ofEntries(
-                new AbstractMap.SimpleEntry<>(ETrackingType.CATEGORY, categoryId),
-                new AbstractMap.SimpleEntry<>(ETrackingType.DISTRICT, districtId),
-                new AbstractMap.SimpleEntry<>(ETrackingType.PROVINCE, provinceId)
-        );
+        Map<ETrackingType, Long> map = new HashMap<>();
+        map.put(ETrackingType.CATEGORY, categoryId);
+        map.put(ETrackingType.DISTRICT, districtId);
+        map.put(ETrackingType.PROVINCE, provinceId);
         trackingService.tracking(userId, IPUtils.getIp(request), map, AppConstant.DEFAULT_RATING);
 
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,

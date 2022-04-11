@@ -199,7 +199,7 @@ public class ScraperPropzyServiceImpl implements ScraperService {
                     .builder()
                     .title(title)
                     .area(area)
-                    .status(EApartmentStatus.PENDING)
+                    .status(EApartmentStatus.OPEN)
                     .totalPrice(StringUtils.castNumberFromStringPriceBillion(totalPrice))
                     .typeApartment(ETypeApartment.of(typeApartment))
                     .apartmentAddress(ApartmentAddressRequest.builder()

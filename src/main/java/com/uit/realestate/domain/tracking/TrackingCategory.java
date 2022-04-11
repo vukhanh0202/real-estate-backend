@@ -32,12 +32,12 @@ public class TrackingCategory extends SqlEntity {
     @Column
     private Long rating = 0L;
 
-    public TrackingCategory(Long userId, Long categoryId, String ip, Long rating) {
+    public TrackingCategory(Long userId, Category category, String ip, Long rating) {
         if (userId != null){
             this.user = new User(userId);
         }
-        if (categoryId != null){
-            this.category = new Category(categoryId);
+        if (category != null){
+            this.category = category;
         }
         if (ip != null){
             this.ip = ip;

@@ -34,12 +34,12 @@ public class TrackingDistrict extends SqlEntity {
     @Column
     private Long rating = 0L;
 
-    public TrackingDistrict(Long userId, Long districtId, String ip, Long rating) {
+    public TrackingDistrict(Long userId, District district, String ip, Long rating) {
         if (userId != null){
             this.user = new User(userId);
         }
-        if (districtId != null){
-            this.district = new District(districtId);
+        if (district != null){
+            this.district = district;
         }
         if (ip != null){
             this.ip = ip;

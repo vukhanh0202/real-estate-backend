@@ -25,7 +25,7 @@ public abstract class CategoryMapper implements MapperBase {
     @Mapping(source = "name", target = "name")
     public abstract CategoryDto toCategoryDto(Category category);
 
-    @BeanMapping(ignoreByDefault = true)
+    @BeanMapping(qualifiedByName = "toCategoryDto", ignoreByDefault = true)
     public abstract List<CategoryDto> toCategoryDtoList(List<Category> categoryList);
 
     @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

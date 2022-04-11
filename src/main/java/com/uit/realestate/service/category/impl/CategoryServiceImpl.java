@@ -107,6 +107,8 @@ public class CategoryServiceImpl implements CategoryService {
             }
             category = categoryRepository.findByNameAndIsDeletedFalse(name).orElseThrow(() -> new InvalidException(messageHelper.getMessage(MessageCode.Category.NOT_FOUND)));;
         }
-        return CategoryDto.builder().id(category.getId()).build();
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(category.getId());
+        return categoryDto;
     }
 }

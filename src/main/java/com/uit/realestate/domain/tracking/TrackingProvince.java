@@ -23,7 +23,7 @@ public class TrackingProvince extends SqlEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "province_id")
     private Province province;
 
@@ -33,12 +33,12 @@ public class TrackingProvince extends SqlEntity {
     @Column
     private Long rating = 0L;
 
-    public TrackingProvince(Long userId, Long provinceId, String ip, Long rating) {
+    public TrackingProvince(Long userId, Province province, String ip, Long rating) {
         if (userId != null){
             this.user = new User(userId);
         }
-        if (provinceId != null){
-            this.province = new Province(provinceId);
+        if (province != null){
+            this.province = province;
         }
         if (ip != null){
             this.ip = ip;

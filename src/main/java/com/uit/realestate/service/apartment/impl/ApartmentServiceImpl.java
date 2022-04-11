@@ -32,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.NotTransactional;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -180,9 +181,9 @@ public class ApartmentServiceImpl implements ApartmentService {
                 }
             }
         }
+        ApartmentDto result = apartmentMapper.toApartmentFullDto(apartment, req.getUserId());
 
         log.info("Tracking User");
-        Long rating;
         Map<ETrackingType, Long> map = new HashMap<>();
         map.put(ETrackingType.CATEGORY, apartment.getCategory().getId());
         map.put(ETrackingType.DISTRICT, apartment.getApartmentAddress().getDistrict().getId());
@@ -191,7 +192,7 @@ public class ApartmentServiceImpl implements ApartmentService {
 
         log.info("Get detail apartment ID: " + req.getId());
 
-        return apartmentMapper.toApartmentFullDto(apartment, req.getUserId());
+        return result;
     }
 
     @Override

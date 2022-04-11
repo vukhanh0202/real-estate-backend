@@ -4,6 +4,9 @@ import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.domain.tracking.TrackingCategory;
 import com.uit.realestate.domain.tracking.TrackingDistrict;
 import com.uit.realestate.domain.tracking.TrackingProvince;
+import com.uit.realestate.repository.category.CategoryRepository;
+import com.uit.realestate.repository.location.DistrictRepository;
+import com.uit.realestate.repository.location.ProvinceRepository;
 import com.uit.realestate.repository.tracking.TrackingCategoryRepository;
 import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
 import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
@@ -29,16 +32,25 @@ public class TrackingService {
     private final TrackingProvinceRepository trackingProvinceRepository;
     private final TrackingDistrictRepository trackingDistrictRepository;
 
+    private final CategoryRepository categoryRepository;
+    private final ProvinceRepository provinceRepository;
+    private final DistrictRepository districtRepository;
+
+
     public void tracking(Long userId, String ip, Map<ETrackingType, Long> mapTargetId, Long rating) {
-        for (ETrackingType trackingType : mapTargetId.keySet()) {
-            switch (trackingType) {
-                case CATEGORY:
-                    trackingCategory(userId, ip, mapTargetId.get(trackingType), rating);
-                case DISTRICT:
-                    trackingDistrict(userId, ip, mapTargetId.get(trackingType), rating);
-                case PROVINCE:
-                    trackingProvince(userId, ip, mapTargetId.get(trackingType), rating);
+        try{
+            for (ETrackingType trackingType : mapTargetId.keySet()) {
+                switch (trackingType) {
+                    case CATEGORY:
+                        trackingCategory(userId, ip, mapTargetId.get(trackingType), rating);
+                    case DISTRICT:
+                        trackingDistrict(userId, ip, mapTargetId.get(trackingType), rating);
+                    case PROVINCE:
+                        trackingProvince(userId, ip, mapTargetId.get(trackingType), rating);
+                }
             }
+        }catch (Exception e){
+            log.error(e.getMessage());
         }
     }
 
@@ -56,7 +68,7 @@ public class TrackingService {
             }
         }).collect(Collectors.toList());
         if (trackingCategories.isEmpty()) {
-            trackingCategoryRepository.save(new TrackingCategory(userId, targetId, ip, rating));
+            trackingCategoryRepository.save(new TrackingCategory(userId, categoryRepository.findById(targetId).get(), ip, rating));
         } else {
             trackingCategories.forEach(trackingCategory -> {
                 trackingCategory.setRating(trackingCategory.getRating() + rating);
@@ -80,7 +92,7 @@ public class TrackingService {
             }
         }).collect(Collectors.toList());
         if (trackingDistricts.isEmpty()) {
-            trackingDistrictRepository.save(new TrackingDistrict(userId, targetId, ip, rating));
+            trackingDistrictRepository.save(new TrackingDistrict(userId, districtRepository.findById(targetId).get(), ip, rating));
         } else {
             trackingDistricts.forEach(trackingDistrict -> {
                 trackingDistrict.setRating(trackingDistrict.getRating() + rating);
@@ -104,7 +116,7 @@ public class TrackingService {
             }
         }).collect(Collectors.toList());
         if (trackingProvinces.isEmpty()) {
-            trackingProvinceRepository.save(new TrackingProvince(userId, targetId, ip, rating));
+            trackingProvinceRepository.save(new TrackingProvince(userId, provinceRepository.findById(targetId).get(), ip, rating));
         } else {
             trackingProvinces.forEach(trackingProvince -> {
                 trackingProvince.setRating(trackingProvince.getRating() + rating);
