@@ -266,4 +266,31 @@ public class ApartmentServiceImpl implements ApartmentService {
         return true;
     }
 
+    @Override
+    public boolean existApartment(String title) {
+        log.info("Validate Apartment with title");
+
+        var apartment = apartmentRepository.findAllByTitleContainingIgnoreCase(title);
+
+        return apartment.size() > 0;
+    }
+
+    @Override
+    public Long findByTitleNewest(String title) {
+        var apartment = apartmentRepository.findAllByTitleContainingIgnoreCaseOrderByCreatedAtDesc(title);
+
+        if (apartment.size() > 0) {
+            return apartment.stream().findFirst().get().getId();
+        }
+        return null;
+    }
+
+    @Override
+    public void deletePermanent(String title) {
+        var apartment = apartmentRepository.findAllByTitleContainingIgnoreCaseOrderByCreatedAtDesc(title);
+
+        if (apartment.size() > 0) {
+            apartmentRepository.delete(apartment.stream().findFirst().get());
+        }
+    }
 }

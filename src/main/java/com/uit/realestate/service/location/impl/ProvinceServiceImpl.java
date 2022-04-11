@@ -30,11 +30,17 @@ public class ProvinceServiceImpl implements ProvinceService {
         }
 
         provinceRepository.findById(provinceId)
-                .orElseThrow(()-> new NotFoundException(messageHelper.getMessage(MessageCode.Province.INVALID)));
+                .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.Province.INVALID)));
     }
 
     @Override
     public List<ProvinceDto> findAllProvinceByCountryCode(String countryCode) {
         return provinceMapper.toProvinceDtoList(provinceRepository.findAllByCountry_Code(countryCode));
+    }
+
+    @Override
+    public ProvinceDto findByDistrict(Long districtId) {
+        return provinceMapper.toProvinceDto(provinceRepository.findByDistrictId(districtId)
+                .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.Province.INVALID))));
     }
 }

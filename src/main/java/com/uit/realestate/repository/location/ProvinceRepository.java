@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProvinceRepository extends JpaRepository<Province, Long> {
 
@@ -23,4 +24,10 @@ public interface ProvinceRepository extends JpaRepository<Province, Long> {
             countQuery = "select count(p) from Province p")
     List<Province> findAllByApartmentPrices();
 
+    @Query(value = "SELECT p.* " +
+            " FROM province p " +
+            " JOIN district d ON p.id = d.province_id " +
+            " WHERE d.id = :districtId ",
+            nativeQuery = true)
+    Optional<Province> findByDistrictId(Long districtId);
 }

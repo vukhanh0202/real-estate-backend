@@ -37,7 +37,7 @@ app-config:
 jwt:
   secret: JWTSuperSecretKey
 
-scrapingUrl-propzy: https://propzy.vn/mua/bat-dong-san/hcm
+scrapingUrl-propzy: https://propzy.vn/mua/bat-dong-san/hcm/
 
 server:
   port: 8080

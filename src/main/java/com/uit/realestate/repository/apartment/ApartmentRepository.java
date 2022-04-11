@@ -14,6 +14,8 @@ import java.util.List;
 
 public interface ApartmentRepository extends JpaRepository<Apartment, Long>, JpaSpecificationExecutor<Apartment> {
 
+    List<Apartment> findAllByTitleContainingIgnoreCase(String title);
+    List<Apartment> findAllByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title);
     List<Apartment> findAllByStatusAndPriceBetweenAndAreaBetween(EApartmentStatus status, Double priceFrom, Double priceTo, Double areaFrom, Double areaTo);
     List<Apartment> findAllByStatusAndPriceBetweenAndAreaGreaterThan(EApartmentStatus status, Double priceFrom, Double priceTo, Double areaFrom);
     List<Apartment> findAllByStatusAndPriceGreaterThanAndAreaBetween(EApartmentStatus status, Double priceFrom, Double areaFrom, Double areaTo);

@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -45,5 +47,14 @@ public class DistrictServiceImpl implements DistrictService {
     @Override
     public List<DistrictDto> findAllDistrictByProvince(Long provinceId) {
         return districtMapper.toProvinceDtoList(districtRepository.findAllByProvince_Id(provinceId));
+    }
+
+    @Override
+    public DistrictDto findDistrictNameIn(String str) {
+        List<District> districts = districtRepository.findAllByNameIn(Stream.of(str.split(",")).map(String::trim).collect(Collectors.toList()));
+        if (districts.size() == 1){
+            return districtMapper.toProvinceDto(districts.stream().findFirst().get());
+        }
+        throw new NotFoundException(messageHelper.getMessage(MessageCode.District.INVALID));
     }
 }

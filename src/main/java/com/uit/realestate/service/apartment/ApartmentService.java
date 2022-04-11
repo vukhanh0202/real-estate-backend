@@ -40,4 +40,10 @@ public interface ApartmentService {
     boolean updateApartment(UpdateApartmentRequest req);
 
     boolean validateApartment(ValidateApartmentRequest req);
+
+    boolean existApartment(String title);
+
+    Long findByTitleNewest(String title);
+
+    void deletePermanent(String title);
 }

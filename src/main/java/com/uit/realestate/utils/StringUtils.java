@@ -11,12 +11,16 @@ import java.util.stream.Collectors;
 public final class StringUtils {
 
     public static Double castNumberFromString(String str) {
-        Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?(\\,\\d+)?");
-        String matcher = pattern.matcher(str) .results()
-                .collect(Collectors.toList())
-                .get(0)
-                .group(0);
-        return Double.parseDouble(matcher.replace(",","."));
+        try{
+            Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?(\\,\\d+)?");
+            String matcher = pattern.matcher(str).results()
+                    .collect(Collectors.toList())
+                    .get(0)
+                    .group(0);
+            return Double.parseDouble(matcher.replace(",","."));
+        }catch (Exception e){
+            return 0D;
+        }
     }
 
     public static Double castNumberFromStringPriceBillion(String str) {

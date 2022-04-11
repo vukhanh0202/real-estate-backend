@@ -18,4 +18,6 @@ public interface CategoryService {
     PaginationResponse<CategoryDto> findAll(FindAllCategoryRequest req);
 
     List<CategoryDto> findAll();
+
+    CategoryDto findOrCreate(String name);
 }

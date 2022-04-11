@@ -19,14 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
+import static com.uit.realestate.constant.AppConstant.APARTMENT_FILE;
+import static com.uit.realestate.constant.AppConstant.AVATAR_FILE;
+
 @RestController
 @Slf4j
 @Api(value = "Files APIs")
 @RequiredArgsConstructor
 public class FileController {
-
-    private static final String APARTMENT_FILE = "/apartment/";
-    private static final String AVATAR_FILE = "/avatar/";
 
     private final DownloadImageService downloadImageService;
 

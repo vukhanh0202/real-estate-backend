@@ -4,6 +4,7 @@ import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.domain.apartment.Category;
 import com.uit.realestate.dto.category.CategoryDto;
 import com.uit.realestate.dto.response.PaginationResponse;
+import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.category.CategoryMapper;
 import com.uit.realestate.payload.category.CategoryRequest;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -91,5 +93,18 @@ public class CategoryServiceImpl implements CategoryService {
             return 0;
         });
         return result;
+    }
+
+    @Override
+    public CategoryDto findOrCreate(String name) {
+        Category category = categoryRepository.findByNameAndIsDeletedFalse(name).orElse(null);
+        if (Objects.isNull(category)) {
+            boolean res = createCategory(CategoryRequest.builder().name(name).build());
+            if (!res){
+                throw new InvalidException(messageHelper.getMessage(MessageCode.Category.NOT_FOUND));
+            }
+            category = categoryRepository.findByNameAndIsDeletedFalse(name).orElseThrow(() -> new InvalidException(messageHelper.getMessage(MessageCode.Category.NOT_FOUND)));;
+        }
+        return CategoryDto.builder().id(category.getId()).build();
     }
 }

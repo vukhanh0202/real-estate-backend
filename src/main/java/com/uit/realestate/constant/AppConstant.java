@@ -38,6 +38,10 @@ public interface AppConstant {
 
     Long DEFAULT_MAX_VALUE_AREA = 1000L;
 
-    Long ADMIN_ID_ACCOUNT = -1L;
+    Long ADMIN_ID_ACCOUNT = 1L;
 
+    String DEFAULT_COUNTRY = "VN";
+
+    String APARTMENT_FILE = "/apartment/";
+    String AVATAR_FILE = "/avatar/";
 }

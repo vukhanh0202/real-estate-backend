@@ -23,7 +23,8 @@ public class ScraperController {
 
     @GetMapping(path = "/")
     public ResponseEntity<?> getVehicleByModel() {
+        scraperServiceFactory.getScraperService(EScraper.PROPZY).scrapingData(2);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(scraperServiceFactory.getScraperService(EScraper.PROPZY).scrapingData(100)));
+                .body(new ApiResponse(true));
     }
 }
