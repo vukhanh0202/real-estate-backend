@@ -36,6 +36,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         ExceptionResponse exceptionResponse = new ExceptionResponse(ex.getMessage(), httpStatus.value());
+        ex.printStackTrace();
         return new ResponseEntity<>(exceptionResponse, httpStatus);
     }
 }

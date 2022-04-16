@@ -16,7 +16,7 @@ public enum ETypeApartment {
 
     public static ETypeApartment of(String str){
         for(ETypeApartment type : values()){
-            if(type.getValue().equals(str)){
+            if(str.contains(type.getValue())){
                 return type;
             }
         }

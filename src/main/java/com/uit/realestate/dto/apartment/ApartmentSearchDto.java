@@ -32,7 +32,7 @@ public class ApartmentSearchDto extends BaseDto {
     private Double area;
 
     @JsonProperty("total_price")
-    private Double totalPrice;
+    private String totalPrice;
 
     @JsonProperty("percent_suitable")
     private Double percentSuitable;

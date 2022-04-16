@@ -5,7 +5,7 @@ import lombok.Getter;
 public enum EScraper {
     PROPZY("https://propzy.vn"),
     BDS("batdongsan.vn"),
-    ALOND("alonhadat.com.vn");
+    ALOND("https://alonhadat.com.vn");
 
     @Getter
     private final String value;

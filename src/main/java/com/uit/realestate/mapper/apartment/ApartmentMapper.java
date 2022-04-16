@@ -1,5 +1,6 @@
 package com.uit.realestate.mapper.apartment;
 
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.UserTarget;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
@@ -13,6 +14,7 @@ import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.repository.user.UserTargetRepository;
 import com.uit.realestate.utils.CalculatorPercentSuitability;
+import com.uit.realestate.utils.StringUtils;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,16 +43,24 @@ public abstract class ApartmentMapper implements MapperBase {
     @Autowired
     private UserTargetRepository userTargetRepository;
 
-    private Double getPercentSuitable(Apartment apartment, Long userId){
-        if (userId != null){
+    private Double getPercentSuitable(Apartment apartment, Long userId) {
+        if (userId != null) {
             List<UserTarget> userTarget = userTargetRepository.findAllByUserId(userId);
-            if (userTarget.isEmpty()){
+            if (userTarget.isEmpty()) {
                 return 0D;
             }
             return CalculatorPercentSuitability
                     .calculatorPercent(suitabilityMapper.toSuitabilityDto(apartment), userTarget);
         }
         return 0D;
+    }
+
+    private String convertPriceToString(Apartment apartment) {
+        if (apartment.getTypeApartment().equals(ETypeApartment.BUY)) {
+            return StringUtils.castPriceFromNumber(apartment.getTotalPrice());
+        } else {
+            return apartment.getUnitRent().trim();
+        }
     }
 
     //*************************************************
@@ -69,6 +79,7 @@ public abstract class ApartmentMapper implements MapperBase {
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setPercentSuitable(getPercentSuitable(apartment, userId));
+        dto.setTotalPrice(convertPriceToString(apartment));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -76,7 +87,6 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "overview", target = "overview")
-    @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "category.name", target = "categoryName")
@@ -104,13 +114,13 @@ public abstract class ApartmentMapper implements MapperBase {
                     + ", " + apartment.getApartmentAddress().getProvince().getName());
             dto.setAddressDetail(apartmentAddressMapper.toApartmentAddressDto(apartment.getApartmentAddress()));
         }
+        dto.setTotalPrice(convertPriceToString(apartment));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentSearchDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Named("toApartmentSearchDtoList")
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
-    @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
     public abstract ApartmentSearchDto toApartmentSearchDto(Apartment apartment);
 
@@ -133,13 +143,13 @@ public abstract class ApartmentMapper implements MapperBase {
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setPercentSuitable(getPercentSuitable(apartment, userId));
+        dto.setTotalPrice(convertPriceToString(apartment));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentFullDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "overview", target = "overview")
-    @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "category.id", target = "categoryId")
@@ -162,13 +172,13 @@ public abstract class ApartmentMapper implements MapperBase {
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setPercentSuitable(getPercentSuitable(apartment, userId));
+        dto.setTotalPrice(convertPriceToString(apartment));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "overview", target = "overview")
-    @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "area", target = "area")
@@ -192,14 +202,19 @@ public abstract class ApartmentMapper implements MapperBase {
         apartment.setCategory(categoryRepository.findById(addApartmentRequest.getCategoryId()).get());
         apartment.setApartmentAddress(apartmentAddressMapper.toApartmentAddress(addApartmentRequest.getApartmentAddress()));
         apartment.setApartmentDetail(apartmentDetailMapper.toApartmentDetail(addApartmentRequest.getApartmentDetail()));
-        apartment.setPrice((double) Math.round(addApartmentRequest.getTotalPrice() / addApartmentRequest.getArea()));
+        if (addApartmentRequest.getTypeApartment().equals(ETypeApartment.BUY)) {
+            apartment.setTotalPrice(addApartmentRequest.getTotalPrice());
+            apartment.setPrice((double) Math.round(addApartmentRequest.getTotalPrice() / addApartmentRequest.getArea()));
+        } else {
+            apartment.setPriceRent(addApartmentRequest.getPriceRent());
+            apartment.setUnitRent(addApartmentRequest.getUnitRent());
+        }
     }
 
     @BeanMapping(qualifiedByName = "toApartment", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "title", target = "title")
     @Mapping(source = "overview", target = "overview")
     @Mapping(source = "area", target = "area")
-    @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "typeApartment", target = "typeApartment")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "authorId", target = "author.id")
@@ -220,6 +235,13 @@ public abstract class ApartmentMapper implements MapperBase {
         }
         if (updateApartmentRequest.getTotalPrice() != null || updateApartmentRequest.getArea() != null)
             apartment.setPrice((double) Math.round(updateApartmentRequest.getTotalPrice() / updateApartmentRequest.getArea()));
+        if (updateApartmentRequest.getTypeApartment().equals(ETypeApartment.BUY)) {
+            apartment.setTotalPrice(updateApartmentRequest.getTotalPrice());
+            apartment.setPrice((double) Math.round(updateApartmentRequest.getTotalPrice() / updateApartmentRequest.getArea()));
+        } else {
+            apartment.setPriceRent(updateApartmentRequest.getPriceRent());
+            apartment.setUnitRent(updateApartmentRequest.getUnitRent());
+        }
     }
 
     @BeanMapping(qualifiedByName = "updateApartmentMapping", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -243,12 +265,13 @@ public abstract class ApartmentMapper implements MapperBase {
                 + apartment.getApartmentAddress().getProvince().getName() + ", "
                 + apartment.getApartmentAddress().getCountry().getName());
         apartmentCompareDto.setPercentSuitable(getPercentSuitable(apartment, userId));
+        apartmentCompareDto.setTotalPrice(convertPriceToString(apartment));
     }
+
     @BeanMapping(qualifiedByName = "toApartmentCompareDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "category.name", target = "categoryName")
-    @Mapping(source = "totalPrice", target = "totalPrice")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "typeApartment", target = "typeApartment")
     @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")

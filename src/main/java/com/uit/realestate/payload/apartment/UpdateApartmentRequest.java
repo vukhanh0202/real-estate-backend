@@ -28,6 +28,12 @@ public class UpdateApartmentRequest {
     @JsonProperty("total_price")
     private Double totalPrice;
 
+    @JsonProperty("price_rent")
+    private Double priceRent;
+
+    @JsonProperty("price_rent")
+    private String unitRent;
+
     @JsonProperty("type_apartment")
     private ETypeApartment typeApartment;
 

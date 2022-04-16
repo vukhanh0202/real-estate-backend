@@ -22,6 +22,9 @@ public class ScraperServiceFactoryImpl implements ScraperServiceFactory {
     @Value("${scrapingUrl-propzy}")
     private String propzyUrl;
 
+    @Value("${scrapingUrl-alond}")
+    private String alondUrl;
+
     private final ApartmentService apartmentService;
 
     private final DistrictService districtService;
@@ -40,6 +43,7 @@ public class ScraperServiceFactoryImpl implements ScraperServiceFactory {
     public ScraperService getScraperService(EScraper scraper) {
         switch (scraper){
             case PROPZY: return new ScraperPropzyServiceImpl(propzyUrl, apartmentService, districtService, provinceService, categoryService, uploadService, logScrapingService, app);
+            case ALOND: return new ScraperAloNhaDatImpl(alondUrl, apartmentService, districtService, provinceService, categoryService, uploadService, logScrapingService, app);
         }
         throw new NotFoundException("Not Found");
     }

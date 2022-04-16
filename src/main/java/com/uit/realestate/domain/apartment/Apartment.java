@@ -34,6 +34,10 @@ public class Apartment extends SqlEntity {
 
     private Double totalPrice;
 
+    private Double priceRent;
+
+    private String unitRent;
+
     private Boolean highlight = false;
 
     @Column(columnDefinition = "TEXT")

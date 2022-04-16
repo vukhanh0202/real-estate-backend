@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
 public class AddApartmentRequest {
 
     private String title;
@@ -27,6 +26,12 @@ public class AddApartmentRequest {
 
     @JsonProperty("total_price")
     private Double totalPrice;
+
+    @JsonProperty("price_rent")
+    private Double priceRent;
+
+    @JsonProperty("price_rent")
+    private String unitRent;
 
     @JsonProperty("type_apartment")
     private ETypeApartment typeApartment;

@@ -24,8 +24,8 @@ public class ScraperController {
     private final ScraperServiceFactory scraperServiceFactory;
 
     @GetMapping(path = "/")
-    public ResponseEntity<?> getVehicleByModel() {
-        CompletableFuture.runAsync(() -> scraperServiceFactory.getScraperService(EScraper.PROPZY).scrapingData(1000));
+    public ResponseEntity<?> scraping() {
+        CompletableFuture.runAsync(() -> scraperServiceFactory.getScraperService(EScraper.ALOND).scrapingData(2000));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(true));
     }

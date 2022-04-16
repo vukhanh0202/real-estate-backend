@@ -45,41 +45,31 @@ import static com.uit.realestate.constant.AppConstant.APARTMENT_FILE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @Service
-public class ScraperPropzyServiceImpl extends ScraperService {
+public class ScraperAloNhaDatImpl extends ScraperService {
 
     private final String urlBase;
-    private final String BED_ROOM_STRING = "Phòng ngủ";
-    private final String BATH_ROOM_STRING = "Phòng tắm";
-    private final String AREA_STRING = "Diện tích";
-    private final String DIRECTION_STRING = "Hướng";
 
     private final ApartmentService apartmentService;
-
     private final DistrictService districtService;
-
     private final ProvinceService provinceService;
-
     private final CategoryService categoryService;
-
     private final UploadService uploadService;
-
     private final LogScrapingService logScrapingService;
-
     private final ApplicationProperties app;
 
-    public ScraperPropzyServiceImpl() {
-        this.urlBase = null;
+    public ScraperAloNhaDatImpl() {
         this.apartmentService = null;
         this.districtService = null;
+        this.provinceService = null;
         this.categoryService = null;
         this.uploadService = null;
         this.logScrapingService = null;
-        this.provinceService = null;
         this.app = null;
+        this.urlBase = null;
     }
 
-    public ScraperPropzyServiceImpl(String url, ApartmentService apartmentService, DistrictService districtService, ProvinceService provinceService, CategoryService categoryService, UploadService uploadService, LogScrapingService logScrapingService, ApplicationProperties app) {
-        this.urlBase = url;
+    public ScraperAloNhaDatImpl(String urlBase, ApartmentService apartmentService, DistrictService districtService, ProvinceService provinceService, CategoryService categoryService, UploadService uploadService, LogScrapingService logScrapingService, ApplicationProperties app) {
+        this.urlBase = urlBase;
         this.apartmentService = apartmentService;
         this.districtService = districtService;
         this.provinceService = provinceService;
@@ -92,21 +82,24 @@ public class ScraperPropzyServiceImpl extends ScraperService {
     @Override
     @Async
     public void scrapingData(int size) {
-        int pageNumberBuy = 1;
-        int pageNumberRent = 1;
+        int pageNumberBuy = 429;
+        int pageNumberRent = 429;
         int quantity = 0;
+        ETypeApartment type;
         do {
             StringBuilder urlExtends = new StringBuilder();
             if (pageNumberBuy > pageNumberRent) {
-                urlExtends.append("/thue/bat-dong-san/hcm/p").append(pageNumberRent);
+                urlExtends.append("/cho-thue/trang--").append(pageNumberRent).append(".html");
                 pageNumberRent++;
+                type = ETypeApartment.RENT;
             } else {
-                urlExtends.append("/mua/bat-dong-san/hcm/p").append(pageNumberBuy);
+                urlExtends.append("/can-ban/trang--").append(pageNumberBuy).append(".html");
                 pageNumberBuy++;
+                type = ETypeApartment.BUY;
             }
             String urlWithPage = urlBase + urlExtends;
-            for (String url : extractLink(urlWithPage)) {
-                boolean rs = extractAndSaveDataFromDetailPage(url, null);
+            for (RawDataScraper rawData : extractRawData(urlWithPage, type)) {
+                boolean rs = extractAndSaveDataFromDetailPage(rawData.getLink(), rawData);
                 if (rs) {
                     quantity++;
                 }
@@ -114,44 +107,52 @@ public class ScraperPropzyServiceImpl extends ScraperService {
                     break;
                 }
             }
+            System.out.println("Current: " + quantity);
+            System.out.println("Page: " + pageNumberBuy);
         } while (quantity < size);
+        System.out.println("Finish Scraping");
     }
-
     @Override
     protected List<String> extractLink(String url) {
-        List<String> result = new ArrayList<>();
-        try {
-            //loading the HTML to a Document Object
-            Document document = Jsoup.connect(url)
-                    .get();
-
-            //Selecting the element which contains the ad list
-            Element element = document.getElementById("view-as-grid");
-            //getting all the <a> tag elements inside the content div tag
-            List<Element> elements = element.getElementsByTag("a")
-                    .stream()
-                    .filter(ele -> !ele.getElementsByTag("h3").isEmpty())
-                    .collect(Collectors.toList());
-            //traversing through the elements
-            for (Element ads : elements) {
-                String link = ads.attr("href");
-                if (Objects.nonNull(link)) result.add(EScraper.PROPZY.getValue() + link);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
+        throw new InvalidException("Not Support");
     }
 
     @Override
     protected List<RawDataScraper> extractRawData(String url, ETypeApartment type) {
-        throw new InvalidException("Not Support");
+        //loading the HTML to a Document Object
+        try {
+            Document document = Jsoup.connect(url).get();
+            List<RawDataScraper> result = new ArrayList<>();
+            Elements elementWraps = document.select("#left .content-items .content-item");
+
+            //traversing through the elements
+            for (Element ele : elementWraps) {
+                String direc = getValueFromTextNode(ele.select(".text .square-direct .ct_direct").stream().findFirst().orElse(null));
+                result.add(RawDataScraper.builder()
+                        .type(type)
+                        .link(EScraper.ALOND.getValue() + ele.select(".thumbnail a").attr("href"))
+                        .title(getValueFromTextNode(ele.select(".ct_title a").stream().findFirst().orElse(null)))
+                        .floors(getValueFromTextNode(ele.select(".text .characteristics .floors").stream().findFirst().orElse(null)))
+                        .bedrooms(getValueFromTextNode(ele.select(".text .characteristics .bedroom").stream().findFirst().orElse(null)))
+                        .areas(getValueFromTextNode(ele.select(".text .square-direct .ct_dt").stream().findFirst().orElse(null)))
+                        .direction(direc.contains("_") ? null : direc)
+                        .price(getValueFromTextNode(ele.select(".text .price-dis .ct_price").stream().findFirst().orElse(null)))
+                        .address(getValueFromTextNode(ele.select(".text .price-dis .ct_dis a").get(0))
+                                + ", " + getValueFromTextNode(ele.select(".text .price-dis .ct_dis a").get(1)))
+                        .district(getValueFromTextNode(ele.select(".text .price-dis .ct_dis a").get(2)))
+                        .province(getValueFromTextNode(ele.select(".text .price-dis .ct_dis a").get(3)))
+                        .build());
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
     @Override
     @Transactional
     protected boolean extractAndSaveDataFromDetailPage(String url, RawDataScraper rawData) {
-        // do not use rawData
         LogScrapingRequest logScrapingRequest = null;
         String title = null;
         MultipartFile[] filesTemp = new MultipartFile[0];
@@ -159,83 +160,74 @@ public class ScraperPropzyServiceImpl extends ScraperService {
         AddApartmentRequest addApartmentRequest = new AddApartmentRequest();
         addApartmentRequest.setStatus(EApartmentStatus.OPEN);
         addApartmentRequest.setAuthorId(AppConstant.ADMIN_ID_ACCOUNT);
+        // Address
+        DistrictDto district;
+        ProvinceDto province;
+        try {
+            district = districtService.findDistrictNameIn(rawData.getDistrict().toLowerCase().replace("thành phố", "").trim());
+            province = provinceService.findByDistrict(district.getId());
+            if (province.getId() == 1) {
+                System.out.println("Skip HCM apartment");
+                return false;
+            }else if (province.getId() == 2){
+                System.out.println("Skip HN apartment");
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
         try {
             //loading the HTML to a Document Object
             Document document = Jsoup.connect(url).get();
-            title = getValueSingle("Title", document, ".t-detail", "h1", null, true);
+            title = rawData.getTitle();
             if (apartmentService.existApartment(title)) {
                 return false;
             }
             addApartmentRequest.setTitle(title);
             //Get images
-            List<String> linkImgList = getValue("Image", document, ".project-detail-feature.rtux", "img", "src", true);
-            filesTemp = FileHandler.downloadFileFromUrls(linkImgList);
+            List<String> linkImgList = getValue("Image", document, "#left .property .images", "img", "src", true);
+            linkImgList = linkImgList.size() > AppConstant.MAX_IMAGES_APARTMENT ? linkImgList.subList(0, 8) : linkImgList;
+            filesTemp = FileHandler.downloadFileFromUrls(linkImgList.stream()
+                    .filter(item -> !item.contains(EScraper.ALOND.getValue())).map(item -> EScraper.ALOND.getValue() + item)
+                    .collect(Collectors.toList()));
             //Get typeApartment;
-            String typeApartment = getValueSingle("Type Apartment", document, ".t-detail", ".label-1", null, true);
-            addApartmentRequest.setTypeApartment(ETypeApartment.of(typeApartment));
+            addApartmentRequest.setTypeApartment(rawData.getType());
             //Get totalPrice;
-            String totalPrice = getValueSingle("Total Price", document, ".t-detail", ".p-price-n", null, true);
-            if (addApartmentRequest.getTypeApartment().equals(ETypeApartment.BUY)){
+            String totalPrice = rawData.getPrice();
+            if (addApartmentRequest.getTypeApartment().equals(ETypeApartment.BUY)) {
                 addApartmentRequest.setTotalPrice(StringUtils.castNumberFromStringPrice(totalPrice));
-            }else{
+            } else {
                 addApartmentRequest.setPriceRent(StringUtils.castNumberFromStringPrice(totalPrice));
                 addApartmentRequest.setUnitRent(totalPrice.trim());
             }
             //Get categoryId;
-            String link = url.replaceAll(EScraper.PROPZY.getValue(), "");
-            List<String> splits = Arrays.asList(link.split("/", 5));
-            link = "";
-            for (int i = 1; i < splits.size() - 1; i++) {
-                link = link.concat("/").concat(splits.get(i));
-            }
-            String category = getValueSingle("Category", document, ".fixe", "a[href=" + link + "]", null, true);
+            String category = getValueSingle("Category", document, "#right .search-box .property-type-container.multicolumns", ".text", null, true);
             addApartmentRequest.setCategoryId(categoryService.findOrCreate(category).getId());
-            // Detail Apartment
-            List<String> moreInfo = getValue("More info", document, "#tab-utilities .tab-content", "span", null, false);
-            Element detailElement = document.getElementsByAttributeValue("class", "bl-parameter-listing").stream().findFirst().get();
-            Map<String, String> detailMap = new HashMap<>();
-            detailElement.getElementsByTag("li")
-                    .forEach(item -> {
-                        try {
-                            Elements elements = item.getElementsByTag("span");
-                            String key = "";
-                            String value = "";
-                            for (Element element : elements) {
-                                if (Objects.equals(element.attr("class"), "sp-text")) {
-                                    key = getValueFromTextNode(element);
-                                } else {
-                                    value = getValueFromTextNode(element);
-                                }
-                            }
-                            detailMap.put(key, value);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-            double area = StringUtils.castNumberFromString(detailMap.get(AREA_STRING));
-            addApartmentRequest.setArea(area);
-            double bedRoom = StringUtils.castNumberFromString(detailMap.get(BED_ROOM_STRING));
-            double bathRoom = StringUtils.castNumberFromString(detailMap.get(BATH_ROOM_STRING));
-            int floor = (int) (bedRoom + NumberUtils.random(-bedRoom + 1, bedRoom - 1));
+            //Area
+            addApartmentRequest.setArea(StringUtils.castNumberFromString(rawData.getAreas()));
+            // Detail
+            double bedRoom = StringUtils.castNumberFromString(rawData.getBedrooms());
+            double floor = StringUtils.castNumberFromString(rawData.getFloors());
+            int bathRoom = (int) (bedRoom + NumberUtils.random(-bedRoom + 1, bedRoom - 1));
             int toilet = (int) (bedRoom + NumberUtils.random(-bedRoom + 1, bedRoom - 1));
-            String direction = detailMap.get(DIRECTION_STRING);
-            String address = getValueSingle("Address", document, ".t-detail", ".p-address", null, true);
             String description = getHtml(document, "#tab-overview", ".tab-content.entry-content");
             addApartmentRequest.setApartmentDetail(ApartmentDetailRequest
                     .builder()
                     .description(description)
-                    .houseDirection(direction)
-                    .floorQuantity(floor)
+                    .houseDirection(rawData.getDirection())
+                    .floorQuantity((int) floor)
                     .bedroomQuantity((int) bedRoom)
-                    .bathroomQuantity((int) bathRoom)
+                    .bathroomQuantity(bathRoom)
                     .toiletQuantity(toilet)
-                    .moreInfo(moreInfo)
+                    .moreInfo(null)
                     .build());
             // Address
-            DistrictDto district = districtService.findDistrictNameIn(address);
-            ProvinceDto province = provinceService.findByDistrict(district.getId());
+//            DistrictDto district = districtService.findDistrictNameIn(rawData.getDistrict());
+//            ProvinceDto province = provinceService.findByDistrict(district.getId());
             addApartmentRequest.setApartmentAddress(ApartmentAddressRequest.builder()
-                    .address(address)
+                    .address(rawData.getAddress())
                     .provinceId(province.getId())
                     .districtId(district.getId())
                     .countryCode(AppConstant.DEFAULT_COUNTRY)

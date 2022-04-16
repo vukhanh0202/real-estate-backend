@@ -53,7 +53,8 @@ public class DistrictServiceImpl implements DistrictService {
 
     @Override
     public DistrictDto findDistrictNameIn(String str) {
-        List<District> districts = districtRepository.findAllByNameIn(Stream.of(str.split(",")).map(String::trim).collect(Collectors.toList()));
+        List<String> strs = Stream.of(str.split(",")).map(String::trim).collect(Collectors.toList());
+        List<District> districts = districtRepository.findAllByNameIgnoreCaseInOrShortNameIgnoreCaseIn(strs, strs);
         if (districts.size() == 1){
             return districtMapper.toProvinceDto(districts.stream().findFirst().get());
         }

@@ -1,6 +1,8 @@
 package com.uit.realestate.service.scraper;
 
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.exception.InvalidException;
+import com.uit.realestate.payload.scraper.RawDataScraper;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
@@ -20,8 +22,10 @@ public abstract class ScraperService {
 
     protected abstract List<String> extractLink(String url);
 
+    protected abstract List<RawDataScraper> extractRawData(String url, ETypeApartment type);
+
     @Transactional
-    protected abstract boolean extractAndSaveDataFromDetailPage(String url);
+    protected abstract boolean extractAndSaveDataFromDetailPage(String url, RawDataScraper rawData);
 
     protected String getHtml(Document document, String queryWrapper, String query) {
         Element elementWrap = document.select(queryWrapper)
@@ -74,6 +78,9 @@ public abstract class ScraperService {
     }
 
     protected String getValueFromTextNode(Element element) {
+        if (element == null){
+            return null;
+        }
         return ((TextNode) Objects.requireNonNull((element.childNodes().stream().filter(c -> {
             if (!(c instanceof TextNode)) {
                 return false;

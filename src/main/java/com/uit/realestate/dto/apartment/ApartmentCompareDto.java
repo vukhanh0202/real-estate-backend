@@ -25,7 +25,7 @@ public class ApartmentCompareDto{
     private String categoryName;
 
     @JsonProperty("total_price")
-    private Double totalPrice;
+    private String totalPrice;
 
     private Double area;
 

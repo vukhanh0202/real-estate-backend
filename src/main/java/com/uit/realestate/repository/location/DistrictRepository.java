@@ -13,5 +13,5 @@ public interface DistrictRepository extends JpaRepository<District, Long> {
 
     boolean existsById(Long id);
 
-    List<District> findAllByNameIn(List<String> names);
+    List<District> findAllByNameIgnoreCaseInOrShortNameIgnoreCaseIn(List<String> names, List<String> shortNames);
 }

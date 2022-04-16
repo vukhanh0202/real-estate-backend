@@ -40,6 +40,8 @@ public interface AppConstant {
 
     Long ADMIN_ID_ACCOUNT = 1L;
 
+    Long MAX_IMAGES_APARTMENT = 8L;
+
     String DEFAULT_COUNTRY = "VN";
 
     String APARTMENT_FILE = "/apartment/";

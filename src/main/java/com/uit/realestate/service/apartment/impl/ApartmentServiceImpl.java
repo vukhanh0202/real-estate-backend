@@ -4,6 +4,7 @@ import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.user.ERoleType;
 import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.apartment.Apartment;
@@ -60,7 +61,15 @@ public class ApartmentServiceImpl implements ApartmentService {
         if (Objects.nonNull(req.getApartmentAddress())) {
             districtService.validationDistrict(req.getApartmentAddress().getDistrictId(), req.getApartmentAddress().getProvinceId());
         }
-
+        if (req.getTypeApartment().equals(ETypeApartment.BUY)){
+            if (req.getTotalPrice() == null){
+                throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid total price"));
+            }
+        }else{
+            if (req.getPriceRent() == null || req.getUnitRent() == null){
+                throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid Price Rent"));
+            }
+        }
         log.info("Add a new Apartment");
         apartmentRepository.save(apartmentMapper.toApartment(req));
 
@@ -252,6 +261,16 @@ public class ApartmentServiceImpl implements ApartmentService {
             districtService.validationDistrict(req.getApartmentAddress().getDistrictId(), req.getApartmentAddress().getProvinceId());
         }
 
+        if (req.getTypeApartment().equals(ETypeApartment.BUY)){
+            if (req.getTotalPrice() == null){
+                throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid total price"));
+            }
+        }else{
+            if (req.getPriceRent() == null || req.getUnitRent() == null){
+                throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid Price Rent"));
+            }
+        }
+
         log.info("Update apartment");
         apartmentMapper.updateApartment(req, apartment);
         apartmentRepository.save(apartment);
@@ -272,7 +291,9 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public boolean existApartment(String title) {
         log.info("Validate Apartment with title");
-
+        if (title == null || title.equals("")){
+            throw new NotFoundException("Title Null");
+        }
         var apartment = apartmentRepository.findAllByTitleContainingIgnoreCase(title);
 
         return apartment.size() > 0;
