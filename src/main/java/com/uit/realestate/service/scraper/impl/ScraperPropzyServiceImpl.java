@@ -8,7 +8,6 @@ import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.dto.location.DistrictDto;
 import com.uit.realestate.dto.location.ProvinceDto;
 import com.uit.realestate.dto.response.FileCaption;
-import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.payload.address.ApartmentAddressRequest;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.ApartmentDetailRequest;
@@ -27,7 +26,6 @@ import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -45,7 +43,7 @@ import static com.uit.realestate.constant.AppConstant.APARTMENT_FILE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @Service
-public class ScraperPropzyServiceImpl implements ScraperService {
+public class ScraperPropzyServiceImpl extends ScraperService {
 
     private final String urlBase;
     private final String BED_ROOM_STRING = "Phòng ngủ";
@@ -97,7 +95,7 @@ public class ScraperPropzyServiceImpl implements ScraperService {
         do {
             String urlWithPage = urlBase + "/p" + pageNumber;
             for (String url : extractLink(urlWithPage)) {
-                boolean rs = saveDataFromDetailPage(url);
+                boolean rs = extractAndSaveDataFromDetailPage(url);
                 if (rs) {
                     quantity++;
                 }
@@ -112,7 +110,8 @@ public class ScraperPropzyServiceImpl implements ScraperService {
         } while (true);
     }
 
-    private List<String> extractLink(String url) {
+    @Override
+    protected List<String> extractLink(String url) {
         List<String> result = new ArrayList<>();
         try {
             //loading the HTML to a Document Object
@@ -138,7 +137,7 @@ public class ScraperPropzyServiceImpl implements ScraperService {
     }
 
     @Transactional
-    private boolean saveDataFromDetailPage(String url) {
+    protected boolean extractAndSaveDataFromDetailPage(String url) {
         LogScrapingRequest logScrapingRequest = null;
         String title = null;
         MultipartFile[] filesTemp = new MultipartFile[0];
@@ -194,8 +193,8 @@ public class ScraperPropzyServiceImpl implements ScraperService {
             String direction = detailMap.get(DIRECTION_STRING);
             String address = getValueSingle("Address", document, ".t-detail", ".p-address", null, true);
             String description = getHtml(document, "#tab-overview", ".tab-content.entry-content");
-            DistrictDto district = getDistrictFromString(address);
-            ProvinceDto province = getProvinceFromDistrict(district.getId());
+            DistrictDto district = districtService.findDistrictNameIn(address);
+            ProvinceDto province = provinceService.findByDistrict(district.getId());
             photos = uploadService.uploadPhoto(filesTemp, APARTMENT_FILE, AppConstant.ADMIN_ID_ACCOUNT);
             boolean result = apartmentService.addApartment(AddApartmentRequest
                     .builder()
@@ -273,72 +272,4 @@ public class ScraperPropzyServiceImpl implements ScraperService {
             }
         }
     }
-
-    private String getHtml(Document document, String queryWrapper, String query) {
-        Element elementWrap = document.select(queryWrapper)
-                .stream().findFirst().orElse(null);
-        if (elementWrap == null) {
-            return "";
-        } else {
-            Elements elementListWrap = elementWrap.select(query);
-            StringBuilder result = new StringBuilder();
-            elementListWrap
-                    .forEach(rs -> result.append(rs.html()));
-
-            return result.toString();
-        }
-    }
-
-    private List<String> getValue(String value, Document document, String queryWrapper, String query, String attr, boolean isRequired) {
-        Element elementWrap = document.select(queryWrapper)
-                .stream().findFirst().orElse(null);
-        if (elementWrap == null) {
-            if (isRequired) {
-                throw new InvalidException(value + " must not be null");
-            }
-            return Collections.emptyList();
-        } else {
-            Elements elementListWrap = elementWrap.select(query);
-
-            List<String> resultList = elementListWrap
-                    .stream()
-                    .map(rs -> {
-                        if (attr == null) {
-                            return getValueFromTextNode(rs);
-                        }
-                        return rs.attr(attr);
-                    })
-                    .collect(Collectors.toList());
-            if (resultList.isEmpty() && isRequired) {
-                return null;
-            }
-            return resultList;
-        }
-    }
-
-    private String getValueSingle(String value, Document document, String queryWrapper, String query, String attr, boolean isRequired) {
-        List<String> list = getValue(value, document, queryWrapper, query, attr, isRequired);
-        if (list == null) {
-            return null;
-        }
-        return list.stream().findAny().orElse(null);
-    }
-
-    private String getValueFromTextNode(Element element) {
-        return ((TextNode) Objects.requireNonNull((element.childNodes().stream().filter(c -> {
-            if (!(c instanceof TextNode)) {
-                return false;
-            }
-            return !Objects.equals(((TextNode) c).text(), " ");
-        }).findFirst()).orElse(null))).text();
-    }
-
-    private DistrictDto getDistrictFromString(String str) {
-        return districtService.findDistrictNameIn(str);
-    }
-
-    private ProvinceDto getProvinceFromDistrict(Long districtId) {
-        return provinceService.findByDistrict(districtId);
-    }
-
 }
