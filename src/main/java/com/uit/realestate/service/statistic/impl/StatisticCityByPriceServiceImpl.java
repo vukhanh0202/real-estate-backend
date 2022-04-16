@@ -86,17 +86,18 @@ public class StatisticCityByPriceServiceImpl implements IStatisticApartmentServi
             data.add(map.get(item));
         }
         result.setData(data);
-        List<ApartmentBasicDto> apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, userId);
-        if (userId != null) {
-            apartmentBasicDtoList.sort((o1, o2) -> -(o1.getPercentSuitable().compareTo(o2.getPercentSuitable())));
-        } else {
-            Collections.shuffle(apartmentBasicDtoList);
-        }
-        if (apartmentBasicDtoList.size() > 2){
-            result.setHighLightApartments(apartmentBasicDtoList.subList(0, 3));
-        }else{
-            result.setHighLightApartments(apartmentBasicDtoList);
-        }
+//        List<ApartmentBasicDto> apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, userId);
+//        if (userId != null) {
+//            apartmentBasicDtoList.sort((o1, o2) -> -(o1.getPercentSuitable().compareTo(o2.getPercentSuitable())));
+//        } else {
+//            Collections.shuffle(apartmentBasicDtoList);
+//        }
+//        if (apartmentBasicDtoList.size() > 2){
+//            result.setHighLightApartments(apartmentBasicDtoList.subList(0, 3));
+//        }else{
+//            result.setHighLightApartments(apartmentBasicDtoList);
+//        }
+        result.setHighLightApartments(new ArrayList<>());
 
 
         TotalStatisticDto totalStatisticDto = new TotalStatisticDto();

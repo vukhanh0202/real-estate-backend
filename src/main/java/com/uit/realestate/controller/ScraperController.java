@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.CompletableFuture;
+
 @RestController
 @Slf4j
 @RequestMapping("public/scraper")
@@ -23,7 +25,7 @@ public class ScraperController {
 
     @GetMapping(path = "/")
     public ResponseEntity<?> getVehicleByModel() {
-        scraperServiceFactory.getScraperService(EScraper.PROPZY).scrapingData(1000);
+        CompletableFuture.runAsync(() -> scraperServiceFactory.getScraperService(EScraper.PROPZY).scrapingData(1000));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(true));
     }

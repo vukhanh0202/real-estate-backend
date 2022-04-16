@@ -23,9 +23,6 @@ public class ScheduleDeleteFileTemporary {
         File folderDelete = FileUtils.getFile(app.getSource().getDirectory() + "/deleteFiles/");
         if (folderDelete.exists() && folderDelete.listFiles() != null && folderDelete.listFiles().length > 0) {
             List<File> files = Arrays.asList(Objects.requireNonNull(folderDelete.listFiles()));
-            if (files.size() > 500){
-                files = files.subList(0, 500);
-            }
             log.info("Job delete file temporary start with size: " + files.size());
             files.forEach(fileTemp -> {
                 File file1 = FileUtils.getFile(fileTemp.getName());

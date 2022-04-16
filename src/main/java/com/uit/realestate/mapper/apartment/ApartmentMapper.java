@@ -45,12 +45,12 @@ public abstract class ApartmentMapper implements MapperBase {
         if (userId != null){
             List<UserTarget> userTarget = userTargetRepository.findAllByUserId(userId);
             if (userTarget.isEmpty()){
-                return null;
+                return 0D;
             }
             return CalculatorPercentSuitability
                     .calculatorPercent(suitabilityMapper.toSuitabilityDto(apartment), userTarget);
         }
-        return null;
+        return 0D;
     }
 
     //*************************************************

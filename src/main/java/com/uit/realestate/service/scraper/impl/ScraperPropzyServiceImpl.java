@@ -29,6 +29,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -89,6 +90,7 @@ public class ScraperPropzyServiceImpl implements ScraperService {
     }
 
     @Override
+    @Async
     public void scrapingData(int size) {
         int pageNumber = 1;
         int quantity = 0;
