@@ -16,19 +16,19 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
 
     List<Apartment> findAllByTitleContainingIgnoreCase(String title);
     List<Apartment> findAllByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title);
-    List<Apartment> findAllByStatusAndPriceBetweenAndAreaBetween(EApartmentStatus status, Double priceFrom, Double priceTo, Double areaFrom, Double areaTo);
-    List<Apartment> findAllByStatusAndPriceBetweenAndAreaGreaterThan(EApartmentStatus status, Double priceFrom, Double priceTo, Double areaFrom);
-    List<Apartment> findAllByStatusAndPriceGreaterThanAndAreaBetween(EApartmentStatus status, Double priceFrom, Double areaFrom, Double areaTo);
-    List<Apartment> findAllByStatusAndPriceGreaterThanAndAreaGreaterThan(EApartmentStatus status,Double priceFrom, Double areaFrom);
+    List<Apartment> findAllByStatusAndTypeApartmentAndPriceBetweenAndAreaBetween(EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double priceTo, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByStatusAndTypeApartmentAndPriceBetweenAndAreaGreaterThan(EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double priceTo, Double areaFrom);
+    List<Apartment> findAllByStatusAndTypeApartmentAndPriceGreaterThanAndAreaBetween(EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByStatusAndTypeApartmentAndPriceGreaterThanAndAreaGreaterThan(EApartmentStatus status, ETypeApartment typeApartment,Double priceFrom, Double areaFrom);
 
-    List<Apartment> findAllByStatusAndAreaBetween(EApartmentStatus status, Double areaFrom, Double areaTo);
-    List<Apartment> findAllByStatusAndAreaGreaterThan(EApartmentStatus status, Double areaFrom);
-    List<Apartment> findAllByStatusAndPriceBetween(EApartmentStatus status, Double priceFrom, Double priceTo);
-    List<Apartment> findAllByStatusAndPriceGreaterThan(EApartmentStatus status, Double priceFrom);
-    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndAreaBetween(Long provinceId, EApartmentStatus status, Double areaFrom, Double areaTo);
-    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndAreaGreaterThan(Long provinceId, EApartmentStatus status, Double areaFrom);
-    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndPriceBetween(Long provinceId, EApartmentStatus status, Double priceFrom, Double priceTo);
-    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndPriceGreaterThan(Long provinceId, EApartmentStatus status, Double priceFrom);
+    List<Apartment> findAllByStatusAndTypeApartmentAndAreaBetween(EApartmentStatus status, ETypeApartment typeApartment, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByStatusAndTypeApartmentAndAreaGreaterThan(EApartmentStatus status, ETypeApartment typeApartment, Double areaFrom);
+    List<Apartment> findAllByStatusAndTypeApartmentAndPriceBetween(EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double priceTo);
+    List<Apartment> findAllByStatusAndTypeApartmentAndPriceGreaterThan(EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom);
+    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndAreaBetween(Long provinceId,  EApartmentStatus status,ETypeApartment typeApartment, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndAreaGreaterThan(Long provinceId,  EApartmentStatus status,ETypeApartment typeApartment, Double areaFrom);
+    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndPriceBetween(Long provinceId, EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double priceTo);
+    List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndPriceGreaterThan(Long provinceId,  EApartmentStatus status,ETypeApartment typeApartment, Double priceFrom);
 
     List<Apartment> findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus status, String title);
 
@@ -69,4 +69,151 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             nativeQuery = true)
     List<Apartment> findRecommendApartmentByUserId(Long userId);
 
+    @Query(value = "WITH district_tb AS (\n" +
+            "   SELECT a.*,  \n" +
+            "           SUM(CASE\n" +
+            "           WHEN u.district is null THEN 0\n" +
+            "           ELSE\n" +
+            "           CASE\n" +
+            "           WHEN aad.district_id = u.district THEN :accuracy\n" +
+            "           ELSE 0\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "           SUM(CASE\n" +
+            "           WHEN u.district is null THEN 0\n" +
+            "           ELSE :accuracy\n" +
+            "           END)\n" +
+            "       AS total\n" +
+            "   FROM apartment a, apartment_address aad, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.id = aad.id and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id \n" +
+            "), province_tb AS (\n" +
+            "    SELECT a.id, a.title,  \n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.province is null THEN 0\n" +
+            "           ELSE\n" +
+            "           CASE\n" +
+            "           WHEN aad.province_id = u.province THEN :accuracy\n" +
+            "           ELSE 0\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.province is null THEN 0\n" +
+            "           ELSE :accuracy\n" +
+            "           END)\n" +
+            "       AS total\n" +
+            "   FROM apartment a, apartment_address aad, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.id = aad.id and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id, a.title \n" +
+            "), category_tb AS (\n" +
+            "   SELECT a.id, a.title,  \n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.category is null THEN 0\n" +
+            "           ELSE\n" +
+            "           CASE\n" +
+            "           WHEN a.category_id = u.category THEN :accuracy\n" +
+            "           ELSE 0\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.category is null THEN 0\n" +
+            "           ELSE :accuracy\n" +
+            "           END)\n" +
+            "       AS total\n" +
+            "   FROM apartment a, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id, a.title \n" +
+            "), area_tb AS (\n" +
+            "   SELECT a.id, a.title,  \n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.area is null THEN 0\n" +
+            "           ELSE\n" +
+            "           CASE\n" +
+            "           WHEN ABS(a.area-u.area) >= :accuracyArea THEN 0\n" +
+            "           ELSE ABS(:accuracyArea - ABS(a.area-u.area))\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.area is null THEN 0\n" +
+            "           ELSE :accuracyArea\n" +
+            "           END)\n" +
+            "       AS total\n" +
+            "   FROM apartment a, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id, a.title \n" +
+            "), floor_tb AS (\n" +
+            "   SELECT a.id, a.title,  \n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.floor_quantity is null THEN 0\n" +
+            "           ELSE \n" +
+            "           CASE\n" +
+            "           WHEN ABS(ad.floor_quantity-u.floor_quantity) >= :accuracy THEN 0\n" +
+            "           ELSE ABS(:accuracy - ABS(ad.floor_quantity-u.floor_quantity))\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.floor_quantity is null THEN 0\n" +
+            "           ELSE :accuracy\n" +
+            "           END) \n" +
+            "       AS total\n" +
+            "   FROM apartment a, apartment_detail ad, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.id = ad.id and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id, a.title \n" +
+            "), bedroom_tb AS (\n" +
+            "   SELECT a.id, a.title,  \n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.bedroom_quantity is null THEN 0\n" +
+            "           ELSE \n" +
+            "           CASE\n" +
+            "           WHEN ABS(ad.bedroom_quantity-u.bedroom_quantity) >= :accuracy THEN 0\n" +
+            "           ELSE ABS(:accuracy - ABS(ad.bedroom_quantity-u.bedroom_quantity))\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.bedroom_quantity is null THEN 0\n" +
+            "           ELSE :accuracy\n" +
+            "           END) \n" +
+            "       AS total\n" +
+            "   FROM apartment a, apartment_detail ad, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.id = ad.id and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id, a.title \n" +
+            "), bathroom_tb AS (\n" +
+            "   SELECT a.id, a.title,  \n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.bathroom_quantity is null THEN 0\n" +
+            "           ELSE \n" +
+            "           CASE\n" +
+            "           WHEN ABS(ad.bathroom_quantity-u.bathroom_quantity) >= :accuracy THEN 0\n" +
+            "           ELSE ABS(:accuracy - ABS(ad.bathroom_quantity-u.bathroom_quantity))\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.bathroom_quantity is null THEN 0\n" +
+            "           ELSE :accuracy\n" +
+            "           END) \n" +
+            "       AS total\n" +
+            "   FROM apartment a, apartment_detail ad, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.id = ad.id and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id, a.title \n" +
+            ")\n" +
+            "SELECT dtb.area, dtb.id, dtb.author_id, dtb.category_id, dtb.created_at, dtb.created_by, dtb.highlight, dtb.is_deleted, dtb.photos, dtb.price, dtb.price_rent, dtb.status, dtb.title, dtb.total_price, dtb.type_apartment, dtb.unit_rent, dtb.updated_at, dtb.updated_by,\n" +
+            "       SUM((dtb.suitable + ptb.suitable + ctb.suitable + atb.suitable + ftb.suitable + dtb.suitable + batb.suitable)/(dtb.total + ptb.total + ctb.total + atb.total + ftb.total + dtb.total + batb.total))*100 AS suitable_rate\n" +
+            "FROM district_tb dtb \n" +
+            "JOIN province_tb ptb ON dtb.id = ptb.id\n" +
+            "JOIN category_tb ctb ON dtb.id = ctb.id\n" +
+            "JOIN area_tb atb ON dtb.id = atb.id\n" +
+            "JOIN floor_tb ftb ON dtb.id = ftb.id\n" +
+            "JOIN bedroom_tb btb ON dtb.id = btb.id\n" +
+            "JOIN bathroom_tb batb ON dtb.id = batb.id\n" +
+            "GROUP BY dtb.id, dtb.area, dtb.author_id, dtb.category_id, dtb.created_at, dtb.created_by, dtb.highlight, dtb.is_deleted, dtb.photos, dtb.price, dtb.price_rent, dtb.status, dtb.title, dtb.total_price, dtb.type_apartment, dtb.unit_rent, dtb.updated_at, dtb.updated_by\n" +
+            "ORDER BY suitable_rate desc LIMIT :size OFFSET :page",
+            nativeQuery = true)
+    List<Apartment> findApartmentWithSuitableDesc(Long accuracy, Long accuracyArea, Long userId, Long page, Long size);
 }

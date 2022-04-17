@@ -1,7 +1,9 @@
 package com.uit.realestate.service.statistic.impl;
 
 import com.uit.realestate.constant.MessageCode;
+import com.uit.realestate.constant.SuitabilityConstant;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.statistic.ECriteria;
 import com.uit.realestate.constant.enums.statistic.EStatistic;
 import com.uit.realestate.domain.apartment.Apartment;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class StatisticAreaByCityServiceImpl implements IStatisticApartmentService {
+public class StatisticAreaByCityServiceImpl extends IStatisticApartmentService {
 
     private final MessageHelper messageHelper;
 
@@ -34,7 +36,7 @@ public class StatisticAreaByCityServiceImpl implements IStatisticApartmentServic
     private final ApartmentMapper apartmentMapper;
 
     @Override
-    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId) {
+    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId, ETypeApartment typeApartment) {
         if (statistic.getFrom() == null || statistic.getTo() == null) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Area.INVALID));
         }
@@ -42,9 +44,9 @@ public class StatisticAreaByCityServiceImpl implements IStatisticApartmentServic
         var areaTo = Math.floor(statistic.getTo());
         List<Apartment> apartments;
         if (areaTo == -1) {
-            apartments = apartmentRepository.findAllByStatusAndAreaGreaterThan(EApartmentStatus.OPEN, areaFrom);
+            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndAreaGreaterThan(EApartmentStatus.OPEN, typeApartment, areaFrom);
         } else {
-            apartments = apartmentRepository.findAllByStatusAndAreaBetween(EApartmentStatus.OPEN, areaFrom, areaTo);
+            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndAreaBetween(EApartmentStatus.OPEN, typeApartment, areaFrom, areaTo);
         }
 
         Map<String, Long> map = new LinkedHashMap<>();
@@ -72,18 +74,8 @@ public class StatisticAreaByCityServiceImpl implements IStatisticApartmentServic
             data.add(map.get(item));
         }
         result.setData(data);
-        List<ApartmentBasicDto> apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, userId);
 
-        if (userId != null) {
-            apartmentBasicDtoList.sort((o1, o2) -> -(o1.getPercentSuitable().compareTo(o2.getPercentSuitable())));
-        } else {
-            Collections.shuffle(apartmentBasicDtoList);
-        }
-        if (apartmentBasicDtoList.size() > 2) {
-            result.setHighLightApartments(apartmentBasicDtoList.subList(0, 3));
-        } else {
-            result.setHighLightApartments(apartmentBasicDtoList);
-        }
+        result.setHighLightApartments(this.getSuitableApartment(apartments, userId));
 
         DecimalFormat df = new DecimalFormat("###,###,###");
         TotalStatisticDto totalStatisticDto = new TotalStatisticDto();

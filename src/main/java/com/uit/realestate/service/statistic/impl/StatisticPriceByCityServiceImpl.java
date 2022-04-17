@@ -2,6 +2,7 @@ package com.uit.realestate.service.statistic.impl;
 
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.statistic.ECriteria;
 import com.uit.realestate.constant.enums.statistic.EStatistic;
 import com.uit.realestate.domain.apartment.Apartment;
@@ -23,16 +24,14 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class StatisticPriceByCityServiceImpl implements IStatisticApartmentService {
+public class StatisticPriceByCityServiceImpl extends IStatisticApartmentService {
 
     private final MessageHelper messageHelper;
 
     private final ApartmentRepository apartmentRepository;
 
-    private final ApartmentMapper apartmentMapper;
-
     @Override
-    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId) {
+    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId, ETypeApartment typeApartment) {
         if (statistic.getFrom() == null || statistic.getTo() == null) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Area.INVALID));
         }
@@ -40,9 +39,9 @@ public class StatisticPriceByCityServiceImpl implements IStatisticApartmentServi
         var priceTo = Math.floor(statistic.getTo());
         List<Apartment> apartments;
         if (priceTo == -1) {
-            apartments = apartmentRepository.findAllByStatusAndPriceGreaterThan(EApartmentStatus.OPEN, priceFrom);
+            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndPriceGreaterThan(EApartmentStatus.OPEN, typeApartment, priceFrom);
         } else {
-            apartments = apartmentRepository.findAllByStatusAndPriceBetween(EApartmentStatus.OPEN, priceFrom, priceTo);
+            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndPriceBetween(EApartmentStatus.OPEN, typeApartment, priceFrom, priceTo);
         }
 
         Map<String, Long> map = new LinkedHashMap<>();
@@ -69,18 +68,8 @@ public class StatisticPriceByCityServiceImpl implements IStatisticApartmentServi
             data.add(map.get(item));
         }
         result.setData(data);
-        List<ApartmentBasicDto> apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, userId);
 
-        if (userId != null) {
-            apartmentBasicDtoList.sort((o1, o2) -> -(o1.getPercentSuitable().compareTo(o2.getPercentSuitable())));
-        } else {
-            Collections.shuffle(apartmentBasicDtoList);
-        }
-        if (apartmentBasicDtoList.size() > 2) {
-            result.setHighLightApartments(apartmentBasicDtoList.subList(0, 3));
-        } else {
-            result.setHighLightApartments(apartmentBasicDtoList);
-        }
+        result.setHighLightApartments(this.getSuitableApartment(apartments, userId));
 
         DecimalFormat df = new DecimalFormat("###,###,###");
         TotalStatisticDto totalStatisticDto = new TotalStatisticDto();

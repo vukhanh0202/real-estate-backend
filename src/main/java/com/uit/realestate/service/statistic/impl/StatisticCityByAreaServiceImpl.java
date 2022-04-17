@@ -3,6 +3,7 @@ package com.uit.realestate.service.statistic.impl;
 import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.MessageCode;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.statistic.ECriteria;
 import com.uit.realestate.constant.enums.statistic.EStatistic;
 import com.uit.realestate.domain.apartment.Apartment;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class StatisticCityByAreaServiceImpl implements IStatisticApartmentService {
+public class StatisticCityByAreaServiceImpl extends IStatisticApartmentService {
 
     private final ProvinceRepository provinceRepository;
 
@@ -37,7 +38,7 @@ public class StatisticCityByAreaServiceImpl implements IStatisticApartmentServic
     private final ApartmentMapper apartmentMapper;
 
     @Override
-    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId) {
+    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId, ETypeApartment typeApartment) {
         boolean isGreaterMaxValue = false;
         if (statistic.getId() == null || !provinceRepository.existsById(statistic.getId())) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Province.INVALID));
@@ -52,12 +53,12 @@ public class StatisticCityByAreaServiceImpl implements IStatisticApartmentServic
         if (areaTo == -1) {
             gap = Math.round((AppConstant.DEFAULT_MAX_VALUE_AREA - areaFrom) / 10);
             isGreaterMaxValue = true;
-            apartments = apartmentRepository.findAllByApartmentAddressProvinceIdAndStatusAndAreaGreaterThan(statistic.getId(),
-                    EApartmentStatus.OPEN, areaFrom);
+            apartments = apartmentRepository.findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndAreaGreaterThan(statistic.getId(),
+                    EApartmentStatus.OPEN, typeApartment, areaFrom);
         } else {
             gap = Math.round((areaTo - areaFrom) / 10);
-            apartments = apartmentRepository.findAllByApartmentAddressProvinceIdAndStatusAndAreaBetween(statistic.getId(),
-                    EApartmentStatus.OPEN, areaFrom, areaTo);
+            apartments = apartmentRepository.findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndAreaBetween(statistic.getId(),
+                    EApartmentStatus.OPEN, typeApartment, areaFrom, areaTo);
         }
         UnitDto unitForGap = CalculatorUnit.calculatorUnit(gap);
 
@@ -86,18 +87,8 @@ public class StatisticCityByAreaServiceImpl implements IStatisticApartmentServic
             data.add(map.get(item));
         }
         result.setData(data);
-        List<ApartmentBasicDto> apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, userId);
-        if (userId != null) {
-            apartmentBasicDtoList.sort((o1, o2) -> -(o1.getPercentSuitable().compareTo(o2.getPercentSuitable())));
-        } else {
-            Collections.shuffle(apartmentBasicDtoList);
-        }
-        if (apartmentBasicDtoList.size() > 2){
-            result.setHighLightApartments(apartmentBasicDtoList.subList(0, 3));
-        }else{
-            result.setHighLightApartments(apartmentBasicDtoList);
-        }
 
+        result.setHighLightApartments(this.getSuitableApartment(apartments, userId));
 
         TotalStatisticDto totalStatisticDto = new TotalStatisticDto();
         int sizeApartmentsDivide = apartments.size();

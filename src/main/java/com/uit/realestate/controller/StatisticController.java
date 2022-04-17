@@ -1,5 +1,6 @@
 package com.uit.realestate.controller;
 
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.statistic.ECriteria;
 import com.uit.realestate.constant.enums.statistic.EStatistic;
 import com.uit.realestate.data.UserPrincipal;
@@ -48,7 +49,8 @@ public class StatisticController {
                                            @RequestParam(value = "criteria") ECriteria criteria,
                                            @RequestParam(value = "criteria_from", required = false) Double criteriaPriceFrom,
                                            @RequestParam(value = "criteria_to", required = false) Double criteriaPriceTo,
-                                           @RequestParam(value = "user_id", required = false) Long userId) {
+                                           @RequestParam(value = "user_id", required = false) Long userId,
+                                           @RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment) {
         statistic.setId(statisticCityId);
         statistic.setFrom(statisticPriceFrom);
         statistic.setTo(statisticPriceTo);
@@ -56,7 +58,7 @@ public class StatisticController {
         criteria.setTo(criteriaPriceTo);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(statisticApartmentFactoryService
-                        .execute(new IStatisticApartmentFactoryService.Input(statistic, criteria, userId))));
+                        .execute(new IStatisticApartmentFactoryService.Input(statistic, criteria, userId, typeApartment))));
     }
 
     /**

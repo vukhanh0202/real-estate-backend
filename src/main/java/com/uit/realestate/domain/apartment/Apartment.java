@@ -15,7 +15,7 @@ import java.util.*;
 
 @NoArgsConstructor
 @Entity
-@Table(name = "apartment")
+@Table(name = "apartment", schema = "public")
 @Data
 public class Apartment extends SqlEntity {
 
@@ -24,9 +24,6 @@ public class Apartment extends SqlEntity {
     private Long id;
 
     private String title;
-
-    @Column(columnDefinition = "TEXT")
-    private String overview;
 
     private Double area;
 
@@ -80,6 +77,9 @@ public class Apartment extends SqlEntity {
     @OneToOne(mappedBy = "apartment",cascade = CascadeType.ALL,
             orphanRemoval = true,fetch = FetchType.LAZY)
     private ApartmentDetail apartmentDetail;
+
+    @Column(updatable=false, insertable=false)
+    private Double suitableRate;
 
     public void setApartmentDetail(ApartmentDetail apartmentDetail) {
         if (apartmentDetail == null) {

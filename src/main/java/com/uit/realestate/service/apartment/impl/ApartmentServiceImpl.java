@@ -2,6 +2,7 @@ package com.uit.realestate.service.apartment.impl;
 
 import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.MessageCode;
+import com.uit.realestate.constant.SuitabilityConstant;
 import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
@@ -32,6 +33,9 @@ import com.uit.realestate.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.NotTransactional;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,12 +65,12 @@ public class ApartmentServiceImpl implements ApartmentService {
         if (Objects.nonNull(req.getApartmentAddress())) {
             districtService.validationDistrict(req.getApartmentAddress().getDistrictId(), req.getApartmentAddress().getProvinceId());
         }
-        if (req.getTypeApartment().equals(ETypeApartment.BUY)){
-            if (req.getTotalPrice() == null){
+        if (req.getTypeApartment().equals(ETypeApartment.BUY)) {
+            if (req.getTotalPrice() == null) {
                 throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid total price"));
             }
-        }else{
-            if (req.getPriceRent() == null || req.getUnitRent() == null){
+        } else {
+            if (req.getPriceRent() == null || req.getUnitRent() == null) {
                 throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid Price Rent"));
             }
         }
@@ -261,12 +265,12 @@ public class ApartmentServiceImpl implements ApartmentService {
             districtService.validationDistrict(req.getApartmentAddress().getDistrictId(), req.getApartmentAddress().getProvinceId());
         }
 
-        if (req.getTypeApartment().equals(ETypeApartment.BUY)){
-            if (req.getTotalPrice() == null){
+        if (req.getTypeApartment().equals(ETypeApartment.BUY)) {
+            if (req.getTotalPrice() == null) {
                 throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid total price"));
             }
-        }else{
-            if (req.getPriceRent() == null || req.getUnitRent() == null){
+        } else {
+            if (req.getPriceRent() == null || req.getUnitRent() == null) {
                 throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid Price Rent"));
             }
         }
@@ -291,7 +295,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public boolean existApartment(String title) {
         log.info("Validate Apartment with title");
-        if (title == null || title.equals("")){
+        if (title == null || title.equals("")) {
             throw new NotFoundException("Title Null");
         }
         var apartment = apartmentRepository.findAllByTitleContainingIgnoreCase(title);
@@ -316,5 +320,13 @@ public class ApartmentServiceImpl implements ApartmentService {
         if (apartment.size() > 0) {
             apartmentRepository.delete(apartment.stream().findFirst().get());
         }
+    }
+
+    @Override
+    public PaginationResponse<ApartmentBasicDto> findApartmentWithSuitable(Long userId) {
+        List<Apartment> result = apartmentRepository
+                .findApartmentWithSuitableDesc(SuitabilityConstant.DEFAULT_ACCURACY,
+                        SuitabilityConstant.DEFAULT_ACCURACY_AREA, 2L, 1L, 1L);
+        return null;
     }
 }

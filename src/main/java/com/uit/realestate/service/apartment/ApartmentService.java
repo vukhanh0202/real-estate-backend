@@ -46,4 +46,6 @@ public interface ApartmentService {
     Long findByTitleNewest(String title);
 
     void deletePermanent(String title);
+
+    PaginationResponse<ApartmentBasicDto> findApartmentWithSuitable(Long userId);
 }
