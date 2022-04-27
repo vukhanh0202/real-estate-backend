@@ -7,13 +7,11 @@ import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.user.ERoleType;
+import com.uit.realestate.domain.TrackingTemporaryChat;
 import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
-import com.uit.realestate.dto.apartment.ApartmentBasicDto;
-import com.uit.realestate.dto.apartment.ApartmentCompareDto;
-import com.uit.realestate.dto.apartment.ApartmentDto;
-import com.uit.realestate.dto.apartment.ApartmentSearchDto;
+import com.uit.realestate.dto.apartment.*;
 import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
@@ -25,6 +23,7 @@ import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
 import com.uit.realestate.repository.apartment.spec.ApartmentSpecification;
 import com.uit.realestate.repository.category.CategoryRepository;
+import com.uit.realestate.repository.tracking.TrackingTemporaryChatRepository;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.apartment.ApartmentService;
 import com.uit.realestate.service.location.DistrictService;
@@ -36,11 +35,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.NotTransactional;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -59,6 +65,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     private final UserRepository userRepository;
     private final FavouriteRepository favouriteRepository;
     private final CategoryRepository categoryRepository;
+    private final TrackingTemporaryChatRepository trackingTemporaryChatRepository;
 
     @Override
     public boolean addApartment(AddApartmentRequest req) {
@@ -237,7 +244,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public PaginationResponse<ApartmentDto> searchApartment(SearchApartmentRequest req) {
         log.info("Search Apartment");
-
+        req.setApartmentStatus(EApartmentStatus.OPEN);
         Page<Apartment> result = apartmentRepository.findAll(ApartmentSpecification.of(req), req.getPageable());
 
         return new PaginationResponse<>(
@@ -328,5 +335,48 @@ public class ApartmentServiceImpl implements ApartmentService {
                 .findApartmentWithSuitableDesc(SuitabilityConstant.DEFAULT_ACCURACY,
                         SuitabilityConstant.DEFAULT_ACCURACY_AREA, 2L, 1L, 1L);
         return null;
+    }
+
+    @Override
+    @Async
+    public void findAndSaveRecommendApartmentForChatBox(ApartmentQueryParam req, String key) {
+        List<Apartment> result;
+        if (req.getUserId() == null || req.getUserId() == -1){
+            result = apartmentRepository
+                    .findRecommendApartmentForChatBox(req, req.getUserId(), req.getIp(), req.getPageable()).getContent();
+        }else{
+            result = apartmentRepository
+                    .findSuitableApartmentForChatBox(req,SuitabilityConstant.DEFAULT_ACCURACY,
+                            SuitabilityConstant.DEFAULT_ACCURACY_AREA, req.getUserId(), req.getPage(), req.getSize());
+        }
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (!trackingTemporaryChatRepository.existsByKey(req.generateKey())){
+            TrackingTemporaryChat chat = new TrackingTemporaryChat();
+            chat.setKey(key);
+            chat.setValue(result.stream().map(Apartment::getId).collect(Collectors.toList()));
+            trackingTemporaryChatRepository.saveAndFlush(chat);
+        }
+    }
+
+    @Override
+    public List<ThumbnailChatDto> findApartmentForChat(String key) {
+        TrackingTemporaryChat trackingTemporaryChat = trackingTemporaryChatRepository.findByKey(key).orElse(null);
+        if (Objects.isNull(trackingTemporaryChat)){
+            return new ArrayList<>();
+        }
+        try{
+            List<Apartment> apartments = apartmentRepository.findAllByStatusAndIdIn(EApartmentStatus.OPEN, trackingTemporaryChat.getValue());
+            if (apartments.isEmpty()){
+                return new ArrayList<>();
+            }
+            return List.of(new ThumbnailChatDto());
+        }finally {
+            trackingTemporaryChatRepository.delete(trackingTemporaryChat);
+        }
+
     }
 }

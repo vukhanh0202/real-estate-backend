@@ -3,6 +3,7 @@ package com.uit.realestate.dialogflow;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
@@ -10,7 +11,7 @@ public class DialogRequest implements Serializable {
     private String responseId;
     private String session;
     private QueryResult queryResult;
-    private Object originalDetectIntentRequest;
+//    private Map<String, LinkedHashMap> originalDetectIntentRequest;
 
     @Data
     public class QueryResult{
@@ -24,5 +25,6 @@ public class DialogRequest implements Serializable {
         private long intentDetectionConfidenceALong;
         private Object diagnosticInfo;
         private String languageCode;
+        private String action;
     }
 }

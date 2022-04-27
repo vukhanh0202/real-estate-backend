@@ -42,6 +42,8 @@ public interface AppConstant {
 
     Long MAX_IMAGES_APARTMENT = 8L;
 
+    Double PERCENT_RANGE = 0.2D;
+
     String DEFAULT_COUNTRY = "VN";
 
     String APARTMENT_FILE = "/apartment/";

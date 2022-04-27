@@ -44,13 +44,6 @@ public class ApartmentController {
 
     private final TrackingService trackingService;
 
-    @ApiOperation(value = "Search apartment")
-    @PostMapping(value = "/public/dialog")
-    public Object testDialog(@RequestBody String rq) {
-        DialogRequest dialogRequest = JsonUtils.unmarshal(rq, DialogRequest.class);
-        return new DialogResponse("Key from server: " + dialogRequest.getQueryResult().getParameters()).convertText();
-    }
-
     /**
      * Search apartment
      *

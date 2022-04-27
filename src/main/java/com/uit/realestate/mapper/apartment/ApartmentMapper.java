@@ -59,6 +59,9 @@ public abstract class ApartmentMapper implements MapperBase {
         if (apartment.getTypeApartment().equals(ETypeApartment.BUY)) {
             return StringUtils.castPriceFromNumber(apartment.getTotalPrice());
         } else {
+            if (apartment.getUnitRent() == null){
+                return "0";
+            }
             return apartment.getUnitRent().trim();
         }
     }

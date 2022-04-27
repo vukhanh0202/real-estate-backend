@@ -1,15 +1,14 @@
 package com.uit.realestate.service.apartment;
 
-import com.uit.realestate.dto.apartment.ApartmentBasicDto;
-import com.uit.realestate.dto.apartment.ApartmentCompareDto;
-import com.uit.realestate.dto.apartment.ApartmentDto;
-import com.uit.realestate.dto.apartment.ApartmentSearchDto;
+import com.uit.realestate.dto.apartment.*;
 import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.payload.CatchInfoRequest;
 import com.uit.realestate.payload.CatchInfoRequestExt;
 import com.uit.realestate.payload.apartment.*;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 public interface ApartmentService {
 
@@ -48,4 +47,10 @@ public interface ApartmentService {
     void deletePermanent(String title);
 
     PaginationResponse<ApartmentBasicDto> findApartmentWithSuitable(Long userId);
+
+    @Async
+    void findAndSaveRecommendApartmentForChatBox(ApartmentQueryParam req, String key);
+
+    List<ThumbnailChatDto> findApartmentForChat(String key);
+
 }

@@ -16,7 +16,7 @@ public enum ETypeApartment {
 
     public static ETypeApartment of(String str){
         for(ETypeApartment type : values()){
-            if(str.contains(type.getValue())){
+            if(str.toUpperCase().contains(type.getValue())){
                 return type;
             }
         }

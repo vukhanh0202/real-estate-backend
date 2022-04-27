@@ -82,8 +82,9 @@ public class ScraperAloNhaDatImpl extends ScraperService {
     @Override
     @Async
     public void scrapingData(int size) {
-        int pageNumberBuy = 429;
-        int pageNumberRent = 429;
+        //Page 2655
+        int pageNumberBuy = 1;
+        int pageNumberRent = 1;
         int quantity = 0;
         ETypeApartment type;
         do {
@@ -112,6 +113,7 @@ public class ScraperAloNhaDatImpl extends ScraperService {
         } while (quantity < size);
         System.out.println("Finish Scraping");
     }
+
     @Override
     protected List<String> extractLink(String url) {
         throw new InvalidException("Not Support");
@@ -164,13 +166,29 @@ public class ScraperAloNhaDatImpl extends ScraperService {
         DistrictDto district;
         ProvinceDto province;
         try {
+            Document document = Jsoup.connect(url).get();
+
             district = districtService.findDistrictNameIn(rawData.getDistrict().toLowerCase().replace("thành phố", "").trim());
             province = provinceService.findByDistrict(district.getId());
             if (province.getId() == 1) {
                 System.out.println("Skip HCM apartment");
                 return false;
-            }else if (province.getId() == 2){
+            } else if (province.getId() == 2) {
                 System.out.println("Skip HN apartment");
+                return false;
+            } else if (province.getId() == 5) {
+                System.out.println("Skip VungTau apartment");
+                return false;
+            } else if (province.getId() == 36) {
+                System.out.println("Skip LongAn apartment");
+                return false;
+            } else if (province.getId() == 62) {
+                System.out.println("Skip DN apartment");
+                return false;
+            }
+            String category = getValueSingle("Category", document, "#right .search-box .property-type-container.multicolumns", ".text", null, true);
+            if (category.equals("Nhà mặt tiền")) {
+                System.out.println("Skip " + category);
                 return false;
             }
         } catch (Exception e) {

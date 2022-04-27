@@ -35,8 +35,8 @@ public class StatisticRankServiceImpl extends AbstractBaseService<Void, Statisti
 
         List<Province> listTotalPrices = provinceRepository.findAllByApartmentPrices();
         listTotalPrices.sort((o1, o2) -> {
-            var totalO1 = (long) o1.getApartmentAddresses().stream().mapToDouble(item -> item.getApartment().getTotalPrice()).sum();
-            var totalO2 = (long) o2.getApartmentAddresses().stream().mapToDouble(item -> item.getApartment().getTotalPrice()).sum();
+            var totalO1 = (long) o1.getApartmentAddresses().stream().mapToDouble(item -> item.getApartment().getTotalPrice() != null ? item.getApartment().getTotalPrice() :0).sum();
+            var totalO2 = (long) o2.getApartmentAddresses().stream().mapToDouble(item -> item.getApartment().getTotalPrice() != null ? item.getApartment().getTotalPrice() :0).sum();
             if (totalO1 > totalO2){
                 return -1;
             }else  if (totalO1 < totalO2) {
@@ -48,7 +48,7 @@ public class StatisticRankServiceImpl extends AbstractBaseService<Void, Statisti
                 .map(province -> {
                     Long unit;
                     String unitStr;
-                    var total = (long) province.getApartmentAddresses().stream().mapToDouble(item -> item.getApartment().getTotalPrice()).sum();
+                    var total = (long) province.getApartmentAddresses().stream().mapToDouble(item -> item.getApartment().getTotalPrice() != null ? item.getApartment().getTotalPrice() :0).sum();
                     if (total < 1000000L) {
                         unit = 1L;
                         unitStr = " VNĐ";
