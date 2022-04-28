@@ -11,7 +11,7 @@ public class DialogRequest implements Serializable {
     private String responseId;
     private String session;
     private QueryResult queryResult;
-//    private Map<String, LinkedHashMap> originalDetectIntentRequest;
+    private Map<String, LinkedHashMap> originalDetectIntentRequest;
 
     @Data
     public class QueryResult{

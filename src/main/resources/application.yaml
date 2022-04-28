@@ -44,3 +44,6 @@ server:
   port: 8080
   servlet:
     context-path: /api
+
+host: http://localhost:8080
+host-fe: http://localhost:3000

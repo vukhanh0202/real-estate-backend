@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -47,28 +48,23 @@ public class DialogFlowController {
         pr.setSize(5);
         pr.createPageable();
         pr.setIp(IPUtils.getIp(request));
-//        pr.setUserId(Long.valueOf(dialogRequest.getOriginalDetectIntentRequest().get("payload").get("userId").toString()));
-        pr.setUserId(-1L);
+        pr.setUserId(Long.valueOf(dialogRequest.getOriginalDetectIntentRequest().get("payload").get("userId").toString()));
         String key = pr.generateKey();
         ExtendEventChatBot event = ExtendEventChatBot.of(dialogRequest.getQueryResult().getAction());
         final Instant deadline = Instant.now().plusMillis(3000);
-        System.out.println(event.name());
         // No result
         DialogResponse dialogResponse = new DialogResponse();
-        dialogResponse.setItemList(List.of(new ItemList("List item 1 title", "List item 1 subtitle", "http://localhost:8080/api/public/image/apartment/1_2022-04-17T03-58-21-90760989.jpg", "https://google.com")));
-        Map<String, String> values = new HashMap<>();
-        values.put("Case Studies","https://cloud.google.com/dialogflow/case-studies");
-        dialogResponse.setChips(List.of(new Chip(values)));
+
         if (event.isInitEvent()){
             apartmentService.findAndSaveRecommendApartmentForChatBox(pr, key);
         }
         try{
             while(Instant.now().isBefore(deadline)){
-                System.out.println(Instant.now());
                 List<ThumbnailChatDto> result = apartmentService.findApartmentForChat(key);
                 if (!result.isEmpty()){
-                    System.out.println("Success:" + event.name());
-                    System.out.println(dialogResponse.convertText());
+                    dialogResponse.setItemList(result.stream()
+                            .map(item -> new ItemList(item.getTitle(), item.getSubtitle(), item.getImage(), item.getLink()))
+                            .collect(Collectors.toList()));
                     return dialogResponse.convertText();
                 }
                 TimeUnit.SECONDS.sleep(1);
@@ -80,7 +76,6 @@ public class DialogFlowController {
             return event.generateJsonNextEvent();
         }
 
-
-        return dialogResponse.convertText();
+        return dialogResponse.noResponseText();
     }
 }

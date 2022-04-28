@@ -48,4 +48,11 @@ public final class StringUtils {
             return df.format(price);
         }
     }
+
+    public static String concat(String str, int limit) {
+        if (str.length() > limit){
+            return str.substring(0, limit);
+        }
+        return str;
+    }
 }

@@ -15,6 +15,7 @@ import com.uit.realestate.dto.apartment.*;
 import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
+import com.uit.realestate.mapper.TrackingChatbotMapper;
 import com.uit.realestate.mapper.apartment.ApartmentMapper;
 import com.uit.realestate.payload.CatchInfoRequest;
 import com.uit.realestate.payload.CatchInfoRequestExt;
@@ -56,6 +57,7 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     private final ApartmentRepository apartmentRepository;
     private final ApartmentMapper apartmentMapper;
+    private final TrackingChatbotMapper trackingChatbotMapper;
 
     private final DistrictService districtService;
     private final TrackingService trackingService;
@@ -373,7 +375,7 @@ public class ApartmentServiceImpl implements ApartmentService {
             if (apartments.isEmpty()){
                 return new ArrayList<>();
             }
-            return List.of(new ThumbnailChatDto());
+            return trackingChatbotMapper.toThumbnailChatDtoList(apartments);
         }finally {
             trackingTemporaryChatRepository.delete(trackingTemporaryChat);
         }

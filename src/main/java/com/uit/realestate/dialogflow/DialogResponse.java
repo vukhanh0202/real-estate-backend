@@ -18,13 +18,35 @@ public class DialogResponse implements Serializable {
                 "        {\n" +
                 "            \"payload\": {\n" +
                 "                \"richContent\": [\n" +
-                                    JsonUtils.marshal(itemList) + ",\n"+
-                                    JsonUtils.marshal(chips) + "\n"+
+                                    generateString() +
                 "                ]\n" +
                 "            }\n" +
                 "        }\n" +
                 "    ]\n" +
                 "}";
+    }
+
+    private String generateString(){
+        String result = JsonUtils.marshal(itemList);
+        if (result == null){
+            return "";
+        }
+        if (chips.isEmpty()){
+            result = result.concat(",\n").concat(Objects.requireNonNull(JsonUtils.marshal(chips)));
+        }
+        return result;
+    }
+
+    public String noResponseText(){
+        return "\"fulfillmentMessages\": [\n" +
+                "      {\n" +
+                "        \"text\": {\n" +
+                "          \"text\": [\n" +
+                "            \"Response configured for matched intent\"\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ]";
     }
 
 }
