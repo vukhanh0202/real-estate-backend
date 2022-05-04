@@ -20,11 +20,11 @@ public interface ApartmentService {
 
     boolean favouriteApartment(FavouriteApartmentRequest req);
 
-    List<ApartmentBasicDto> findHighLightApartment(CatchInfoRequest req);
+    List<ApartmentBasicDto> findHighLightApartment(HighlightApartmentRequest req);
 
-    List<ApartmentBasicDto> findLatestApartment(CatchInfoRequest req);
+    List<ApartmentBasicDto> findLatestApartment(LatestApartmentRequest req);
 
-    PaginationResponse<ApartmentBasicDto> findRecommendApartment(CatchInfoRequestExt req);
+    PaginationResponse<ApartmentBasicDto> findRecommendApartment(RecommendApartmentRequest req);
 
     PaginationResponse<ApartmentBasicDto> findSimilarApartment(CatchInfoRequestExt req);
 

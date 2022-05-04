@@ -75,7 +75,7 @@ public class ApartmentController {
                                                   @RequestParam(value = "area_from", required = false) Double areaFrom,
                                                   @RequestParam(value = "area_to", required = false) Double areaTo,
                                                   @RequestParam(value = "category_id", required = false) Long categoryId,
-                                                  @RequestParam(value = "type_apartment") ETypeApartment typeApartment,
+                                                  @RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
                                                   @RequestParam(value = "user_id", required = false) Long userId,
                                                   @RequestParam(value = "house_direction", required = false) Long houseDirection,
                                                   @RequestParam(value = "bedroom_quantity", required = false) Long bedroomQuantity,
@@ -120,9 +120,10 @@ public class ApartmentController {
     @GetMapping(value = "/public/apartment/recommend")
     public ResponseEntity<?> findRecommendApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
                                                     @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+                                                    @RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
                                                     @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
                                                     HttpServletRequest request) {
-        CatchInfoRequestExt req = new CatchInfoRequestExt(userId, IPUtils.getIp(request), page, size);
+        RecommendApartmentRequest req = new RecommendApartmentRequest(userId, IPUtils.getIp(request), page, size, typeApartment);
         req.createPageable();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.findRecommendApartment(req)));
@@ -153,9 +154,10 @@ public class ApartmentController {
      */
     @ApiOperation(value = "Get latest new apartment ")
     @GetMapping(value = "/public/apartment/latest-new")
-    public ResponseEntity<?> findLatestNewApartment(@RequestParam(value = "user_id", required = false) Long userId) {
+    public ResponseEntity<?> findLatestNewApartment(@RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
+                                                    @RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.findLatestApartment(new CatchInfoRequest(userId))));
+                .body(new ApiResponse(apartmentService.findLatestApartment(new LatestApartmentRequest(userId, typeApartment))));
     }
 
     /**
@@ -165,9 +167,11 @@ public class ApartmentController {
      */
     @ApiOperation(value = "Get highlight apartment ")
     @GetMapping(value = "/public/apartment/highlight")
-    public ResponseEntity<?> findHighlightApartment(@RequestParam(value = "user_id", required = false) Long userId) {
+    public ResponseEntity<?> findHighlightApartment(@RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
+                                                    @RequestParam(value = "province_id") Long provinceId,
+                                                    @RequestParam(value = "user_id", required = false) Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.findHighLightApartment(new CatchInfoRequest(userId))));
+                .body(new ApiResponse(apartmentService.findHighLightApartment(new HighlightApartmentRequest(userId,typeApartment, provinceId))));
     }
 
     /**

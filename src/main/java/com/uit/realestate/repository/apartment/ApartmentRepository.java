@@ -35,9 +35,9 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
 
     List<Apartment> findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus status, String title);
 
-    List<Apartment> findTop4ByStatusOrderByCreatedAtDesc(EApartmentStatus status);
+    List<Apartment> findTop16ByStatusAndTypeApartmentOrderByCreatedAtDesc(EApartmentStatus status, ETypeApartment typeApartment);
 
-    List<Apartment> findTop4ByHighlightTrueAndStatusOrderByUpdatedAtDesc(EApartmentStatus status);
+    List<Apartment> findTop4ByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus status, Long provinceId);
 
     List<Apartment> findAllByIdIn(List<Long> ids);
 
@@ -51,10 +51,11 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "           OR (tp.ip = :ip OR tp.user_id = :userId) " +
             "           OR (td.ip = :ip OR td.user_id = :userId)) " +
             "       AND ap.status = 'OPEN' " +
+            "       AND ap.type_apartment = :typeApartment " +
             " GROUP BY ap.id " +
             " ORDER BY rating DESC, ap.created_at DESC ",
             nativeQuery = true)
-    Page<Apartment> findRecommendApartmentByUserIdAndIp(Long userId, String ip, Pageable pageable);
+    Page<Apartment> findRecommendApartmentByUserIdAndIp(ETypeApartment typeApartment, Long userId, String ip, Pageable pageable);
 
     @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +

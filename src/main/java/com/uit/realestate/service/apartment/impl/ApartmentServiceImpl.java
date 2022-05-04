@@ -147,24 +147,24 @@ public class ApartmentServiceImpl implements ApartmentService {
     }
 
     @Override
-    public List<ApartmentBasicDto> findHighLightApartment(CatchInfoRequest req) {
+    public List<ApartmentBasicDto> findHighLightApartment(HighlightApartmentRequest req) {
         log.info("Find top 4 highlight apartment");
         return apartmentMapper.toApartmentBasicDtoList(apartmentRepository
-                .findTop4ByHighlightTrueAndStatusOrderByUpdatedAtDesc(EApartmentStatus.OPEN), req.getUserId());
+                .findTop4ByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus.OPEN, req.getProvinceId()), req.getUserId());
     }
 
     @Override
-    public List<ApartmentBasicDto> findLatestApartment(CatchInfoRequest req) {
+    public List<ApartmentBasicDto> findLatestApartment(LatestApartmentRequest req) {
         log.info("Find top 4 new latest apartment");
         return apartmentMapper.toApartmentBasicDtoList(apartmentRepository
-                .findTop4ByStatusOrderByCreatedAtDesc(EApartmentStatus.OPEN), req.getUserId());
+                .findTop16ByStatusAndTypeApartmentOrderByCreatedAtDesc(EApartmentStatus.OPEN, req.getTypeApartment()), req.getUserId());
     }
 
     @Override
-    public PaginationResponse<ApartmentBasicDto> findRecommendApartment(CatchInfoRequestExt req) {
+    public PaginationResponse<ApartmentBasicDto> findRecommendApartment(RecommendApartmentRequest req) {
         log.info("Find recommend apartment");
         Page<Apartment> result = apartmentRepository
-                .findRecommendApartmentByUserIdAndIp(req.getUserId(), req.getIp(), req.getPageable());
+                .findRecommendApartmentByUserIdAndIp(req.getTypeApartment(), req.getUserId(), req.getIp(), req.getPageable());
         return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
@@ -176,7 +176,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     public PaginationResponse<ApartmentBasicDto> findSimilarApartment(CatchInfoRequestExt req) {
         log.info("Find Similar apartment");
         Page<Apartment> result = apartmentRepository
-                .findRecommendApartmentByUserIdAndIp(req.getUserId(), req.getIp(), req.getPageable());
+                .findRecommendApartmentByUserIdAndIp(ETypeApartment.BUY, req.getUserId(), req.getIp(), req.getPageable());
         List<ApartmentBasicDto> contents = apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId());
         Collections.shuffle(contents);
         return new PaginationResponse<>(
