@@ -134,7 +134,7 @@ public enum EEntitiesDialog {
                     if (types == null || types.isEmpty()) {
                         return;
                     }
-                    param.setType(ETypeApartment.valueOf(types.get(0).toUpperCase()));
+                    param.setType(types.get(0).toUpperCase());
                     break;
             }
         } catch (Exception e) {

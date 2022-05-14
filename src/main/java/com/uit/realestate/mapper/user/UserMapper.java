@@ -106,6 +106,7 @@ public abstract class UserMapper implements MapperBase {
     @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "category", target = "category")
+    @Mapping(source = "typeApartment", target = "typeApartment")
     public abstract UserTarget toUserTarget(AddUserTargetRequest userTargetDto);
 
     @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -117,6 +118,7 @@ public abstract class UserMapper implements MapperBase {
     @Mapping(source = "bathroomQuantity", target = "bathroomQuantity")
     @Mapping(source = "area", target = "area")
     @Mapping(source = "category", target = "category")
+    @Mapping(source = "typeApartment", target = "typeApartment")
     public abstract void updateUserTarget(UpdateUserTargetRequest dto, @MappingTarget UserTarget entity);
 
     @BeanMapping(qualifiedByName = "toUserTargetDto")

@@ -2,7 +2,6 @@ package com.uit.realestate.mapper.apartment;
 
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
-import com.uit.realestate.domain.user.UserTarget;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentCompareDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
@@ -12,8 +11,6 @@ import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
-import com.uit.realestate.repository.user.UserTargetRepository;
-import com.uit.realestate.utils.CalculatorPercentSuitability;
 import com.uit.realestate.utils.StringUtils;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,26 +37,11 @@ public abstract class ApartmentMapper implements MapperBase {
     @Autowired
     private SuitabilityMapper suitabilityMapper;
 
-    @Autowired
-    private UserTargetRepository userTargetRepository;
-
-//    private Double getPercentSuitable(Apartment apartment, Long userId) {
-//        if (userId != null) {
-//            List<UserTarget> userTarget = userTargetRepository.findAllByUserId(userId);
-//            if (userTarget.isEmpty()) {
-//                return 0D;
-//            }
-//            return CalculatorPercentSuitability
-//                    .calculatorPercent(suitabilityMapper.toSuitabilityDto(apartment), userTarget);
-//        }
-//        return 0D;
-//    }
-
     private String convertPriceToString(Apartment apartment) {
         if (apartment.getTypeApartment().equals(ETypeApartment.BUY)) {
             return StringUtils.castPriceFromNumber(apartment.getTotalPrice());
         } else {
-            if (apartment.getUnitRent() == null){
+            if (apartment.getUnitRent() == null) {
                 return "0";
             }
             return apartment.getUnitRent().trim();

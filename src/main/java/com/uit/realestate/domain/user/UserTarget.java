@@ -1,5 +1,6 @@
 package com.uit.realestate.domain.user;
 
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.SqlEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,9 @@ public class UserTarget extends SqlEntity {
     private Double area;
 
     private Long category;
+
+    @Enumerated(EnumType.STRING)
+    private ETypeApartment typeApartment;
 
     @Override
     public String toString() {

@@ -1,6 +1,7 @@
 package com.uit.realestate.payload.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import lombok.Data;
 
 @Data
@@ -20,5 +21,6 @@ public class UpdateUserTargetRequest {
     private Long bathroomQuantity;
     private Double area;
     private Long category;
-
+    @JsonProperty("type_apartment")
+    private ETypeApartment typeApartment;
 }

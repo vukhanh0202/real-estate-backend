@@ -34,7 +34,7 @@ public class ApartmentQueryParam extends CatchInfoRequestExt {
     private Double priceLow;
     private Double priceHigh;
 
-    private ETypeApartment type;
+    private String type;
 
     public static ApartmentQueryParam of(Map<String, Object> rq) {
         ApartmentQueryParam param = new ApartmentQueryParam();

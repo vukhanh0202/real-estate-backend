@@ -41,14 +41,16 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
 
     List<Apartment> findAllByIdIn(List<Long> ids);
 
-    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
+    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(tta.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +
             " JOIN apartment_address ad ON ap.id = ad.id " +
             " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
             " FULL OUTER JOIN tracking_province tp ON tp.province_id = ad.province_id " +
             " FULL OUTER JOIN tracking_district td ON td.district_id = ad.district_id " +
+            " FULL OUTER JOIN tracking_type_apartment tta ON tta.type_apartment = ap.type_apartment " +
             " WHERE ((tc.ip = :ip OR tc.user_id = :userId) " +
             "           OR (tp.ip = :ip OR tp.user_id = :userId) " +
+            "           OR (tta.ip = :ip OR tta.user_id = :userId) " +
             "           OR (td.ip = :ip OR td.user_id = :userId)) " +
             "       AND ap.status = 'OPEN' " +
             "       AND ap.type_apartment = :typeApartment " +
@@ -57,15 +59,17 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             nativeQuery = true)
     Page<Apartment> findRecommendApartmentByUserIdAndIp(String typeApartment, Long userId, String ip, Pageable pageable);
 
-    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
+    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(tta.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +
             " JOIN apartment_address ad ON ap.id = ad.id " +
             " JOIN apartment_detail adt ON ap.id = adt.id " +
             " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
             " FULL OUTER JOIN tracking_province tp ON tp.province_id = ad.province_id " +
             " FULL OUTER JOIN tracking_district td ON td.district_id = ad.district_id " +
+            " FULL OUTER JOIN tracking_type_apartment tta ON tta.type_apartment = ap.type_apartment " +
             " WHERE ((tc.ip = :ip OR tc.user_id = :userId) " +
             "           OR (tp.ip = :ip OR tp.user_id = :userId) " +
+            "           OR (tta.ip = :ip OR tta.user_id = :userId) " +
             "           OR (td.ip = :ip OR td.user_id = :userId)) " +
             "       AND ap.status = 'OPEN' " +
             "       AND (COALESCE(:#{#param.bathrooms}) is null OR adt.bathroom_quantity IN :#{#param.bathrooms} ) " +
@@ -87,14 +91,16 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
 
     Page<Apartment> findAllByAuthorIdAndStatusIn(Long userId, List<EApartmentStatus> status, Pageable pageable);
 
-    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
+    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(tta.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +
             " JOIN apartment_address ad ON ap.id = ad.id " +
             " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
             " FULL OUTER JOIN tracking_province tp ON tp.province_id = ad.province_id " +
             " FULL OUTER JOIN tracking_district td ON td.district_id = ad.district_id " +
+            " FULL OUTER JOIN tracking_type_apartment tta ON tta.type_apartment = ap.type_apartment " +
             " WHERE ((tc.user_id = :userId) " +
             "       OR (tp.user_id = :userId) " +
+            "       OR (tta.user_id = :userId) " +
             "       OR (td.user_id = :userId)) " +
             " GROUP BY ap.id " +
             " ORDER BY rating DESC, ap.created_at DESC ",
@@ -152,6 +158,25 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "       AS suitable,\n" +
             "       SUM(CASE\n" +
             "           WHEN u.category is null THEN 0\n" +
+            "           ELSE :accuracy\n" +
+            "           END)\n" +
+            "       AS total\n" +
+            "   FROM apartment a, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id, a.title \n" +
+            "), type_apartment_tb AS (\n" +
+            "   SELECT a.id, a.title,  \n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.type_apartment is null THEN 0\n" +
+            "           ELSE\n" +
+            "           CASE\n" +
+            "           WHEN a.type_apartment = u.type_apartment THEN :accuracy\n" +
+            "           ELSE 0\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.type_apartment is null THEN 0\n" +
             "           ELSE :accuracy\n" +
             "           END)\n" +
             "       AS total\n" +
@@ -236,7 +261,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "   GROUP BY a.id, a.title \n" +
             ")\n" +
             "SELECT dtb.area, dtb.id, dtb.author_id, dtb.category_id, dtb.created_at, dtb.created_by, dtb.highlight, dtb.is_deleted, dtb.photos, dtb.price, dtb.price_rent, dtb.status, dtb.title, dtb.total_price, dtb.type_apartment, dtb.unit_rent, dtb.updated_at, dtb.updated_by,\n" +
-            "       SUM((dtb.suitable + ptb.suitable + ctb.suitable + atb.suitable + ftb.suitable + dtb.suitable + batb.suitable)/(dtb.total + ptb.total + ctb.total + atb.total + ftb.total + dtb.total + batb.total))*100 AS suitable_rate\n" +
+            "       SUM((dtb.suitable + ptb.suitable + ctb.suitable + atb.suitable + ftb.suitable + dtb.suitable + batb.suitable + tatb.suitable)/(dtb.total + ptb.total + ctb.total + atb.total + ftb.total + dtb.total + batb.total + tatb.total))*100 AS suitable_rate\n" +
             "FROM district_tb dtb \n" +
             "JOIN province_tb ptb ON dtb.id = ptb.id\n" +
             "JOIN category_tb ctb ON dtb.id = ctb.id\n" +
@@ -244,6 +269,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "JOIN floor_tb ftb ON dtb.id = ftb.id\n" +
             "JOIN bedroom_tb btb ON dtb.id = btb.id\n" +
             "JOIN bathroom_tb batb ON dtb.id = batb.id\n" +
+            "JOIN type_apartment_tb tatb ON dtb.id = tatb.id\n" +
             "GROUP BY dtb.id, dtb.area, dtb.author_id, dtb.category_id, dtb.created_at, dtb.created_by, dtb.highlight, dtb.is_deleted, dtb.photos, dtb.price, dtb.price_rent, dtb.status, dtb.title, dtb.total_price, dtb.type_apartment, dtb.unit_rent, dtb.updated_at, dtb.updated_by\n" +
             "ORDER BY suitable_rate desc LIMIT :size OFFSET :page",
             nativeQuery = true)
@@ -309,6 +335,25 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "   FROM apartment a, user_target u\n" +
             "   WHERE u.user_id = :userId and a.status = 'OPEN'\n" +
             "   GROUP BY a.id, a.title \n" +
+            "), type_apartment_tb AS (\n" +
+            "   SELECT a.id, a.title,  \n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.type_apartment is null THEN 0\n" +
+            "           ELSE\n" +
+            "           CASE\n" +
+            "           WHEN a.type_apartment = u.type_apartment THEN :accuracy\n" +
+            "           ELSE 0\n" +
+            "           END\n" +
+            "           END) \n" +
+            "       AS suitable,\n" +
+            "       SUM(CASE\n" +
+            "           WHEN u.type_apartment is null THEN 0\n" +
+            "           ELSE :accuracy\n" +
+            "           END)\n" +
+            "       AS total\n" +
+            "   FROM apartment a, user_target u\n" +
+            "   WHERE u.user_id = :userId and a.status = 'OPEN'\n" +
+            "   GROUP BY a.id, a.title \n" +
             "), area_tb AS (\n" +
             "   SELECT a.id, a.title,  \n" +
             "       SUM(CASE\n" +
@@ -387,7 +432,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "   GROUP BY a.id, a.title \n" +
             ")\n" +
             "SELECT dtb.area, dtb.id, dtb.author_id, dtb.category_id, dtb.created_at, dtb.created_by, dtb.highlight, dtb.is_deleted, dtb.photos, dtb.price, dtb.price_rent, dtb.status, dtb.title, dtb.total_price, dtb.type_apartment, dtb.unit_rent, dtb.updated_at, dtb.updated_by,\n" +
-            "       SUM((dtb.suitable + ptb.suitable + ctb.suitable + atb.suitable + ftb.suitable + dtb.suitable + batb.suitable)/(dtb.total + ptb.total + ctb.total + atb.total + ftb.total + dtb.total + batb.total))*100 AS suitable_rate\n" +
+            "       SUM((dtb.suitable + ptb.suitable + ctb.suitable + atb.suitable + ftb.suitable + dtb.suitable + batb.suitable + tatb.suitable)/(dtb.total + ptb.total + ctb.total + atb.total + ftb.total + dtb.total + batb.total + tatb.total))*100 AS suitable_rate\n" +
             "FROM district_tb dtb \n" +
             "JOIN province_tb ptb ON dtb.id = ptb.id\n" +
             "JOIN category_tb ctb ON dtb.id = ctb.id\n" +
@@ -395,6 +440,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "JOIN floor_tb ftb ON dtb.id = ftb.id\n" +
             "JOIN bedroom_tb btb ON dtb.id = btb.id\n" +
             "JOIN bathroom_tb batb ON dtb.id = batb.id\n" +
+            "JOIN type_apartment_tb tatb ON dtb.id = tatb.id\n" +
             "WHERE  (COALESCE(:#{#param.bathrooms}) is null OR dtb.bathroom_quantity IN :#{#param.bathrooms} ) " +
             "       AND (COALESCE(:#{#param.bedrooms}) is null OR dtb.bedroom_quantity IN :#{#param.bedrooms} ) " +
             "       AND (COALESCE(:#{#param.categories}) is null OR dtb.category_id IN :#{#param.categories} ) " +
