@@ -55,7 +55,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             " GROUP BY ap.id " +
             " ORDER BY rating DESC, ap.created_at DESC ",
             nativeQuery = true)
-    Page<Apartment> findRecommendApartmentByUserIdAndIp(ETypeApartment typeApartment, Long userId, String ip, Pageable pageable);
+    Page<Apartment> findRecommendApartmentByUserIdAndIp(String typeApartment, Long userId, String ip, Pageable pageable);
 
     @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +

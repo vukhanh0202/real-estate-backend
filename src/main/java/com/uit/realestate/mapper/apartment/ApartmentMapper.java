@@ -81,7 +81,6 @@ public abstract class ApartmentMapper implements MapperBase {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
-//        dto.setPercentSuitable(getPercentSuitable(apartment, userId));
         dto.setTotalPrice(convertPriceToString(apartment));
     }
 
@@ -144,7 +143,6 @@ public abstract class ApartmentMapper implements MapperBase {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
-//        dto.setPercentSuitable(getPercentSuitable(apartment, userId));
         dto.setTotalPrice(convertPriceToString(apartment));
     }
 
@@ -172,7 +170,6 @@ public abstract class ApartmentMapper implements MapperBase {
             dto.setFavourite(true);
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
-//        dto.setPercentSuitable(getPercentSuitable(apartment, userId));
         dto.setTotalPrice(convertPriceToString(apartment));
     }
 
@@ -262,7 +259,6 @@ public abstract class ApartmentMapper implements MapperBase {
                 + apartment.getApartmentAddress().getDistrict().getName() + ", "
                 + apartment.getApartmentAddress().getProvince().getName() + ", "
                 + apartment.getApartmentAddress().getCountry().getName());
-//        apartmentCompareDto.setPercentSuitable(getPercentSuitable(apartment, userId));
         apartmentCompareDto.setTotalPrice(convertPriceToString(apartment));
     }
 

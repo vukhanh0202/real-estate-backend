@@ -17,7 +17,6 @@ import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.TrackingChatbotMapper;
 import com.uit.realestate.mapper.apartment.ApartmentMapper;
-import com.uit.realestate.payload.CatchInfoRequest;
 import com.uit.realestate.payload.CatchInfoRequestExt;
 import com.uit.realestate.payload.apartment.*;
 import com.uit.realestate.repository.action.FavouriteRepository;
@@ -29,24 +28,16 @@ import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.service.apartment.ApartmentService;
 import com.uit.realestate.service.location.DistrictService;
 import com.uit.realestate.service.tracking.TrackingService;
+import com.uit.realestate.utils.JsonUtils;
 import com.uit.realestate.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
-import org.springframework.test.annotation.NotTransactional;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,10 +114,11 @@ public class ApartmentServiceImpl implements ApartmentService {
                 .orElse(null);
 
         Long rating;
-        Map<ETrackingType, Long> map = new HashMap<>();
-        map.put(ETrackingType.CATEGORY, apartment.getCategory().getId());
-        map.put(ETrackingType.DISTRICT, apartment.getApartmentAddress().getDistrict().getId());
-        map.put(ETrackingType.PROVINCE, apartment.getApartmentAddress().getProvince().getId());
+        Map<ETrackingType, String> map = new HashMap<>();
+        map.put(ETrackingType.CATEGORY, String.valueOf(apartment.getCategory().getId()));
+        map.put(ETrackingType.DISTRICT, String.valueOf(apartment.getApartmentAddress().getDistrict().getId()));
+        map.put(ETrackingType.PROVINCE, String.valueOf(apartment.getApartmentAddress().getProvince().getId()));
+        map.put(ETrackingType.TYPE, apartment.getTypeApartment().name());
 
         if (favourite == null) {
             log.info("Favourite Apartment with apartment ID: " + req.getApartmentId());
@@ -164,7 +156,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     public PaginationResponse<ApartmentBasicDto> findRecommendApartment(RecommendApartmentRequest req) {
         log.info("Find recommend apartment");
         Page<Apartment> result = apartmentRepository
-                .findRecommendApartmentByUserIdAndIp(req.getTypeApartment(), req.getUserId(), req.getIp(), req.getPageable());
+                .findRecommendApartmentByUserIdAndIp(req.getTypeApartment().name(), req.getUserId(), req.getIp(), req.getPageable());
         return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
@@ -176,7 +168,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     public PaginationResponse<ApartmentBasicDto> findSimilarApartment(CatchInfoRequestExt req) {
         log.info("Find Similar apartment");
         Page<Apartment> result = apartmentRepository
-                .findRecommendApartmentByUserIdAndIp(ETypeApartment.BUY, req.getUserId(), req.getIp(), req.getPageable());
+                .findRecommendApartmentByUserIdAndIp(ETypeApartment.BUY.name(), req.getUserId(), req.getIp(), req.getPageable());
         List<ApartmentBasicDto> contents = apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId());
         Collections.shuffle(contents);
         return new PaginationResponse<>(
@@ -206,10 +198,11 @@ public class ApartmentServiceImpl implements ApartmentService {
         ApartmentDto result = apartmentMapper.toApartmentFullDto(apartment, req.getUserId());
 
         log.info("Tracking User");
-        Map<ETrackingType, Long> map = new HashMap<>();
-        map.put(ETrackingType.CATEGORY, apartment.getCategory().getId());
-        map.put(ETrackingType.DISTRICT, apartment.getApartmentAddress().getDistrict().getId());
-        map.put(ETrackingType.PROVINCE, apartment.getApartmentAddress().getProvince().getId());
+        Map<ETrackingType, String> map = new HashMap<>();
+        map.put(ETrackingType.CATEGORY, String.valueOf(apartment.getCategory().getId()));
+        map.put(ETrackingType.DISTRICT, String.valueOf(apartment.getApartmentAddress().getDistrict().getId()));
+        map.put(ETrackingType.PROVINCE, String.valueOf(apartment.getApartmentAddress().getProvince().getId()));
+        map.put(ETrackingType.TYPE, apartment.getTypeApartment().name());
         trackingService.tracking(req.getUserId(), req.getIp(), map, AppConstant.DEFAULT_RATING);
 
         log.info("Get detail apartment ID: " + req.getId());
@@ -343,41 +336,41 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Async
     public void findAndSaveRecommendApartmentForChatBox(ApartmentQueryParam req, String key) {
         List<Apartment> result;
-        if (req.getUserId() == null || req.getUserId() == -1){
+        if (req.getUserId() == null || req.getUserId() == -1) {
             result = apartmentRepository
                     .findRecommendApartmentForChatBox(req, req.getUserId(), req.getIp(), req.getPageable()).getContent();
-        }else{
+        } else {
             result = apartmentRepository
-                    .findSuitableApartmentForChatBox(req,SuitabilityConstant.DEFAULT_ACCURACY,
+                    .findSuitableApartmentForChatBox(req, SuitabilityConstant.DEFAULT_ACCURACY,
                             SuitabilityConstant.DEFAULT_ACCURACY_AREA, req.getUserId(), req.getPage(), req.getSize());
         }
-        try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        TrackingTemporaryChat trackingTemporaryChat = trackingTemporaryChatRepository.findByKey(key).orElse(null);
+        if (Objects.nonNull(trackingTemporaryChat)) {
+            trackingTemporaryChatRepository.delete(trackingTemporaryChat);
+            trackingTemporaryChatRepository.flush();
         }
-        if (!trackingTemporaryChatRepository.existsByKey(req.generateKey())){
-            TrackingTemporaryChat chat = new TrackingTemporaryChat();
-            chat.setKey(key);
-            chat.setValue(result.stream().map(Apartment::getId).collect(Collectors.toList()));
-            trackingTemporaryChatRepository.saveAndFlush(chat);
-        }
+        TrackingTemporaryChat chat = new TrackingTemporaryChat();
+        chat.setKey(key);
+        chat.setValue(result.stream().map(Apartment::getId).collect(Collectors.toList()));
+        trackingTemporaryChatRepository.saveAndFlush(chat);
+        System.out.println(JsonUtils.marshal(chat));
     }
 
     @Override
     public List<ThumbnailChatDto> findApartmentForChat(String key) {
         TrackingTemporaryChat trackingTemporaryChat = trackingTemporaryChatRepository.findByKey(key).orElse(null);
-        if (Objects.isNull(trackingTemporaryChat)){
+        if (Objects.isNull(trackingTemporaryChat)) {
             return new ArrayList<>();
         }
-        try{
+        try {
             List<Apartment> apartments = apartmentRepository.findAllByStatusAndIdIn(EApartmentStatus.OPEN, trackingTemporaryChat.getValue());
-            if (apartments.isEmpty()){
+            if (apartments.isEmpty()) {
                 return new ArrayList<>();
             }
-            return trackingChatbotMapper.toThumbnailChatDtoList(apartments);
-        }finally {
+            return trackingChatbotMapper.toThumbnailChatDtoList(apartments.stream().filter(apartment -> !apartment.getPhotos().equals("[]")).collect(Collectors.toList()));
+        } finally {
             trackingTemporaryChatRepository.delete(trackingTemporaryChat);
+            trackingTemporaryChatRepository.flush();
         }
 
     }

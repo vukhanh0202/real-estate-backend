@@ -1,15 +1,18 @@
 package com.uit.realestate.service.tracking;
 
 import com.uit.realestate.constant.enums.ETrackingType;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.tracking.TrackingCategory;
 import com.uit.realestate.domain.tracking.TrackingDistrict;
 import com.uit.realestate.domain.tracking.TrackingProvince;
+import com.uit.realestate.domain.tracking.TrackingTypeApartment;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.location.ProvinceRepository;
 import com.uit.realestate.repository.tracking.TrackingCategoryRepository;
 import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
 import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
+import com.uit.realestate.repository.tracking.TrackingTypeApartmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,25 +34,32 @@ public class TrackingService {
     private final TrackingCategoryRepository trackingCategoryRepository;
     private final TrackingProvinceRepository trackingProvinceRepository;
     private final TrackingDistrictRepository trackingDistrictRepository;
+    private final TrackingTypeApartmentRepository trackingTypeApartmentRepository;
 
     private final CategoryRepository categoryRepository;
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;
 
 
-    public void tracking(Long userId, String ip, Map<ETrackingType, Long> mapTargetId, Long rating) {
-        try{
-            for (ETrackingType trackingType : mapTargetId.keySet()) {
+    public void tracking(Long userId, String ip, Map<ETrackingType, String> mapTarget, Long rating) {
+        try {
+            for (ETrackingType trackingType : mapTarget.keySet()) {
                 switch (trackingType) {
                     case CATEGORY:
-                        trackingCategory(userId, ip, mapTargetId.get(trackingType), rating);
+                        trackingCategory(userId, ip, Long.valueOf(mapTarget.get(trackingType)), rating);
+                        break;
                     case DISTRICT:
-                        trackingDistrict(userId, ip, mapTargetId.get(trackingType), rating);
+                        trackingDistrict(userId, ip, Long.valueOf(mapTarget.get(trackingType)), rating);
+                        break;
                     case PROVINCE:
-                        trackingProvince(userId, ip, mapTargetId.get(trackingType), rating);
+                        trackingProvince(userId, ip, Long.valueOf(mapTarget.get(trackingType)), rating);
+                        break;
+                    case TYPE:
+                        trackingTypeApartment(userId, ip, mapTarget.get(trackingType), rating);
+                        break;
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
@@ -57,7 +67,7 @@ public class TrackingService {
     public void trackingCategory(Long userId, String ip, Long targetId, Long rating) {
         if (targetId == null) return;
 
-        log.info("Tracking category " + targetId + "with UserId:" + userId + "And IP" + ip);
+        log.info("Tracking category: " + targetId + "with UserId:" + userId + "And IP" + ip);
         List<TrackingCategory> trackingCategories = trackingCategoryRepository
                 .findAll(getTrackingCategorySpecification(ip, targetId));
         trackingCategories = trackingCategories.stream().filter(trackingCategory -> {
@@ -125,10 +135,43 @@ public class TrackingService {
         }
     }
 
+    public void trackingTypeApartment(Long userId, String ip, String targetId, Long rating) {
+        if (targetId == null) return;
+
+        log.info("Tracking Type Apartment: " + targetId + "with UserId:" + userId + "And IP" + ip);
+
+        List<TrackingTypeApartment> trackingTypeApartments = trackingTypeApartmentRepository
+                .findAll(getTrackingTypeApartmentSpecification(ip, ETypeApartment.valueOf(targetId)));
+        trackingTypeApartments = trackingTypeApartments.stream().filter(trackingTypeApartment -> {
+            if (userId == null) {
+                return trackingTypeApartment.getUser() == null;
+            } else {
+                return trackingTypeApartment.getUser() != null && trackingTypeApartment.getUser().getId().equals(userId);
+            }
+        }).collect(Collectors.toList());
+        if (trackingTypeApartments.isEmpty()) {
+            trackingTypeApartmentRepository.save(new TrackingTypeApartment(userId, ETypeApartment.valueOf(targetId), ip, rating));
+        } else {
+            trackingTypeApartments.forEach(trackingTypeApartment -> {
+                trackingTypeApartment.setRating(trackingTypeApartment.getRating() + rating);
+            });
+            trackingTypeApartmentRepository.saveAll(trackingTypeApartments);
+        }
+    }
+
     private Specification<TrackingProvince> getTrackingProvinceSpecification(String ip, Long targetId) {
         return (Specification<TrackingProvince>) (root, query, builder) -> {
             List<Predicate> predicateList = new ArrayList<>();
             predicateList.add(builder.equal(root.get("province").get("id"), targetId));
+            predicateList.add(builder.equal(root.get("ip"), ip));
+            return builder.and(predicateList.toArray(new Predicate[0]));
+        };
+    }
+
+    private Specification<TrackingTypeApartment> getTrackingTypeApartmentSpecification(String ip, ETypeApartment targetId) {
+        return (Specification<TrackingTypeApartment>) (root, query, builder) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            predicateList.add(builder.equal(root.get("typeApartment"), targetId));
             predicateList.add(builder.equal(root.get("ip"), ip));
             return builder.and(predicateList.toArray(new Predicate[0]));
         };

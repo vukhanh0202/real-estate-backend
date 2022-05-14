@@ -2,13 +2,11 @@ package com.uit.realestate.service.apartment;
 
 import com.uit.realestate.dto.apartment.*;
 import com.uit.realestate.dto.response.PaginationResponse;
-import com.uit.realestate.payload.CatchInfoRequest;
 import com.uit.realestate.payload.CatchInfoRequestExt;
 import com.uit.realestate.payload.apartment.*;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 public interface ApartmentService {
 

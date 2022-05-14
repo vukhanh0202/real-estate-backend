@@ -14,6 +14,6 @@ public class ListToLongConverter implements AttributeConverter<List<Long>, Strin
 
     @Override
     public List<Long> convertToEntityAttribute(String dbData) {
-        return dbData == null ? Collections.emptyList() : Arrays.stream(dbData.split(",")).map(Long::valueOf).collect(Collectors.toList());
+        return dbData == null || dbData.equals("") ? Collections.emptyList() : Arrays.stream(dbData.split(",")).map(Long::valueOf).collect(Collectors.toList());
     }
 }

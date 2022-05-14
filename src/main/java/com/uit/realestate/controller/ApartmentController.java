@@ -6,16 +6,12 @@ import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.data.UserPrincipal;
-import com.uit.realestate.dialogflow.DialogRequest;
-import com.uit.realestate.dialogflow.DialogResponse;
 import com.uit.realestate.dto.response.ApiResponse;
-import com.uit.realestate.payload.CatchInfoRequest;
 import com.uit.realestate.payload.CatchInfoRequestExt;
 import com.uit.realestate.payload.apartment.*;
 import com.uit.realestate.service.apartment.ApartmentService;
 import com.uit.realestate.service.tracking.TrackingService;
 import com.uit.realestate.utils.IPUtils;
-import com.uit.realestate.utils.JsonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -29,7 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,10 +79,11 @@ public class ApartmentController {
                                                   @RequestParam(value = "search", defaultValue = "") String search,
                                                   HttpServletRequest request) {
         log.info("Tracking User");
-        Map<ETrackingType, Long> map = new HashMap<>();
-        map.put(ETrackingType.CATEGORY, categoryId);
-        map.put(ETrackingType.DISTRICT, districtId);
-        map.put(ETrackingType.PROVINCE, provinceId);
+        Map<ETrackingType, String> map = new HashMap<>();
+        map.put(ETrackingType.CATEGORY, String.valueOf(categoryId));
+        map.put(ETrackingType.DISTRICT, String.valueOf(districtId));
+        map.put(ETrackingType.PROVINCE, String.valueOf(provinceId));
+        map.put(ETrackingType.TYPE, typeApartment.name());
         trackingService.tracking(userId, IPUtils.getIp(request), map, AppConstant.DEFAULT_RATING);
 
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,

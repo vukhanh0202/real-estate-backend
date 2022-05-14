@@ -2,30 +2,35 @@ package com.uit.realestate.dialogflow;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class ItemList {
 
-    private final String type = "list";
+    private final int MAX_LENGTH_STRING = 50;
 
-    private String title;
-
-    private String subtitle;
+    private String actionLink;
 
     private Image image;
 
-    private String link;
+    private String subtitle;
 
-    public ItemList(String title, String subtitle, String image, String link) {
-        this.title = title;
+    private String title;
+
+    private String type;
+
+    public ItemList(String title, String subtitle, String image, String actionLink) {
+        this.title = this.subString(title);
         this.subtitle = subtitle;
         this.image = new Image(image);
-        this.link = link;
+        this.actionLink = actionLink;
+        this.type = "info";
+    }
+
+    public ItemList(String type) {
+        this.type = type;
     }
 
     @Data
-    class Image{
+    class Image {
         private Source src;
 
         public Image(String src) {
@@ -33,12 +38,19 @@ public class ItemList {
         }
 
         @Data
-        class Source{
+        class Source {
             private String rawUrl;
 
             public Source(String rawUrl) {
                 this.rawUrl = rawUrl;
             }
         }
+    }
+
+    private String subString(String str) {
+        if (str.length() > MAX_LENGTH_STRING) {
+            return str.substring(0, MAX_LENGTH_STRING).concat("...");
+        }
+        return str;
     }
 }

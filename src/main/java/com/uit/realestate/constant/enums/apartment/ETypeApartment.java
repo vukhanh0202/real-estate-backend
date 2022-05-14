@@ -4,14 +4,18 @@ import com.uit.realestate.exception.InvalidException;
 import lombok.Getter;
 
 public enum ETypeApartment {
-    BUY("Bán"),
-    RENT("Thuê");
+    BUY("Bán","Cần bán"),
+    RENT("Thuê","Cho thuê");
 
     @Getter
     private final String value;
 
-    ETypeApartment(String value){
+    @Getter
+    private final String displayName;
+
+    ETypeApartment(String value, String displayName){
         this.value = value;
+        this.displayName = displayName;
     }
 
     public static ETypeApartment of(String str){
