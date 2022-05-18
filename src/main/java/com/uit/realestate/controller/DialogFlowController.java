@@ -48,15 +48,13 @@ public class DialogFlowController {
         String key = pr.generateKey();
         ExtendEventChatBot event = ExtendEventChatBot.of(dialogRequest.getQueryResult().getAction());
         final Instant deadline = Instant.now().plusMillis(4000);
-        // No result
         DialogResponse dialogResponse = new DialogResponse();
-        System.out.println(event.name());
         if (event.isInitEvent()){
             apartmentService.findAndSaveRecommendApartmentForChatBox(pr, key);
         }
         try{
             while(Instant.now().isBefore(deadline)){
-                List<ThumbnailChatDto> result = apartmentService.findApartmentForChat(key);
+                List<ThumbnailChatDto> result = apartmentService.findApartmentForChat(key, pr.getUserId());
                 if (!result.isEmpty()){
                     dialogResponse.setItemList(result.stream()
                             .map(item -> new ItemList(item.getTitle(), item.getSubtitle(), item.getImage(), item.getLink()))

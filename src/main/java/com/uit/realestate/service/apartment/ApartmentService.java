@@ -49,6 +49,6 @@ public interface ApartmentService {
     @Async
     void findAndSaveRecommendApartmentForChatBox(ApartmentQueryParam req, String key);
 
-    List<ThumbnailChatDto> findApartmentForChat(String key);
+    List<ThumbnailChatDto> findApartmentForChat(String key, Long userId);
 
 }

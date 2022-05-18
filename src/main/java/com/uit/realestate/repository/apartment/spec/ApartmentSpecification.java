@@ -1,6 +1,8 @@
 package com.uit.realestate.repository.apartment.spec;
 
+import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.payload.apartment.ApartmentQueryParam;
 import com.uit.realestate.payload.apartment.SearchApartmentRequest;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -33,29 +35,45 @@ public class ApartmentSpecification {
                 predicateList.add(builder.equal(root.get("status"), req.getApartmentStatus()));
             if (!req.getSearch().equals(""))
                 predicateList.add(builder.like(builder.lower(root.get("title")), "%" + req.getSearch().toLowerCase() + "%"));
-            // Need to search house direction
-            final Long defaultQuantity = 3L;
-            if (req.getBedroomQuantity() != null){
-                if (req.getBedroomQuantity() > defaultQuantity){
-                    predicateList.add(builder.greaterThan(root.get("apartmentDetail").get("bedroomQuantity"), defaultQuantity));
-                }else{
-                    predicateList.add(builder.equal(root.get("apartmentDetail").get("bedroomQuantity"), req.getBedroomQuantity()));
-                }
-            }
-            if (req.getBathroomQuantity() != null){
-                if (req.getBathroomQuantity() > defaultQuantity){
-                    predicateList.add(builder.greaterThan(root.get("apartmentDetail").get("bathroomQuantity"), defaultQuantity));
-                }else{
-                    predicateList.add(builder.equal(root.get("apartmentDetail").get("bathroomQuantity"), req.getBathroomQuantity()));
-                }
-            }
-            if (req.getFloorQuantity() != null){
-                if (req.getFloorQuantity() > defaultQuantity){
-                    predicateList.add(builder.greaterThan(root.get("apartmentDetail").get("floorQuantity"), defaultQuantity));
-                }else{
-                    predicateList.add(builder.equal(root.get("apartmentDetail").get("floorQuantity"), req.getFloorQuantity()));
-                }
-            }
+            if (req.getBedroomQuantity() != null)
+                predicateList.add(builder.equal(root.get("apartmentDetail").get("bedroomQuantity"), req.getBedroomQuantity()));
+            if (req.getBathroomQuantity() != null)
+                predicateList.add(builder.equal(root.get("apartmentDetail").get("bathroomQuantity"), req.getBathroomQuantity()));
+            if (req.getFloorQuantity() != null)
+                predicateList.add(builder.equal(root.get("apartmentDetail").get("floorQuantity"), req.getFloorQuantity()));
+            return builder.and(predicateList.toArray(new Predicate[0]));
+        };
+    }
+
+    public static Specification<Apartment> of(ApartmentQueryParam req) {
+        return (Specification<Apartment>) (root, query, builder) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            predicateList.add(builder.equal(root.get("status"), EApartmentStatus.OPEN));
+
+            if (req.getPriceLow() != null)
+                predicateList.add(builder.greaterThanOrEqualTo(root.get("totalPrice"), req.getPriceLow()));
+            if (req.getPriceHigh() != null)
+                predicateList.add(builder.lessThanOrEqualTo(root.get("totalPrice"), req.getPriceHigh()));
+            if (req.getAreaLow() != null)
+                predicateList.add(builder.greaterThanOrEqualTo(root.get("area"), req.getAreaLow()));
+            if (req.getAreaHigh() != null)
+                predicateList.add(builder.lessThanOrEqualTo(root.get("area"), req.getAreaHigh()));
+            if (req.getType() != null)
+                predicateList.add(builder.equal(root.get("typeApartment"), req.getType()));
+            if (!req.getBedrooms().isEmpty())
+                predicateList.add(builder.in(root.get("apartmentDetail").get("bedroomQuantity")).value(req.getBedrooms()));
+            if (!req.getBathrooms().isEmpty())
+                predicateList.add(builder.in(root.get("apartmentDetail").get("bathroomQuantity")).value(req.getBathrooms()));
+            if (!req.getCategories().isEmpty())
+                predicateList.add(builder.in(root.get("category").get("id")).value(req.getCategories()));
+            if (!req.getDirections().isEmpty())
+                predicateList.add(builder.in(root.get("apartmentDetail").get("houseDirection")).value(req.getDirections()));
+            if (!req.getDistricts().isEmpty())
+                predicateList.add(builder.in(root.get("apartmentAddress").get("district").get("id")).value(req.getDistricts()));
+            if (!req.getProvinces().isEmpty())
+                predicateList.add(builder.in(root.get("apartmentAddress").get("province").get("id")).value(req.getProvinces()));
+            if (!req.getFloors().isEmpty())
+                predicateList.add(builder.in(root.get("apartmentDetail").get("floorQuantity")).value(req.getFloors()));
             return builder.and(predicateList.toArray(new Predicate[0]));
         };
     }

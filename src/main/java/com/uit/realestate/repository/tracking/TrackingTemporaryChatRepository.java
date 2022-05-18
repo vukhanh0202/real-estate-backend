@@ -7,7 +7,5 @@ import java.util.Optional;
 
 public interface TrackingTemporaryChatRepository extends JpaRepository<TrackingTemporaryChat, Long> {
 
-    boolean existsByKey(String key);
-
     Optional<TrackingTemporaryChat> findByKey(String key);
 }

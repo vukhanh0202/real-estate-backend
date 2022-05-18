@@ -25,10 +25,10 @@ import com.uit.realestate.repository.apartment.spec.ApartmentSpecification;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.repository.tracking.TrackingTemporaryChatRepository;
 import com.uit.realestate.repository.user.UserRepository;
+import com.uit.realestate.service.AsyncService;
 import com.uit.realestate.service.apartment.ApartmentService;
 import com.uit.realestate.service.location.DistrictService;
 import com.uit.realestate.service.tracking.TrackingService;
-import com.uit.realestate.utils.JsonUtils;
 import com.uit.realestate.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +59,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     private final FavouriteRepository favouriteRepository;
     private final CategoryRepository categoryRepository;
     private final TrackingTemporaryChatRepository trackingTemporaryChatRepository;
+    private final AsyncService asyncService;
 
     @Override
     public boolean addApartment(AddApartmentRequest req) {
@@ -335,35 +336,64 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     @Async
     public void findAndSaveRecommendApartmentForChatBox(ApartmentQueryParam req, String key) {
-        List<Apartment> result;
-        if (req.getUserId() == null || req.getUserId() == -1) {
-            result = apartmentRepository
-                    .findRecommendApartmentForChatBox(req, req.getUserId(), req.getIp(), req.getPageable()).getContent();
-        } else {
-            result = apartmentRepository
-                    .findSuitableApartmentForChatBox(req, SuitabilityConstant.DEFAULT_ACCURACY,
-                            SuitabilityConstant.DEFAULT_ACCURACY_AREA, req.getUserId(), req.getPage(), req.getSize());
+        TrackingTemporaryChat trackingTemporaryChat = new TrackingTemporaryChat();
+        trackingTemporaryChat.setKey(key);
+        trackingTemporaryChatRepository.saveAndFlush(trackingTemporaryChat);
+        if (Objects.nonNull(req.getUserId())) {
+            asyncService.findAndSaveWithUserTarget(req, key);
         }
-        TrackingTemporaryChat trackingTemporaryChat = trackingTemporaryChatRepository.findByKey(key).orElse(null);
-        if (Objects.nonNull(trackingTemporaryChat)) {
-            trackingTemporaryChatRepository.delete(trackingTemporaryChat);
-            trackingTemporaryChatRepository.flush();
-        }
-        TrackingTemporaryChat chat = new TrackingTemporaryChat();
-        chat.setKey(key);
-        chat.setValue(result.stream().map(Apartment::getId).collect(Collectors.toList()));
-        trackingTemporaryChatRepository.saveAndFlush(chat);
-        System.out.println(JsonUtils.marshal(chat));
+        asyncService.findAndSaveWithUserOrIp(req, key);
+        asyncService.findAndSaveWithLatestRandom(req, key);
     }
 
     @Override
-    public List<ThumbnailChatDto> findApartmentForChat(String key) {
+    public List<ThumbnailChatDto> findApartmentForChat(String key, Long userId) {
         TrackingTemporaryChat trackingTemporaryChat = trackingTemporaryChatRepository.findByKey(key).orElse(null);
+        List<Long> ids;
+        List<Long> listTemp;
         if (Objects.isNull(trackingTemporaryChat)) {
             return new ArrayList<>();
         }
+        if (Objects.isNull(userId) || userId.equals(-1L)){
+            listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserOrIp());
+            if (Objects.isNull(listTemp)){
+                ids = truncateListIds(trackingTemporaryChat.getListRecommendWithLatestRandom());
+                if (!(Objects.isNull(ids) || ids.isEmpty())){
+                    System.out.println("Bot with: No User - recommend with random");
+                }
+            }else{
+                ids = listTemp;
+                if (!ids.isEmpty()){
+                    System.out.println("Bot with: No User - recommend with user or ip");
+                }
+            }
+        }else{
+            listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserTargets());
+            if (Objects.isNull(listTemp)){
+                listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserOrIp());
+                if (Objects.isNull(listTemp)){
+                    ids = truncateListIds(trackingTemporaryChat.getListRecommendWithLatestRandom());
+                    if (!(Objects.isNull(ids) || ids.isEmpty())){
+                        System.out.println("Bot with: Had User - recommend with random");
+                    }
+                }else{
+                    ids = listTemp;
+                    if (!ids.isEmpty()){
+                        System.out.println("Bot with: Had User - recommend with user or ip");
+                    }
+                }
+            }else{
+                ids = listTemp;
+                if (!ids.isEmpty()){
+                    System.out.println("Bot with: Had User - recommend with User Target");
+                }
+            }
+        }
+        if (Objects.isNull(ids) || ids.isEmpty()){
+            return new ArrayList<>();
+        }
         try {
-            List<Apartment> apartments = apartmentRepository.findAllByStatusAndIdIn(EApartmentStatus.OPEN, trackingTemporaryChat.getValue());
+            List<Apartment> apartments = apartmentRepository.findAllByStatusAndIdIn(EApartmentStatus.OPEN, ids);
             if (apartments.isEmpty()) {
                 return new ArrayList<>();
             }
@@ -372,6 +402,15 @@ public class ApartmentServiceImpl implements ApartmentService {
             trackingTemporaryChatRepository.delete(trackingTemporaryChat);
             trackingTemporaryChatRepository.flush();
         }
+    }
 
+    private List<Long> truncateListIds(List<Long> list){
+        if (list == null || list.isEmpty()){
+            return Collections.emptyList();
+        }
+        if (list.contains(-1L)){
+            return null;
+        }
+        return list;
     }
 }
