@@ -1,6 +1,8 @@
 package com.uit.realestate.service.location.impl;
 
 import com.uit.realestate.constant.MessageCode;
+import com.uit.realestate.domain.location.District;
+import com.uit.realestate.domain.location.Province;
 import com.uit.realestate.dto.location.ProvinceDto;
 import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
@@ -44,5 +46,16 @@ public class ProvinceServiceImpl implements ProvinceService {
     public ProvinceDto findByDistrict(Long districtId) {
         return provinceMapper.toProvinceDto(provinceRepository.findByDistrictId(districtId)
                 .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.Province.INVALID))));
+    }
+
+    @Override
+    public ProvinceDto findById(Long id) {
+        Province province = provinceRepository.findById(id).orElse(null);
+        if (province == null){
+            ProvinceDto dto = new ProvinceDto();
+            dto.setName("");
+            return dto;
+        }
+        return provinceMapper.toProvinceDto(province);
     }
 }

@@ -141,9 +141,9 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     @Override
     public List<ApartmentBasicDto> findHighLightApartment(HighlightApartmentRequest req) {
-        log.info("Find top 4 highlight apartment");
+        log.info("Find top highlight apartment");
         return apartmentMapper.toApartmentBasicDtoList(apartmentRepository
-                .findTop4ByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus.OPEN, req.getProvinceId()), req.getUserId());
+                .findAllByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus.OPEN, req.getProvinceId()), req.getUserId());
     }
 
     @Override
@@ -336,14 +336,23 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     @Async
     public void findAndSaveRecommendApartmentForChatBox(ApartmentQueryParam req, String key) {
-        TrackingTemporaryChat trackingTemporaryChat = new TrackingTemporaryChat();
-        trackingTemporaryChat.setKey(key);
-        trackingTemporaryChatRepository.saveAndFlush(trackingTemporaryChat);
-        if (Objects.nonNull(req.getUserId())) {
-            asyncService.findAndSaveWithUserTarget(req, key);
+        try{
+            TrackingTemporaryChat trackingTemporaryChat = trackingTemporaryChatRepository
+                    .findByKey(key).orElse(null);
+            if (trackingTemporaryChat == null){
+                trackingTemporaryChat = new TrackingTemporaryChat();
+                trackingTemporaryChat.setKey(key);
+                trackingTemporaryChatRepository.saveAndFlush(trackingTemporaryChat);
+            }
+            if (Objects.nonNull(req.getUserId())) {
+                asyncService.findAndSaveWithUserTarget(req, key);
+            }
+            asyncService.findAndSaveWithUserOrIp(req, key);
+            asyncService.findAndSaveWithLatestRandom(req, key);
+        }catch (Exception e){
+            e.printStackTrace();
+            asyncService.removeKey(key);
         }
-        asyncService.findAndSaveWithUserOrIp(req, key);
-        asyncService.findAndSaveWithLatestRandom(req, key);
     }
 
     @Override

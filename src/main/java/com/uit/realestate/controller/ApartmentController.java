@@ -39,6 +39,12 @@ public class ApartmentController {
 
     private final TrackingService trackingService;
 
+    @GetMapping(value = "/public/test")
+    public ResponseEntity<?> findHighlightApartment() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(apartmentService.findHighLightApartment(null)));
+    }
+
     /**
      * Search apartment
      *

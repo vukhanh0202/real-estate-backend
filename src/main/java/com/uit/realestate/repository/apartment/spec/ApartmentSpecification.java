@@ -1,6 +1,7 @@
 package com.uit.realestate.repository.apartment.spec;
 
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.payload.apartment.ApartmentQueryParam;
 import com.uit.realestate.payload.apartment.SearchApartmentRequest;
@@ -59,7 +60,7 @@ public class ApartmentSpecification {
             if (req.getAreaHigh() != null)
                 predicateList.add(builder.lessThanOrEqualTo(root.get("area"), req.getAreaHigh()));
             if (req.getType() != null)
-                predicateList.add(builder.equal(root.get("typeApartment"), req.getType()));
+                predicateList.add(builder.equal(root.get("typeApartment"), ETypeApartment.valueOf(req.getType())));
             if (!req.getBedrooms().isEmpty())
                 predicateList.add(builder.in(root.get("apartmentDetail").get("bedroomQuantity")).value(req.getBedrooms()));
             if (!req.getBathrooms().isEmpty())

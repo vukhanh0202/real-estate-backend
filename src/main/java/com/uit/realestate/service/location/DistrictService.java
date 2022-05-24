@@ -11,4 +11,7 @@ public interface DistrictService {
     List<DistrictDto> findAllDistrictByProvince(Long provinceId);
 
     DistrictDto findDistrictNameIn(String str);
+
+    DistrictDto findById(Long id);
+
 }

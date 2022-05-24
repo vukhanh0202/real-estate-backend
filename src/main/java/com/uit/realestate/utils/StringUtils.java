@@ -1,5 +1,7 @@
 package com.uit.realestate.utils;
 
+import com.uit.realestate.constant.enums.apartment.ETypeApartment;
+import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.dto.statistic.TotalStatisticDto;
 import com.uit.realestate.exception.InvalidException;
 import lombok.extern.slf4j.Slf4j;

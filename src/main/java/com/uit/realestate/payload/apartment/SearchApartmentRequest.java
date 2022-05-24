@@ -35,9 +35,13 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
         this.districtId = districtId;
         this.provinceId = provinceId;
         this.priceFrom = priceFrom;
-        this.priceTo = priceTo;
+        if (priceTo != null){
+            this.priceTo = priceTo == -1 ? null : priceTo;
+        }
         this.areaFrom = areaFrom;
-        this.areaTo = areaTo;
+        if (areaTo != null){
+            this.areaTo = areaTo == -1 ? null : areaTo;
+        }
         this.categoryId = categoryId;
         this.typeApartment = typeApartment;
         this.apartmentStatus = status;

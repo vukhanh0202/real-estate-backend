@@ -3,7 +3,6 @@ package com.uit.realestate.repository.apartment;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
-import com.uit.realestate.domain.apartment.Category;
 import com.uit.realestate.payload.apartment.ApartmentQueryParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +36,7 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
 
     List<Apartment> findTop16ByStatusAndTypeApartmentOrderByCreatedAtDesc(EApartmentStatus status, ETypeApartment typeApartment);
 
-    List<Apartment> findTop4ByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus status, Long provinceId);
+    List<Apartment> findAllByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus status, Long provinceId);
 
     List<Apartment> findAllByIdIn(List<Long> ids);
 
@@ -82,7 +81,8 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "       AND (:#{#param.areaLow} is null OR ap.area BETWEEN CAST(CAST(:#{#param.areaLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.areaHigh} AS TEXT) AS DOUBLE PRECISION)) " +
             "       AND (:#{#param.type} is null OR ap.type_apartment = CAST(:#{#param.type} AS TEXT)) " +
             "       AND (:#{#param.priceLow} is null " +
-            "           OR ((:#{#param.type} is null OR :#{#param.type} = 'BUY') AND ap.total_price BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION)) " +
+            "           OR ((:#{#param.type} is null) AND (ap.total_price BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION)) OR (ap.price_rent BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION)))" +
+            "           OR (:#{#param.type} = 'BUY' AND ap.total_price BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION)) " +
             "           OR (:#{#param.type} = 'RENT' AND ap.price_rent BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION))) " +
             " GROUP BY ap.id " +
             " ORDER BY rating DESC, ap.created_at DESC ",
@@ -451,7 +451,8 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "       AND (:#{#param.areaLow} is null OR dtb.area BETWEEN CAST(CAST(:#{#param.areaLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.areaHigh} AS TEXT) AS DOUBLE PRECISION)) " +
             "       AND (:#{#param.type} is null OR dtb.type_apartment = CAST(:#{#param.type} AS TEXT)) " +
             "       AND (:#{#param.priceLow} is null " +
-            "           OR ((:#{#param.type} is null OR :#{#param.type} = 'BUY') AND dtb.total_price BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION)) " +
+            "           OR ((:#{#param.type} is null) AND (dtb.total_price BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION)) OR (dtb.price_rent BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION)))" +
+            "           OR (:#{#param.type} = 'BUY' AND dtb.total_price BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION)) " +
             "           OR (:#{#param.type} = 'RENT' AND dtb.price_rent BETWEEN CAST(CAST(:#{#param.priceLow} AS TEXT) AS DOUBLE PRECISION) AND CAST(CAST(:#{#param.priceHigh} AS TEXT) AS DOUBLE PRECISION))) " +
             "GROUP BY dtb.id, dtb.area, dtb.author_id, dtb.category_id, dtb.created_at, dtb.created_by, dtb.highlight, dtb.is_deleted, dtb.photos, dtb.price, dtb.price_rent, dtb.status, dtb.title, dtb.total_price, dtb.type_apartment, dtb.unit_rent, dtb.updated_at, dtb.updated_by\n" +
             "ORDER BY suitable_rate desc LIMIT :size OFFSET :page",

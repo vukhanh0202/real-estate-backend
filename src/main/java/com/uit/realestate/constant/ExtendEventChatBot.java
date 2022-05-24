@@ -32,10 +32,11 @@ public enum ExtendEventChatBot {
         return INIT;
     }
 
-    public String generateJsonNextEvent() {
+    public String generateJsonNextEvent(String param) {
         return "{\n" +
                 "    \"followupEventInput\": {\n" +
                 "    \"name\": \"" + this.getEventNext() + "\",\n" +
+                "    \"parameters\": " + param + ",\n" +
                 "    \"languageCode\": \"vi\"\n" +
                 "    }\n" +
                 "}";

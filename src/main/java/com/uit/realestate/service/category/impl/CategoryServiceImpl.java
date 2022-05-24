@@ -111,4 +111,17 @@ public class CategoryServiceImpl implements CategoryService {
         categoryDto.setId(category.getId());
         return categoryDto;
     }
+
+    @Override
+    public CategoryDto findCategory(Long id) {
+        Category category = categoryRepository.findById(id).orElse(null);
+        if (category == null){
+            CategoryDto categoryDto = new CategoryDto();
+            categoryDto.setName("");
+            return categoryDto;
+        }
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setName(category.getName());
+        return categoryDto;
+    }
 }

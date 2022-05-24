@@ -59,6 +59,7 @@ public enum EEntitiesDialog {
                     }
                     if (areas.size() == 1) {
                         Double val = areas.get(0);
+                        param.setAreaRange(val);
                         param.setAreaLow(val - (val * AppConstant.PERCENT_RANGE));
                         param.setAreaHigh(val + (val * AppConstant.PERCENT_RANGE));
                     } else {
@@ -115,6 +116,7 @@ public enum EEntitiesDialog {
                     }
                     if (prices.size() == 1) {
                         Double val = prices.get(0);
+                        param.setPriceRange(val);
                         param.setPriceLow(val - (val * AppConstant.PERCENT_RANGE));
                         param.setPriceHigh(val + (val * AppConstant.PERCENT_RANGE));
                     } else {
@@ -136,6 +138,7 @@ public enum EEntitiesDialog {
                     }
                     param.setType(types.get(0).toUpperCase());
                     break;
+                default: break;
             }
         } catch (Exception e) {
             e.printStackTrace();

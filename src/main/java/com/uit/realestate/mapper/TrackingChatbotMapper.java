@@ -30,7 +30,7 @@ public abstract class TrackingChatbotMapper implements MapperBase {
         StringBuilder str = new StringBuilder();
         str.append("Diện tích: ").append(StringUtils.castPriceFromNumber(apartment.getArea())).append("m2");
         str.append("  -  ");
-        str.append("Giá : ").append(convertPriceToString(apartment));
+        str.append("Giá: ").append(convertPriceToString(apartment));
         str.append("\n");
         str.append("Thể loại: ").append(apartment.getTypeApartment().getDisplayName());
         dto.setSubtitle(str.toString());

@@ -60,4 +60,15 @@ public class DistrictServiceImpl implements DistrictService {
         }
         throw new NotFoundException(messageHelper.getMessage(MessageCode.District.INVALID));
     }
+
+    @Override
+    public DistrictDto findById(Long id) {
+        District district = districtRepository.findById(id).orElse(null);
+        if (district == null){
+            DistrictDto dto = new DistrictDto();
+            dto.setName("");
+            return dto;
+        }
+        return districtMapper.toProvinceDto(district);
+    }
 }

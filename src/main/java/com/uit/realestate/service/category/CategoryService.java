@@ -20,4 +20,6 @@ public interface CategoryService {
     List<CategoryDto> findAll();
 
     CategoryDto findOrCreate(String name);
+
+    CategoryDto findCategory(Long id);
 }

@@ -41,9 +41,9 @@ scrapingUrl-propzy: https://propzy.vn
 scrapingUrl-alond: https://alonhadat.com.vn/nha-dat
 
 server:
-  port: 8080
+  port: 9090
   servlet:
     context-path: /api
 
-host: http://localhost:8080
+host: http://localhost:9090
 host-fe: http://localhost:3000
