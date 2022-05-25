@@ -40,16 +40,14 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
 
     List<Apartment> findAllByIdIn(List<Long> ids);
 
-    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(tta.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
+    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +
             " JOIN apartment_address ad ON ap.id = ad.id " +
             " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
             " FULL OUTER JOIN tracking_province tp ON tp.province_id = ad.province_id " +
             " FULL OUTER JOIN tracking_district td ON td.district_id = ad.district_id " +
-            " FULL OUTER JOIN tracking_type_apartment tta ON tta.type_apartment = ap.type_apartment " +
             " WHERE ((tc.ip = :ip OR tc.user_id = :userId) " +
             "           OR (tp.ip = :ip OR tp.user_id = :userId) " +
-            "           OR (tta.ip = :ip OR tta.user_id = :userId) " +
             "           OR (td.ip = :ip OR td.user_id = :userId)) " +
             "       AND ap.status = 'OPEN' " +
             "       AND ap.type_apartment = :typeApartment " +
