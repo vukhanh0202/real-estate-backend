@@ -95,11 +95,13 @@ public class ApartmentController {
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment.name(), EApartmentStatus.OPEN, userId, IPUtils.getIp(request), search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
-        if(sortBy.getValue().equals("rating")){
-            req.createPageable(Sort.by(Sort.Direction.DESC, "rating"));
-        }else{
-            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(Sort.by(Sort.Direction.DESC, "rating")));
-        }
+//        if(sortBy.getValue().equals("rating")){
+//            req.createPageable(Sort.by(Sort.Direction.DESC, "rating"));
+//        }else{
+//            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(Sort.by(Sort.Direction.DESC, "rating")));
+//        }
+                    req.createPageable(Sort.by(Sort.Direction.DESC, "id"));
+
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.searchApartment(req)));
