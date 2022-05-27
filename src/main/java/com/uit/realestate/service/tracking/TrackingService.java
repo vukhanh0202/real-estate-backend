@@ -13,7 +13,6 @@ import com.uit.realestate.repository.tracking.TrackingCategoryRepository;
 import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
 import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
 import com.uit.realestate.repository.tracking.TrackingTypeApartmentRepository;
-import com.uit.realestate.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,7 +23,6 @@ import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,12 +39,15 @@ public class TrackingService {
     private final CategoryRepository categoryRepository;
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;
-    private final UserRepository userRepository;
+
+    private boolean isEmptyUserId(Long userId){
+        if (userId == null || userId == -1){
+            return true;
+        }
+        return false;
+    }
 
     public void tracking(Long userId, String ip, Map<ETrackingType, String> mapTarget, Long rating) {
-        if (Objects.isNull(userId) || userRepository.findById(userId).isEmpty()){
-            return;
-        }
         try {
             for (ETrackingType trackingType : mapTarget.keySet()) {
                 switch (trackingType) {
@@ -76,7 +77,7 @@ public class TrackingService {
         List<TrackingCategory> trackingCategories = trackingCategoryRepository
                 .findAll(getTrackingCategorySpecification(ip, targetId));
         trackingCategories = trackingCategories.stream().filter(trackingCategory -> {
-            if (userId == null) {
+            if (isEmptyUserId(userId)) {
                 return trackingCategory.getUser() == null;
             } else {
                 return trackingCategory.getUser() != null && trackingCategory.getUser().getId().equals(userId);
@@ -100,7 +101,7 @@ public class TrackingService {
         List<TrackingDistrict> trackingDistricts = trackingDistrictRepository
                 .findAll(getTrackingDistrictSpecification(ip, targetId));
         trackingDistricts = trackingDistricts.stream().filter(trackingDistrict -> {
-            if (userId == null) {
+            if (isEmptyUserId(userId)) {
                 return trackingDistrict.getUser() == null;
             } else {
                 return trackingDistrict.getUser() != null && trackingDistrict.getUser().getId().equals(userId);
@@ -124,7 +125,7 @@ public class TrackingService {
         List<TrackingProvince> trackingProvinces = trackingProvinceRepository
                 .findAll(getTrackingProvinceSpecification(ip, targetId));
         trackingProvinces = trackingProvinces.stream().filter(trackingProvince -> {
-            if (userId == null) {
+            if (isEmptyUserId(userId)) {
                 return trackingProvince.getUser() == null;
             } else {
                 return trackingProvince.getUser() != null && trackingProvince.getUser().getId().equals(userId);
@@ -148,7 +149,7 @@ public class TrackingService {
         List<TrackingTypeApartment> trackingTypeApartments = trackingTypeApartmentRepository
                 .findAll(getTrackingTypeApartmentSpecification(ip, ETypeApartment.valueOf(targetId)));
         trackingTypeApartments = trackingTypeApartments.stream().filter(trackingTypeApartment -> {
-            if (userId == null) {
+            if (isEmptyUserId(userId)) {
                 return trackingTypeApartment.getUser() == null;
             } else {
                 return trackingTypeApartment.getUser() != null && trackingTypeApartment.getUser().getId().equals(userId);
