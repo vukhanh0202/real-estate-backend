@@ -242,13 +242,13 @@ public class ApartmentServiceImpl implements ApartmentService {
     public PaginationResponse<ApartmentDto> searchApartment(SearchApartmentRequest req) {
         log.info("Search Apartment");
         req.setApartmentStatus(EApartmentStatus.OPEN);
-        Page<Apartment> result = apartmentRepository.findRecommendApartmentByUserIdAndIp("BUY", req.getUserId(), req.getIp(), req.getPageable());
+        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
 
         return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
-                , apartmentMapper.toApartmentPreviewDtoList(result.getContent(), req.getUserId(), req.getIp()));
+                , apartmentMapper.toApartmentRatingPreviewDtoList(result.getContent(), req.getUserId(), req.getIp()));
     }
 
     @Override

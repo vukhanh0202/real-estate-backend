@@ -2,10 +2,12 @@ package com.uit.realestate.mapper.apartment;
 
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.domain.apartment.ApartmentRating;
 import com.uit.realestate.domain.tracking.TrackingCategory;
 import com.uit.realestate.domain.tracking.TrackingDistrict;
 import com.uit.realestate.domain.tracking.TrackingProvince;
 import com.uit.realestate.domain.tracking.TrackingTypeApartment;
+import com.uit.realestate.domain.user.User;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentCompareDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
@@ -15,17 +17,19 @@ import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
+import com.uit.realestate.repository.location.DistrictRepository;
+import com.uit.realestate.repository.location.ProvinceRepository;
 import com.uit.realestate.repository.tracking.TrackingCategoryRepository;
 import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
 import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
 import com.uit.realestate.repository.tracking.TrackingTypeApartmentRepository;
+import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.utils.StringUtils;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Mapper(componentModel = "spring")
@@ -58,6 +62,15 @@ public abstract class ApartmentMapper implements MapperBase {
     @Autowired
     private TrackingProvinceRepository trackingProvinceRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProvinceRepository provinceRepository;
+
+    @Autowired
+    private DistrictRepository districtRepository;
+
     private Double calculateSuitableWithIpAndUserId(Apartment apartment, String ip, Long userId){
         if (ip != null && userId != null){
             List<TrackingCategory> categories = trackingCategoryRepository.findAllByUserIdOrIp(userId, ip);
@@ -75,6 +88,29 @@ public abstract class ApartmentMapper implements MapperBase {
                     /  districts.stream().mapToLong(TrackingDistrict::getRating).sum() * 100;
 
             total += (double) provinces.stream().filter(item -> item.getProvince().getId().equals(apartment.getApartmentAddress().getProvince().getId())).mapToLong(TrackingProvince::getRating).sum()
+                    /  provinces.stream().mapToLong(TrackingProvince::getRating).sum() * 100;
+            return Math.ceil(total / 4);
+        }
+        return null;
+    }
+
+    private Double calculateSuitableWithIpAndUserId(ApartmentRating apartment, String ip, Long userId){
+        if (ip != null && userId != null){
+            List<TrackingCategory> categories = trackingCategoryRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingTypeApartment> typeApartments = trackingTypeApartmentRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingDistrict> districts = trackingDistrictRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingProvince> provinces = trackingProvinceRepository.findAllByUserIdOrIp(userId, ip);
+            Double total = 0D;
+            total += (double) categories.stream().filter(item -> item.getCategory().getId().equals(apartment.getCategoryId())).mapToLong(TrackingCategory::getRating).sum()
+                    /  categories.stream().mapToLong(TrackingCategory::getRating).sum() * 100;
+
+            total += (double) typeApartments.stream().filter(item -> item.getTypeApartment().equals(apartment.getTypeApartment())).mapToLong(TrackingTypeApartment::getRating).sum()
+                    /  typeApartments.stream().mapToLong(TrackingTypeApartment::getRating).sum() * 100;
+
+            total += (double) districts.stream().filter(item -> item.getDistrict().getId().equals(apartment.getDistrictId())).mapToLong(TrackingDistrict::getRating).sum()
+                    /  districts.stream().mapToLong(TrackingDistrict::getRating).sum() * 100;
+
+            total += (double) provinces.stream().filter(item -> item.getProvince().getId().equals(apartment.getProvinceId())).mapToLong(TrackingProvince::getRating).sum()
                     /  provinces.stream().mapToLong(TrackingProvince::getRating).sum() * 100;
             return Math.ceil(total / 4);
         }
@@ -130,6 +166,42 @@ public abstract class ApartmentMapper implements MapperBase {
     @IterableMapping(qualifiedByName = "toApartmentPreviewDtoList")
     public abstract List<ApartmentDto> toApartmentPreviewDtoList(List<Apartment> apartmentList, @Context Long userId, @Context String ip);
 
+    @Named("toApartmentRatingPreviewDto")
+    @BeforeMapping
+    protected void toApartmentRatingPreviewDto(ApartmentRating apartment, @MappingTarget ApartmentDto dto, @Context Long userId, @Context String ip) {
+        dto.setId(apartment.getId());
+        dto.setTitle(apartment.getTitle());
+        dto.setArea(apartment.getArea());
+        dto.setStatus(apartment.getStatus());
+        dto.setCategoryName(apartment.getCategoryName());
+        dto.setPhotos(getFiles(apartment.getPhotos()));
+        dto.setIsHighlight(apartment.getHighlight());
+        dto.setAuthor(getUserInfo(userRepository.findById(apartment.getAuthorId()).orElse(new User())));
+        dto.setBedroomQuantity(apartment.getBedroomQuantity());
+        dto.setBathroomQuantity(apartment.getBathroomQuantity());
+        dto.setFloorQuantity(apartment.getFloorQuantity());
+        dto.setAddress(districtRepository.findById(apartment.getDistrictId()).get().getName() +", "+ provinceRepository.findById(apartment.getProvinceId()).get().getName());
+        dto.setTypeApartment(apartment.getTypeApartment());
+        if (apartment.getTypeApartment().equals(ETypeApartment.BUY.name())) {
+            dto.setTotalPrice( StringUtils.castPriceFromNumber(apartment.getTotal_Price()));
+        } else {
+            if (apartment.getUnit_Rent() == null) {
+                dto.setTotalPrice("0");
+            }
+            dto.setTotalPrice(apartment.getUnit_Rent().trim());
+        }
+
+        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()) {
+            dto.setFavourite(true);
+        }
+        dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment, ip, userId));
+    }
+
+    @BeanMapping(qualifiedByName = "toApartmentRatingPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    public abstract ApartmentDto toApartmentRatingPreviewDto(ApartmentRating apartment, @Context Long userId, @Context String ip);
+
+    @BeanMapping(ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    public abstract List<ApartmentDto> toApartmentRatingPreviewDtoList(List<ApartmentRating> apartmentList, @Context Long userId, @Context String ip);
 
     //*************************************************
     //********** Mapper Apartment To ApartmentSearchDto (Search All) **********

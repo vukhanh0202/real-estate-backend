@@ -6,7 +6,8 @@ public enum ESortApartment {
     ID("id"),
     AREA("area"),
     TOTAL_PRICE("totalPrice"),
-    HIGHLIGHT("highlight");
+    HIGHLIGHT("highlight"),
+    RATING("rating");
 
     @Getter
     private String value;

@@ -9,31 +9,21 @@ public interface ApartmentRating{
     String getTitle();
     Double getArea();
     Double getPrice();
-    Double getTotalPrice();
-    Double getPriceRent();
-    String getUnitRent();
-    Boolean getHighLight();
+    Double getTotal_Price();
+    Double getPrice_Rent();
+    String getUnit_Rent();
+    Boolean getHighlight();
     String getPhotos();
-    ETypeApartment getETypeApartment();
+    String getTypeApartment();
     EApartmentStatus getStatus();
     Long getCategoryId();
-    User getAuthor();
+    String getCategoryName();
+    Long getAuthorId();
     Long getRating();
-//    ApartmentDetail getApartmentDetail();
-
-    interface ApartmentAddress {
-        Long getProvinceId();
-        Long getDistrictId();
-        String getAddress();
-    }
-    interface Category {
-        String getCategoryName();
-    }
-    interface User {
-        String getUsername();
-        String getFullName();
-    }
-//    interface ApartmentDetail {
-//        String getCity();
-//    }
+    Long getBedroomQuantity();
+    Long getBathroomQuantity();
+    Long getFloorQuantity();
+    Long getDistrictId();
+    Long getProvinceId();
+    String getAddress();
 }

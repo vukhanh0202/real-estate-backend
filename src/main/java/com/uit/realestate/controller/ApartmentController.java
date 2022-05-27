@@ -67,7 +67,7 @@ public class ApartmentController {
     @GetMapping(value = "/public/apartment/search")
     public ResponseEntity<?> findAllApartmentOpen(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
                                                   @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
-                                                  @RequestParam(value = "sort_by", defaultValue = "ID") ESortApartment sortBy,
+                                                  @RequestParam(value = "sort_by", defaultValue = "RATING") ESortApartment sortBy,
                                                   @RequestParam(value = "sort_direction", defaultValue = "DESC") Sort.Direction sortDirection,
                                                   @RequestParam(value = "district_id", required = false) Long districtId,
                                                   @RequestParam(value = "province_id", required = false) Long provinceId,
@@ -95,12 +95,11 @@ public class ApartmentController {
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment.name(), EApartmentStatus.OPEN, userId, IPUtils.getIp(request), search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
-//        if(sortBy.getValue().equals("rating")){
-//            req.createPageable(Sort.by(Sort.Direction.DESC, "rating"));
-//        }else{
-//            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(Sort.by(Sort.Direction.DESC, "rating")));
-//        }
-        req.createPageable(Sort.by(Sort.Direction.DESC, "id"));
+        if(sortBy.getValue().equals("rating")){
+            req.createPageable(Sort.by(Sort.Direction.DESC, "rating"));
+        }else{
+            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(Sort.by(Sort.Direction.DESC, "rating")));
+        }
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.searchApartment(req)));
