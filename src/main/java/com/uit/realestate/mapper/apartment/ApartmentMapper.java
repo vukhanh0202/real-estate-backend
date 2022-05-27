@@ -181,7 +181,7 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setBathroomQuantity(apartment.getBathroomQuantity());
         dto.setFloorQuantity(apartment.getFloorQuantity());
         dto.setAddress(districtRepository.findById(apartment.getDistrictId()).get().getName() +", "+ provinceRepository.findById(apartment.getProvinceId()).get().getName());
-        dto.setTypeApartment(apartment.getTypeApartment());
+        dto.setTypeApartment(ETypeApartment.valueOf(apartment.getTypeApartment()).getValue());
         if (apartment.getTypeApartment().equals(ETypeApartment.BUY.name())) {
             dto.setTotalPrice( StringUtils.castPriceFromNumber(apartment.getTotal_Price()));
         } else {
