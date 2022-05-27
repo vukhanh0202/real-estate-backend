@@ -13,6 +13,7 @@ import com.uit.realestate.repository.tracking.TrackingCategoryRepository;
 import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
 import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
 import com.uit.realestate.repository.tracking.TrackingTypeApartmentRepository;
+import com.uit.realestate.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -39,9 +40,12 @@ public class TrackingService {
     private final CategoryRepository categoryRepository;
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;
-
+    private final UserRepository userRepository;
 
     public void tracking(Long userId, String ip, Map<ETrackingType, String> mapTarget, Long rating) {
+        if (userRepository.findById(userId).isEmpty()){
+            return;
+        }
         try {
             for (ETrackingType trackingType : mapTarget.keySet()) {
                 switch (trackingType) {

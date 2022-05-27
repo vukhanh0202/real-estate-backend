@@ -31,7 +31,7 @@ public class StatisticPriceByCityServiceImpl extends IStatisticApartmentService 
     private final ApartmentRepository apartmentRepository;
 
     @Override
-    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId, ETypeApartment typeApartment) {
+    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId, String ip, ETypeApartment typeApartment) {
         if (statistic.getFrom() == null || statistic.getTo() == null) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Area.INVALID));
         }
@@ -69,12 +69,12 @@ public class StatisticPriceByCityServiceImpl extends IStatisticApartmentService 
         }
         result.setData(data);
 
-        result.setHighLightApartments(this.getSuitableApartment(apartments, userId));
+        result.setHighLightApartments(this.getSuitableApartment(apartments, userId, ip));
 
         DecimalFormat df = new DecimalFormat("###,###,###");
         TotalStatisticDto totalStatisticDto = new TotalStatisticDto();
         int sizeApartmentsDivide = apartments.size();
-        if (sizeApartmentsDivide == 0){
+        if (sizeApartmentsDivide == 0) {
             sizeApartmentsDivide = 1;
         }
         totalStatisticDto.setTotalApartment(df.format(apartments.size()) + " BĐS");

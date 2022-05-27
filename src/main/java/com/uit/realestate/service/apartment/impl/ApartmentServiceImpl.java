@@ -10,6 +10,7 @@ import com.uit.realestate.constant.enums.user.ERoleType;
 import com.uit.realestate.domain.TrackingTemporaryChat;
 import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.domain.apartment.ApartmentRating;
 import com.uit.realestate.domain.user.User;
 import com.uit.realestate.dto.apartment.*;
 import com.uit.realestate.dto.response.PaginationResponse;
@@ -143,14 +144,14 @@ public class ApartmentServiceImpl implements ApartmentService {
     public List<ApartmentBasicDto> findHighLightApartment(HighlightApartmentRequest req) {
         log.info("Find top highlight apartment");
         return apartmentMapper.toApartmentBasicDtoList(apartmentRepository
-                .findAllByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus.OPEN, req.getProvinceId()), req.getUserId());
+                .findAllByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus.OPEN, req.getProvinceId()), req.getUserId(), req.getIp());
     }
 
     @Override
     public List<ApartmentBasicDto> findLatestApartment(LatestApartmentRequest req) {
-        log.info("Find top 4 new latest apartment");
+        log.info("Find top 16 new latest apartment");
         return apartmentMapper.toApartmentBasicDtoList(apartmentRepository
-                .findTop16ByStatusAndTypeApartmentOrderByCreatedAtDesc(EApartmentStatus.OPEN, req.getTypeApartment()), req.getUserId());
+                .findTop16ByStatusAndTypeApartmentOrderByCreatedAtDesc(EApartmentStatus.OPEN, req.getTypeApartment()), req.getUserId(), req.getIp());
     }
 
     @Override
@@ -162,7 +163,7 @@ public class ApartmentServiceImpl implements ApartmentService {
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
-                , apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId()));
+                , apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId(), req.getIp()));
     }
 
     @Override
@@ -170,7 +171,7 @@ public class ApartmentServiceImpl implements ApartmentService {
         log.info("Find Similar apartment");
         Page<Apartment> result = apartmentRepository
                 .findRecommendApartmentByUserIdAndIp(ETypeApartment.BUY.name(), req.getUserId(), req.getIp(), req.getPageable());
-        List<ApartmentBasicDto> contents = apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId());
+        List<ApartmentBasicDto> contents = apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId(), req.getIp());
         Collections.shuffle(contents);
         return new PaginationResponse<>(
                 result.getTotalElements()
@@ -241,13 +242,13 @@ public class ApartmentServiceImpl implements ApartmentService {
     public PaginationResponse<ApartmentDto> searchApartment(SearchApartmentRequest req) {
         log.info("Search Apartment");
         req.setApartmentStatus(EApartmentStatus.OPEN);
-        Page<Apartment> result = apartmentRepository.findAll(ApartmentSpecification.of(req), req.getPageable());
+        Page<Apartment> result = apartmentRepository.findRecommendApartmentByUserIdAndIp("BUY", req.getUserId(), req.getIp(), req.getPageable());
 
         return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
-                , apartmentMapper.toApartmentPreviewDtoList(result.getContent(), req.getUserId()));
+                , apartmentMapper.toApartmentPreviewDtoList(result.getContent(), req.getUserId(), req.getIp()));
     }
 
     @Override
@@ -336,10 +337,10 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     @Async
     public void findAndSaveRecommendApartmentForChatBox(ApartmentQueryParam req, String key) {
-        try{
+        try {
             TrackingTemporaryChat trackingTemporaryChat = trackingTemporaryChatRepository
                     .findByKey(key).orElse(null);
-            if (trackingTemporaryChat == null){
+            if (trackingTemporaryChat == null) {
                 trackingTemporaryChat = new TrackingTemporaryChat();
                 trackingTemporaryChat.setKey(key);
                 trackingTemporaryChatRepository.saveAndFlush(trackingTemporaryChat);
@@ -349,7 +350,7 @@ public class ApartmentServiceImpl implements ApartmentService {
             }
             asyncService.findAndSaveWithUserOrIp(req, key);
             asyncService.findAndSaveWithLatestRandom(req, key);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             asyncService.removeKey(key);
         }
@@ -363,42 +364,42 @@ public class ApartmentServiceImpl implements ApartmentService {
         if (Objects.isNull(trackingTemporaryChat)) {
             return new ArrayList<>();
         }
-        if (Objects.isNull(userId) || userId.equals(-1L)){
+        if (Objects.isNull(userId) || userId.equals(-1L)) {
             listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserOrIp());
-            if (Objects.isNull(listTemp)){
+            if (Objects.isNull(listTemp)) {
                 ids = truncateListIds(trackingTemporaryChat.getListRecommendWithLatestRandom());
-                if (!(Objects.isNull(ids) || ids.isEmpty())){
+                if (!(Objects.isNull(ids) || ids.isEmpty())) {
                     System.out.println("Bot with: No User - recommend with random");
                 }
-            }else{
+            } else {
                 ids = listTemp;
-                if (!ids.isEmpty()){
+                if (!ids.isEmpty()) {
                     System.out.println("Bot with: No User - recommend with user or ip");
                 }
             }
-        }else{
+        } else {
             listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserTargets());
-            if (Objects.isNull(listTemp)){
+            if (Objects.isNull(listTemp)) {
                 listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserOrIp());
-                if (Objects.isNull(listTemp)){
+                if (Objects.isNull(listTemp)) {
                     ids = truncateListIds(trackingTemporaryChat.getListRecommendWithLatestRandom());
-                    if (!(Objects.isNull(ids) || ids.isEmpty())){
+                    if (!(Objects.isNull(ids) || ids.isEmpty())) {
                         System.out.println("Bot with: Had User - recommend with random");
                     }
-                }else{
+                } else {
                     ids = listTemp;
-                    if (!ids.isEmpty()){
+                    if (!ids.isEmpty()) {
                         System.out.println("Bot with: Had User - recommend with user or ip");
                     }
                 }
-            }else{
+            } else {
                 ids = listTemp;
-                if (!ids.isEmpty()){
+                if (!ids.isEmpty()) {
                     System.out.println("Bot with: Had User - recommend with User Target");
                 }
             }
         }
-        if (Objects.isNull(ids) || ids.isEmpty()){
+        if (Objects.isNull(ids) || ids.isEmpty()) {
             return new ArrayList<>();
         }
         try {
@@ -413,11 +414,11 @@ public class ApartmentServiceImpl implements ApartmentService {
         }
     }
 
-    private List<Long> truncateListIds(List<Long> list){
-        if (list == null || list.isEmpty()){
+    private List<Long> truncateListIds(List<Long> list) {
+        if (list == null || list.isEmpty()) {
             return Collections.emptyList();
         }
-        if (list.contains(-1L)){
+        if (list.contains(-1L)) {
             return null;
         }
         return list;

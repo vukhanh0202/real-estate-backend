@@ -29,21 +29,21 @@ public class StatisticApartmentFactoryServiceImpl extends AbstractBaseService<IS
     public StatisticDto doing(Input input) {
         if (input.getStatistic() == EStatistic.CITY) {
             if (input.getCriteria() == ECriteria.PRICE) {
-                return statisticCityByPriceService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getTypeApartment());
+                return statisticCityByPriceService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getIp(), input.getTypeApartment());
             } else if (input.getCriteria() == ECriteria.AREA) {
-                return statisticCityByAreaService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getTypeApartment());
+                return statisticCityByAreaService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getIp(), input.getTypeApartment());
             }
         } else if (input.getStatistic() == EStatistic.AREA) {
             if (input.getCriteria() == ECriteria.CITY) {
-                return statisticAreaByCityService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getTypeApartment());
+                return statisticAreaByCityService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getIp(), input.getTypeApartment());
             } else if (input.getCriteria() == ECriteria.PRICE) {
-                return statisticAreaByPriceService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getTypeApartment());
+                return statisticAreaByPriceService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getIp(), input.getTypeApartment());
             }
         } else if (input.getStatistic() == EStatistic.PRICE) {
             if (input.getCriteria() == ECriteria.CITY) {
-                return statisticPriceByCityService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getTypeApartment());
+                return statisticPriceByCityService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getIp(), input.getTypeApartment());
             } else if (input.getCriteria() == ECriteria.AREA) {
-                return statisticPriceByAreaService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getTypeApartment());
+                return statisticPriceByAreaService.executeStatistic(input.getStatistic(), input.getCriteria(), input.getUserId(), input.getIp(), input.getTypeApartment());
             }
         }
         throw new InvalidException(messageHelper.getMessage(MessageCode.System.INVALID));

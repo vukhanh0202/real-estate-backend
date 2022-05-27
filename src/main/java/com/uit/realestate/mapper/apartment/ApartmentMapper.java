@@ -2,6 +2,10 @@ package com.uit.realestate.mapper.apartment;
 
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.domain.tracking.TrackingCategory;
+import com.uit.realestate.domain.tracking.TrackingDistrict;
+import com.uit.realestate.domain.tracking.TrackingProvince;
+import com.uit.realestate.domain.tracking.TrackingTypeApartment;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentCompareDto;
 import com.uit.realestate.dto.apartment.ApartmentDto;
@@ -11,12 +15,17 @@ import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
+import com.uit.realestate.repository.tracking.TrackingCategoryRepository;
+import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
+import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
+import com.uit.realestate.repository.tracking.TrackingTypeApartmentRepository;
 import com.uit.realestate.utils.StringUtils;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Mapper(componentModel = "spring")
@@ -37,6 +46,41 @@ public abstract class ApartmentMapper implements MapperBase {
     @Autowired
     private SuitabilityMapper suitabilityMapper;
 
+    @Autowired
+    private TrackingCategoryRepository trackingCategoryRepository;
+
+    @Autowired
+    private TrackingTypeApartmentRepository trackingTypeApartmentRepository;
+
+    @Autowired
+    private TrackingDistrictRepository trackingDistrictRepository;
+
+    @Autowired
+    private TrackingProvinceRepository trackingProvinceRepository;
+
+    private Double calculateSuitableWithIpAndUserId(Apartment apartment, String ip, Long userId){
+        if (ip != null && userId != null){
+            List<TrackingCategory> categories = trackingCategoryRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingTypeApartment> typeApartments = trackingTypeApartmentRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingDistrict> districts = trackingDistrictRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingProvince> provinces = trackingProvinceRepository.findAllByUserIdOrIp(userId, ip);
+            Double total = 0D;
+            total += (double) categories.stream().filter(item -> item.getCategory().getId().equals(apartment.getCategory().getId())).mapToLong(TrackingCategory::getRating).sum()
+                    /  categories.stream().mapToLong(TrackingCategory::getRating).sum() * 100;
+
+            total += (double) typeApartments.stream().filter(item -> item.getTypeApartment().equals(apartment.getTypeApartment())).mapToLong(TrackingTypeApartment::getRating).sum()
+                    /  typeApartments.stream().mapToLong(TrackingTypeApartment::getRating).sum() * 100;
+
+            total += (double) districts.stream().filter(item -> item.getDistrict().getId().equals(apartment.getApartmentAddress().getDistrict().getId())).mapToLong(TrackingDistrict::getRating).sum()
+                    /  districts.stream().mapToLong(TrackingDistrict::getRating).sum() * 100;
+
+            total += (double) provinces.stream().filter(item -> item.getProvince().getId().equals(apartment.getApartmentAddress().getProvince().getId())).mapToLong(TrackingProvince::getRating).sum()
+                    /  provinces.stream().mapToLong(TrackingProvince::getRating).sum() * 100;
+            return Math.ceil(total / 4);
+        }
+        return null;
+    }
+
     private String convertPriceToString(Apartment apartment) {
         if (apartment.getTypeApartment().equals(ETypeApartment.BUY)) {
             return StringUtils.castPriceFromNumber(apartment.getTotalPrice());
@@ -53,7 +97,7 @@ public abstract class ApartmentMapper implements MapperBase {
     //*************************************************
     @Named("toApartmentPreviewDto")
     @BeforeMapping
-    protected void toApartmentPreviewDto(Apartment apartment, @MappingTarget ApartmentDto dto, @Context Long userId) {
+    protected void toApartmentPreviewDto(Apartment apartment, @MappingTarget ApartmentDto dto, @Context Long userId, @Context String ip) {
         if (apartment.getApartmentAddress() != null) {
             dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                     + ", " + apartment.getApartmentAddress().getProvince().getName());
@@ -64,6 +108,7 @@ public abstract class ApartmentMapper implements MapperBase {
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setTotalPrice(convertPriceToString(apartment));
+        dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment, ip, userId));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -79,11 +124,11 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
     @Mapping(source = "highlight", target = "isHighlight")
     @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")
-    public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment, @Context Long userId);
+    public abstract ApartmentDto toApartmentPreviewDto(Apartment apartment, @Context Long userId, @Context String ip);
 
     @BeanMapping(ignoreByDefault = true)
     @IterableMapping(qualifiedByName = "toApartmentPreviewDtoList")
-    public abstract List<ApartmentDto> toApartmentPreviewDtoList(List<Apartment> apartmentList, @Context Long userId);
+    public abstract List<ApartmentDto> toApartmentPreviewDtoList(List<Apartment> apartmentList, @Context Long userId, @Context String ip);
 
 
     //*************************************************
@@ -145,7 +190,7 @@ public abstract class ApartmentMapper implements MapperBase {
     //*************************************************
     @Named("toApartmentBasicDto")
     @BeforeMapping
-    protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentBasicDto dto, @Context Long userId) {
+    protected void toApartmentBasicDto(Apartment apartment, @MappingTarget ApartmentBasicDto dto, @Context Long userId, @Context String ip) {
         dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                 + ", " + apartment.getApartmentAddress().getProvince().getName());
         if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()) {
@@ -153,6 +198,7 @@ public abstract class ApartmentMapper implements MapperBase {
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setTotalPrice(convertPriceToString(apartment));
+        dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment, ip, userId));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -167,10 +213,10 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
     @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")
-    public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment, @Context Long userId);
+    public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment, @Context Long userId, @Context String ip);
 
     @BeanMapping(ignoreByDefault = true)
-    public abstract List<ApartmentBasicDto> toApartmentBasicDtoList(List<Apartment> apartmentList, @Context Long userId);
+    public abstract List<ApartmentBasicDto> toApartmentBasicDtoList(List<Apartment> apartmentList, @Context Long userId, @Context String ip);
 
     //*************************************************
     //********** Mapper AddApartmentRequest To Apartment (Entity) **********

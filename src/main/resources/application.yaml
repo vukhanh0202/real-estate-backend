@@ -19,7 +19,7 @@ spring:
     filters: stat
   jpa:
     open-in-view: false
-    show-sql: false
+    show-sql: true
     generate-ddl: true
     hibernate:
       ddl-auto: update

@@ -1,6 +1,5 @@
 package com.uit.realestate.domain.apartment;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.SqlEntity;
@@ -8,10 +7,11 @@ import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.user.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor
 @Entity
@@ -106,4 +106,5 @@ public class Apartment extends SqlEntity {
     public int hashCode() {
         return Objects.hash(super.hashCode(), id);
     }
+
 }

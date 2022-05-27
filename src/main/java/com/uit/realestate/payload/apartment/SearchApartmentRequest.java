@@ -19,7 +19,7 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
     private Double areaFrom;
     private Double areaTo;
     private Long categoryId;
-    private ETypeApartment typeApartment;
+    private String typeApartment;
     @JsonIgnore
     private EApartmentStatus apartmentStatus;
     private String search;
@@ -29,17 +29,17 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
     private Long floorQuantity;
 
     public SearchApartmentRequest(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
-                 Double areaFrom, Double areaTo, Long categoryId, ETypeApartment typeApartment, EApartmentStatus status,
-                 Long userId, String search, Long houseDirection, Long bedroomQuantity, Long bathroomQuantity, Long floorQuantity) {
-        super(userId, page, size);
+                                  Double areaFrom, Double areaTo, Long categoryId, String typeApartment, EApartmentStatus status,
+                                  Long userId, String ip, String search, Long houseDirection, Long bedroomQuantity, Long bathroomQuantity, Long floorQuantity) {
+        super(userId, ip, page, size);
         this.districtId = districtId;
         this.provinceId = provinceId;
         this.priceFrom = priceFrom;
-        if (priceTo != null){
+        if (priceTo != null) {
             this.priceTo = priceTo == -1 ? null : priceTo;
         }
         this.areaFrom = areaFrom;
-        if (areaTo != null){
+        if (areaTo != null) {
             this.areaTo = areaTo == -1 ? null : areaTo;
         }
         this.categoryId = categoryId;

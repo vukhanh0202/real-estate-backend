@@ -6,12 +6,14 @@ import com.uit.realestate.constant.enums.statistic.EStatistic;
 import com.uit.realestate.data.UserPrincipal;
 import com.uit.realestate.dto.response.ApiResponse;
 import com.uit.realestate.dto.response.FileCaption;
+import com.uit.realestate.payload.apartment.RecommendApartmentRequest;
 import com.uit.realestate.service.file.DownloadImageService;
 import com.uit.realestate.service.file.UploadService;
 import com.uit.realestate.service.statistic.IStatisticApartmentFactoryService;
 import com.uit.realestate.service.statistic.IStatisticRankService;
 import com.uit.realestate.service.statistic.impl.StatisticApartmentFactoryServiceImpl;
 import com.uit.realestate.service.statistic.impl.StatisticCityByPriceServiceImpl;
+import com.uit.realestate.utils.IPUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -23,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
@@ -50,7 +53,8 @@ public class StatisticController {
                                            @RequestParam(value = "criteria_from", required = false) Double criteriaPriceFrom,
                                            @RequestParam(value = "criteria_to", required = false) Double criteriaPriceTo,
                                            @RequestParam(value = "user_id", required = false) Long userId,
-                                           @RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment) {
+                                           @RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
+                                           HttpServletRequest request) {
         statistic.setId(statisticCityId);
         statistic.setFrom(statisticPriceFrom);
         statistic.setTo(statisticPriceTo);
@@ -58,7 +62,7 @@ public class StatisticController {
         criteria.setTo(criteriaPriceTo);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(statisticApartmentFactoryService
-                        .execute(new IStatisticApartmentFactoryService.Input(statistic, criteria, userId, typeApartment))));
+                        .execute(new IStatisticApartmentFactoryService.Input(statistic, criteria, userId, IPUtils.getIp(request), typeApartment))));
     }
 
     /**

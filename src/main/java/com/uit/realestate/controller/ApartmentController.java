@@ -77,7 +77,7 @@ public class ApartmentController {
                                                   @RequestParam(value = "area_to", required = false) Double areaTo,
                                                   @RequestParam(value = "category_id", required = false) Long categoryId,
                                                   @RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
-                                                  @RequestParam(value = "user_id", required = false) Long userId,
+                                                  @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
                                                   @RequestParam(value = "house_direction", required = false) Long houseDirection,
                                                   @RequestParam(value = "bedroom_quantity", required = false) Long bedroomQuantity,
                                                   @RequestParam(value = "bathroom_quantity", required = false) Long bathroomQuantity,
@@ -93,9 +93,15 @@ public class ApartmentController {
         trackingService.tracking(userId, IPUtils.getIp(request), map, AppConstant.DEFAULT_RATING);
 
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, EApartmentStatus.OPEN, userId, search,
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment.name(), EApartmentStatus.OPEN, userId, IPUtils.getIp(request), search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
-        req.createPageable(Sort.by(sortDirection, sortBy.getValue()));
+//        if(sortBy.getValue().equals("rating")){
+//            req.createPageable(Sort.by(Sort.Direction.DESC, "rating"));
+//        }else{
+//            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(Sort.by(Sort.Direction.DESC, "rating")));
+//        }
+        req.createPageable(Sort.by(Sort.Direction.DESC, "id"));
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.searchApartment(req)));
     }
@@ -157,9 +163,10 @@ public class ApartmentController {
     @ApiOperation(value = "Get latest new apartment ")
     @GetMapping(value = "/public/apartment/latest-new")
     public ResponseEntity<?> findLatestNewApartment(@RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
-                                                    @RequestParam(value = "user_id", required = false) Long userId) {
+                                                    @RequestParam(value = "user_id", required = false) Long userId,
+                                                    HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.findLatestApartment(new LatestApartmentRequest(userId, typeApartment))));
+                .body(new ApiResponse(apartmentService.findLatestApartment(new LatestApartmentRequest(userId, IPUtils.getIp(request), typeApartment))));
     }
 
     /**
@@ -171,9 +178,10 @@ public class ApartmentController {
     @GetMapping(value = "/public/apartment/highlight")
     public ResponseEntity<?> findHighlightApartment(@RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
                                                     @RequestParam(value = "province_id") Long provinceId,
-                                                    @RequestParam(value = "user_id", required = false) Long userId) {
+                                                    @RequestParam(value = "user_id", required = false) Long userId,
+                                                    HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.findHighLightApartment(new HighlightApartmentRequest(userId,typeApartment, provinceId))));
+                .body(new ApiResponse(apartmentService.findHighLightApartment(new HighlightApartmentRequest(userId, IPUtils.getIp(request), typeApartment, provinceId))));
     }
 
     /**

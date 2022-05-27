@@ -10,16 +10,18 @@ import lombok.Data;
 public interface IStatisticApartmentFactoryService extends IService<IStatisticApartmentFactoryService.Input, StatisticDto> {
 
     @Data
-    class Input{
+    class Input {
         private EStatistic statistic;
         private ECriteria criteria;
         private Long userId;
+        private String ip;
         private ETypeApartment typeApartment;
 
-        public Input(EStatistic statistic, ECriteria criteria, Long userId, ETypeApartment typeApartment) {
+        public Input(EStatistic statistic, ECriteria criteria, Long userId, String ip, ETypeApartment typeApartment) {
             this.statistic = statistic;
             this.criteria = criteria;
             this.userId = userId;
+            this.ip = ip;
             this.typeApartment = typeApartment;
         }
     }

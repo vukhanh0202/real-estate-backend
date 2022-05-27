@@ -74,13 +74,13 @@ public class UserServiceImpl implements UserService {
         log.info("Find detail user with ID: " + id);
 
         UserDetailDto result = userMapper.toUserDetailDto(user);
-        result.setPostApartmentList(apartmentMapper.toApartmentPreviewDtoList(user.getApartments(), id));
+        result.setPostApartmentList(apartmentMapper.toApartmentPreviewDtoList(user.getApartments(), id, null));
         result.setFavouriteApartmentList(apartmentMapper
                 .toApartmentPreviewDtoList(user.getFavourites()
                                 .stream()
                                 .map(Favourite::getApartment)
                                 .collect(Collectors.toList()),
-                        id));
+                        id, null));
         result.setTotalFavouriteApartment(result.getFavouriteApartmentList().size());
         result.setTotalPostApartment(result.getPostApartmentList().size());
         result.setTotalRecommendApartment(apartmentRepository.findRecommendApartmentByUserId(id).size());
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
-                , apartmentMapper.toApartmentPreviewDtoList(result.getContent(), req.getUserId()));
+                , apartmentMapper.toApartmentPreviewDtoList(result.getContent(), req.getUserId(), req.getIp()));
     }
 
     @Override
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
                 , apartmentMapper.toApartmentPreviewDtoList(result.getContent()
-                .stream().map(Favourite::getApartment).collect(Collectors.toList()), req.getUserId()));
+                .stream().map(Favourite::getApartment).collect(Collectors.toList()), req.getUserId(), req.getIp()));
     }
 
     @Override

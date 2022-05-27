@@ -12,8 +12,8 @@ public class LatestApartmentRequest extends CatchInfoRequest {
     @JsonProperty("type_apartment")
     private ETypeApartment typeApartment;
 
-    public LatestApartmentRequest(Long userId, ETypeApartment typeApartment) {
-        super(userId);
+    public LatestApartmentRequest(Long userId, String ip, ETypeApartment typeApartment) {
+        super(userId, ip);
         this.typeApartment = typeApartment;
     }
 }

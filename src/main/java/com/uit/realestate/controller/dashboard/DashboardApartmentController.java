@@ -12,6 +12,7 @@ import com.uit.realestate.payload.apartment.SearchApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.payload.apartment.ValidateApartmentRequest;
 import com.uit.realestate.service.apartment.*;
+import com.uit.realestate.utils.IPUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -23,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Slf4j
@@ -70,11 +73,12 @@ public class DashboardApartmentController {
                                               @RequestParam(value = "bedroom_quantity", required = false) Long bedroomQuantity,
                                               @RequestParam(value = "bathroom_quantity", required = false) Long bathroomQuantity,
                                               @RequestParam(value = "floor_quantity", required = false) Long floorQuantity,
-                                              @RequestParam(value = "search", defaultValue = "") String search
+                                              @RequestParam(value = "search", defaultValue = "") String search,
+                                              HttpServletRequest request
     ) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment, status, userPrincipal.getId(), search,
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment.name(), status, userPrincipal.getId(), IPUtils.getIp(request), search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
         req.createPageable(Sort.by(ESortApartment.HIGHLIGHT.getValue()).descending()
                 .and(Sort.by(sortDirection, sortBy.getValue())));

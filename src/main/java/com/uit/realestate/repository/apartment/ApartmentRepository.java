@@ -3,7 +3,9 @@ package com.uit.realestate.repository.apartment;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.domain.apartment.ApartmentRating;
 import com.uit.realestate.payload.apartment.ApartmentQueryParam;
+import com.uit.realestate.payload.apartment.SearchApartmentRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -55,6 +57,34 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             " ORDER BY rating DESC, ap.created_at DESC ",
             nativeQuery = true)
     Page<Apartment> findRecommendApartmentByUserIdAndIp(String typeApartment, Long userId, String ip, Pageable pageable);
+
+    @Query(value = " SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
+            " FROM apartment ap " +
+            " JOIN apartment_address add ON ap.id = add.id " +
+            " JOIN apartment_detail ad ON ap.id = ad.id " +
+            " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
+            " FULL OUTER JOIN tracking_province tp ON tp.province_id = add.province_id " +
+            " FULL OUTER JOIN tracking_district td ON td.district_id = add.district_id " +
+            " WHERE ((tc.ip = :ip OR tc.user_id = :userId) " +
+            "           OR (tp.ip = :ip OR tp.user_id = :userId) " +
+            "           OR (td.ip = :ip OR td.user_id = :userId)) " +
+            "       AND ap.status = 'OPEN' " +
+//            "       AND (:#{#param.districtId} is null OR add.district_id = :#{#param.districtId}) " +
+//            "       AND (:#{#param.provinceId} is null OR add.province_id = :#{#param.provinceId}) " +
+//            "       AND (:#{#param.priceFrom} is null OR ap.total_price = :#{#param.priceFrom}) " +
+//            "       AND (:#{#param.priceTo} is null OR ap.total_price = :#{#param.priceTo}) " +
+//            "       AND (:#{#param.areaFrom} is null OR ap.area >= :#{#param.areaFrom}) " +
+//            "       AND (:#{#param.areaTo} is null OR ap.area <= :#{#param.areaTo}) " +
+//            "       AND (:#{#param.categoryId} is null OR ap.category_id = :#{#param.categoryId}) " +
+//            "       AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT)) " +
+//            "       AND (:#{#param.search} is null OR ap.title LIKE %:#{#param.search}%) " +
+//            "       AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE %:#{#param.houseDirection}%) " +
+//            "       AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = :#{#param.bedroomQuantity}) " +
+//            "       AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = :#{#param.bathroomQuantity}) " +
+//            "       AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = :#{#param.floorQuantity}) " +
+            " GROUP BY ap.id ",
+            nativeQuery = true)
+    Page<ApartmentRating> findRecommendApartmentByUserIdAndIp(Long userId, String ip, Pageable pageable);
 
     @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(tta.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +

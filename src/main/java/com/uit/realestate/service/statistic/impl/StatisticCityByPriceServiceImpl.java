@@ -39,7 +39,7 @@ public class StatisticCityByPriceServiceImpl extends IStatisticApartmentService 
     private final ApartmentMapper apartmentMapper;
 
     @Override
-    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId, ETypeApartment typeApartment) {
+    public StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId, String ip, ETypeApartment typeApartment) {
         boolean isGreaterMaxValue = false;
         if (statistic.getId() == null || !provinceRepository.existsById(statistic.getId())) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Province.INVALID));
@@ -89,7 +89,7 @@ public class StatisticCityByPriceServiceImpl extends IStatisticApartmentService 
         }
         result.setData(data);
 
-        result.setHighLightApartments(this.getSuitableApartment(apartments, userId));
+        result.setHighLightApartments(this.getSuitableApartment(apartments, userId, ip));
 
         TotalStatisticDto totalStatisticDto = new TotalStatisticDto();
         int sizeApartmentsDivide = apartments.size();

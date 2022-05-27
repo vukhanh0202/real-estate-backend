@@ -25,22 +25,22 @@ public abstract class IStatisticApartmentService {
     @Autowired
     private ApartmentMapper apartmentMapper;
 
-    public abstract StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId, ETypeApartment typeApartment);
+    public abstract StatisticDto executeStatistic(EStatistic statistic, ECriteria criteria, Long userId , String ip, ETypeApartment typeApartment);
 
-    protected List<ApartmentBasicDto> getSuitableApartment(List<Apartment> apartments, Long userId) {
+    protected List<ApartmentBasicDto> getSuitableApartment(List<Apartment> apartments, Long userId, String ip) {
         List<ApartmentBasicDto> apartmentBasicDtoList = new ArrayList<>();
         if (userId != null) {
             List<Apartment> list = apartmentRepository
                     .findApartmentWithSuitableDesc(SuitabilityConstant.DEFAULT_ACCURACY,
                             SuitabilityConstant.DEFAULT_ACCURACY_AREA, userId, 0L, 3L);
-            apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(list, userId);
+            apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(list, userId, ip);
         }
         if (userId == null || apartmentBasicDtoList.size() < 3) {
             Collections.shuffle(apartments);
             if (apartments.size() > 2) {
-                apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments.subList(0, 3), userId);
+                apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments.subList(0, 3), userId, ip);
             } else {
-                apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, userId);
+                apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, userId, ip);
             }
         }
         return apartmentBasicDtoList;

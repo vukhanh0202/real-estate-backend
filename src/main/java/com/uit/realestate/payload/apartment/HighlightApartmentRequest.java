@@ -11,8 +11,8 @@ public class HighlightApartmentRequest extends CatchInfoRequestExt {
 
     private Long provinceId;
 
-    public HighlightApartmentRequest(Long userId, ETypeApartment typeApartment, Long provinceId) {
-        super(userId);
+    public HighlightApartmentRequest(Long userId, String ip, ETypeApartment typeApartment, Long provinceId) {
+        super(userId, ip);
         this.typeApartment = typeApartment;
         this.provinceId = provinceId;
     }
