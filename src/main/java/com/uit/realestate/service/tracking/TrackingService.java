@@ -24,6 +24,7 @@ import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +44,7 @@ public class TrackingService {
     private final UserRepository userRepository;
 
     public void tracking(Long userId, String ip, Map<ETrackingType, String> mapTarget, Long rating) {
-        if (userRepository.findById(userId).isEmpty()){
+        if (Objects.isNull(userId) || userRepository.findById(userId).isEmpty()){
             return;
         }
         try {
