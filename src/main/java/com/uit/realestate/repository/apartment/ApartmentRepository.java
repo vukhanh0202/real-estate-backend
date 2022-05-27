@@ -77,20 +77,20 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             " WHERE ((tc.ip = :ip OR tc.user_id = :userId) " +
             "           OR (tp.ip = :ip OR tp.user_id = :userId) " +
             "           OR (td.ip = :ip OR td.user_id = :userId)) " +
-            "       AND ap.status = 'OPEN' " +
-//            "       AND (:#{#param.districtId} is null OR add.district_id = :#{#param.districtId}) " +
-//            "       AND (:#{#param.provinceId} is null OR add.province_id = :#{#param.provinceId}) " +
-//            "       AND (:#{#param.priceFrom} is null OR ap.total_price = :#{#param.priceFrom}) " +
-//            "       AND (:#{#param.priceTo} is null OR ap.total_price = :#{#param.priceTo}) " +
-//            "       AND (:#{#param.areaFrom} is null OR ap.area >= :#{#param.areaFrom}) " +
-//            "       AND (:#{#param.areaTo} is null OR ap.area <= :#{#param.areaTo}) " +
-//            "       AND (:#{#param.categoryId} is null OR ap.category_id = :#{#param.categoryId}) " +
+            "       AND (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) " +
+            "       AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) " +
+            "       AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) " +
+            "       AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent)) " +
+            "       AND (:#{#param.priceTo} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.price_rent)) " +
+            "       AND (:#{#param.areaFrom} is null OR ap.area >= CAST(CAST(:#{#param.areaFrom} AS TEXT) AS DOUBLE PRECISION)) " +
+            "       AND (:#{#param.areaTo} is null OR ap.area <= CAST(CAST(:#{#param.areaTo} AS TEXT) AS DOUBLE PRECISION)) " +
+            "       AND (:#{#param.categoryId} is null OR ap.category_id = CAST(CAST(:#{#param.categoryId} AS TEXT) AS BIGINT)) " +
             "       AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT)) " +
-//            "       AND (:#{#param.search} is null OR ap.title LIKE %:#{#param.search}%) " +
-//            "       AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE %:#{#param.houseDirection}%) " +
-//            "       AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = :#{#param.bedroomQuantity}) " +
-//            "       AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = :#{#param.bathroomQuantity}) " +
-//            "       AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = :#{#param.floorQuantity}) " +
+            "       AND (:#{#param.search} is null OR ap.title LIKE CAST(:#{#param.search} AS TEXT)) " +
+            "       AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT)) " +
+            "       AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT)) " +
+            "       AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT)) " +
+            "       AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT)) " +
             " GROUP BY ap.id, c.id, c.name, ap.type_apartment, ad.bedroom_quantity, ad.bathroom_quantity, ad.floor_quantity, add.district_id, add.province_id, add.address, ap.author_id",
             nativeQuery = true)
     Page<ApartmentRating> findRecommendApartmentByUserIdAndIp(SearchApartmentRequest param, Long userId, String ip, Pageable pageable);

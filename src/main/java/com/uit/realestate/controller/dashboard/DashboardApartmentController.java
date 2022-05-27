@@ -69,7 +69,7 @@ public class DashboardApartmentController {
                                               @RequestParam(value = "category_id", required = false) Long categoryId,
                                               @RequestParam(value = "type_apartment", required = false) ETypeApartment typeApartment,
                                               @RequestParam(value = "status", required = false) EApartmentStatus status,
-                                              @RequestParam(value = "house_direction", required = false) Long houseDirection,
+                                              @RequestParam(value = "house_direction", required = false) String houseDirection,
                                               @RequestParam(value = "bedroom_quantity", required = false) Long bedroomQuantity,
                                               @RequestParam(value = "bathroom_quantity", required = false) Long bathroomQuantity,
                                               @RequestParam(value = "floor_quantity", required = false) Long floorQuantity,

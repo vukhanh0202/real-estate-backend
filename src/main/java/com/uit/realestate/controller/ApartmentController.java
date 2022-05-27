@@ -18,6 +18,7 @@ import io.swagger.annotations.Authorization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,7 +79,7 @@ public class ApartmentController {
                                                   @RequestParam(value = "category_id", required = false) Long categoryId,
                                                   @RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
                                                   @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
-                                                  @RequestParam(value = "house_direction", required = false) Long houseDirection,
+                                                  @RequestParam(value = "house_direction", required = false) String houseDirection,
                                                   @RequestParam(value = "bedroom_quantity", required = false) Long bedroomQuantity,
                                                   @RequestParam(value = "bathroom_quantity", required = false) Long bathroomQuantity,
                                                   @RequestParam(value = "floor_quantity", required = false) Long floorQuantity,
@@ -95,12 +96,11 @@ public class ApartmentController {
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment.name(), EApartmentStatus.OPEN, userId, IPUtils.getIp(request), search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
-//        if(sortBy.getValue().equals("rating")){
-//            req.createPageable(Sort.by(Sort.Direction.DESC, "rating"));
-//        }else{
-//            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(Sort.by(Sort.Direction.DESC, "rating")));
-//        }
-                    req.createPageable(Sort.by(Sort.Direction.DESC, "id"));
+        if(sortBy.getValue().equals("rating")){
+            req.createPageable(JpaSort.unsafe(sortDirection, "(rating)"));
+        }else{
+            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+        }
 
 
         return ResponseEntity.status(HttpStatus.OK)

@@ -21,16 +21,16 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
     private Long categoryId;
     private String typeApartment;
     @JsonIgnore
-    private EApartmentStatus apartmentStatus;
+    private String apartmentStatus;
     private String search;
-    private Long houseDirection;
+    private String houseDirection;
     private Long bedroomQuantity;
     private Long bathroomQuantity;
     private Long floorQuantity;
 
     public SearchApartmentRequest(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
                                   Double areaFrom, Double areaTo, Long categoryId, String typeApartment, EApartmentStatus status,
-                                  Long userId, String ip, String search, Long houseDirection, Long bedroomQuantity, Long bathroomQuantity, Long floorQuantity) {
+                                  Long userId, String ip, String search, String houseDirection, Long bedroomQuantity, Long bathroomQuantity, Long floorQuantity) {
         super(userId, ip, page, size);
         this.districtId = districtId;
         this.provinceId = provinceId;
@@ -44,9 +44,13 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
         }
         this.categoryId = categoryId;
         this.typeApartment = typeApartment;
-        this.apartmentStatus = status;
-        this.search = search;
-        this.houseDirection = houseDirection;
+        this.apartmentStatus = status.name();
+        if (search != null){
+            this.search = "%" + search + "%";
+        }
+        if (houseDirection != null){
+            this.houseDirection = "%" + houseDirection + "%";
+        }
         this.bedroomQuantity = bedroomQuantity;
         this.bathroomQuantity = bathroomQuantity;
         this.floorQuantity = floorQuantity;

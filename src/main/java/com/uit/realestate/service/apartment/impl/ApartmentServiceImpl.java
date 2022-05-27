@@ -241,7 +241,6 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public PaginationResponse<ApartmentDto> searchApartment(SearchApartmentRequest req) {
         log.info("Search Apartment");
-        req.setApartmentStatus(EApartmentStatus.OPEN);
         Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
 
         return new PaginationResponse<>(
