@@ -31,11 +31,4 @@ public class ScraperController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(true));
     }
-
-    @GetMapping(path = "/test")
-    public ResponseEntity<?> test() {
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.findApartmentWithSuitable(2L)));
-    }
 }

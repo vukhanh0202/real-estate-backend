@@ -13,6 +13,7 @@ import com.uit.realestate.mapper.MapperBase;
 import com.uit.realestate.payload.apartment.AddApartmentRequest;
 import com.uit.realestate.payload.apartment.UpdateApartmentRequest;
 import com.uit.realestate.repository.action.FavouriteRepository;
+import com.uit.realestate.repository.apartment.ApartmentRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.location.ProvinceRepository;
@@ -68,12 +69,28 @@ public abstract class ApartmentMapper implements MapperBase {
     private TrackingPriceRepository trackingPriceRepository;
     @Autowired
     private TrackingToiletRepository trackingToiletRepository;
+    @Autowired
+    private ApartmentRepository apartmentRepository;
 
     private int countValue(double result) {
         if (result > 0) {
             return 1;
         }
         return 0;
+    }
+
+    private Double getRating(Long id, String ip, Long userId) {
+        if (userId == null) {
+            userId = -1L;
+        }
+        if (ip == null) {
+            return null;
+        }
+        ApartmentRating apartment = apartmentRepository.findApartmentDetailRatingByUserIdAndIp(id, userId, ip).stream().findFirst().orElse(null);
+        if (apartment == null){
+            return null;
+        }
+        return apartment.getRating();
     }
 
     private Double calculateSuitableWithIpAndUserId(Apartment apartment, String ip, Long userId) {
@@ -94,7 +111,7 @@ public abstract class ApartmentMapper implements MapperBase {
             double value;
 
             value = (double) categories.stream().filter(item -> item.getCategory().getId().equals(apartment.getCategory().getId())).mapToLong(TrackingCategory::getRating).sum()
-                    /  categories.stream().mapToLong(TrackingCategory::getRating).sum() * 100;
+                    / categories.stream().mapToLong(TrackingCategory::getRating).sum() * 100;
             count += countValue(value);
             total += value;
             value = (double) typeApartments.stream().filter(item -> item.getTypeApartment().equals(apartment.getTypeApartment())).mapToLong(TrackingTypeApartment::getRating).sum()
@@ -134,7 +151,7 @@ public abstract class ApartmentMapper implements MapperBase {
             count += countValue(value);
             total += value;
             value = (double) prices.stream().filter(item -> {
-                if (apartment.getTypeApartment().equals(ETypeApartment.BUY)){
+                if (apartment.getTypeApartment().equals(ETypeApartment.BUY)) {
                     return item.getPrice().equals(apartment.getTotalPrice());
                 }
                 return item.getPrice().equals(apartment.getPriceRent());
@@ -143,7 +160,7 @@ public abstract class ApartmentMapper implements MapperBase {
             count += countValue(value);
             total += value;
 
-            if (count > 0){
+            if (count > 0) {
                 return Math.ceil(total / count);
             }
             return 0D;
@@ -151,45 +168,60 @@ public abstract class ApartmentMapper implements MapperBase {
         return null;
     }
 
-    private Double calculateSuitableWithIpAndUserId(ApartmentRating apartment, String ip, Long userId) {
+    private Double calculateSuitableWithIpAndUserId(Long id, String ip, Long userId) {
+        return calculateSuitableWithIpAndUserId(getRating(id, ip, userId), ip, userId);
+    }
+
+    private Double calculateSuitableWithIpAndUserId(Double rating, String ip, Long userId) {
         if (ip != null && userId != null) {
             int count = 0;
-            if(!trackingCategoryRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            if (!trackingCategoryRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingTypeApartmentRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingTypeApartmentRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingDistrictRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingDistrictRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingProvinceRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingProvinceRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingAreaRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingAreaRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingBedroomRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingBedroomRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingBathRoomRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingBathRoomRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingDirectionRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingDirectionRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingFloorRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingFloorRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingPriceRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingPriceRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
-            if(!trackingToiletRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+            }
+            ;
+            if (!trackingToiletRepository.findAllByUserIdOrIp(userId, ip).isEmpty()) {
                 count++;
-            };
+            }
+            ;
 
-            if (count > 0){
-                return Math.ceil((double)apartment.getRating() / count * 100);
+            if (count > 0) {
+                return Math.ceil(rating / count * 100);
             }
             return 0D;
         }
@@ -273,7 +305,8 @@ public abstract class ApartmentMapper implements MapperBase {
         if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()) {
             dto.setFavourite(true);
         }
-        dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment, ip, userId));
+        dto.setCreatedAt(apartment.getCreatedAt());
+        dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment.getRating(), ip, userId));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentRatingPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -312,7 +345,7 @@ public abstract class ApartmentMapper implements MapperBase {
     //*************************************************
     @Named("toApartmentFullDto")
     @BeforeMapping
-    protected void toApartmentFullDto(Apartment apartment, @MappingTarget ApartmentDto dto, @Context Long userId) {
+    protected void toApartmentFullDto(Apartment apartment, @MappingTarget ApartmentDto dto, @Context Long userId, @Context String ip) {
         dto.setAddress(apartment.getApartmentAddress().getDistrict().getName()
                 + ", " + apartment.getApartmentAddress().getProvince().getName());
         dto.setApartmentDetail(apartmentDetailMapper.toApartmentDetailDto(apartment.getApartmentDetail()));
@@ -322,6 +355,7 @@ public abstract class ApartmentMapper implements MapperBase {
         }
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setTotalPrice(convertPriceToString(apartment));
+        dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment.getId(), ip, userId));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentFullDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -333,7 +367,7 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
     @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")
-    public abstract ApartmentDto toApartmentFullDto(Apartment apartment, @Context Long userId);
+    public abstract ApartmentDto toApartmentFullDto(Apartment apartment, @Context Long userId, @Context String ip);
 
 
     //*************************************************
@@ -368,6 +402,43 @@ public abstract class ApartmentMapper implements MapperBase {
 
     @BeanMapping(ignoreByDefault = true)
     public abstract List<ApartmentBasicDto> toApartmentBasicDtoList(List<Apartment> apartmentList, @Context Long userId, @Context String ip);
+
+    @Named("toApartmentRatingBasicDto")
+    @BeforeMapping
+    protected void toApartmentRatingBasicDto(ApartmentRating apartment, @MappingTarget ApartmentBasicDto dto, @Context Long userId, @Context String ip) {
+        dto.setId(apartment.getId());
+        dto.setTitle(apartment.getTitle());
+        dto.setArea(apartment.getArea());
+        dto.setStatus(apartment.getStatus());
+        dto.setCategoryName(apartment.getCategoryName());
+        dto.setPhotos(getFiles(apartment.getPhotos()));
+        dto.setAuthor(getUserInfo(userRepository.findById(apartment.getAuthorId()).orElse(new User())));
+        dto.setBedroomQuantity(Long.valueOf(apartment.getBedroomQuantity()));
+        dto.setBathroomQuantity(Long.valueOf(apartment.getBathroomQuantity()));
+        dto.setAddress(districtRepository.findById(apartment.getDistrictId()).get().getName() + ", " + provinceRepository.findById(apartment.getProvinceId()).get().getName());
+        dto.setTypeApartment(ETypeApartment.valueOf(apartment.getTypeApartment()).getValue());
+        if (apartment.getTypeApartment().equals(ETypeApartment.BUY.name())) {
+            dto.setTotalPrice(StringUtils.castPriceFromNumber(apartment.getTotal_Price()));
+        } else {
+            if (apartment.getUnit_Rent() == null) {
+                dto.setTotalPrice("0");
+            }
+            dto.setTotalPrice(apartment.getUnit_Rent().trim());
+        }
+
+        if (userId != null && favouriteRepository.findByApartmentIdAndUserId(apartment.getId(), userId).isPresent()) {
+            dto.setFavourite(true);
+        }
+        dto.setCreatedAt(apartment.getCreatedAt());
+        dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment.getRating(), ip, userId));
+    }
+
+    @BeanMapping(qualifiedByName = "toApartmentRatingBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "createdAt", target = "createdAt")
+    public abstract ApartmentBasicDto toApartmentRatingBasicDto(ApartmentRating apartment, @Context Long userId, @Context String ip);
+
+    @BeanMapping(ignoreByDefault = true)
+    public abstract List<ApartmentBasicDto> toApartmentBasicRatingDtoList(List<ApartmentRating> apartmentList, @Context Long userId, @Context String ip);
 
     //*************************************************
     //********** Mapper AddApartmentRequest To Apartment (Entity) **********
@@ -433,12 +504,13 @@ public abstract class ApartmentMapper implements MapperBase {
     //*************************************************
     @Named("toApartmentCompareDto")
     @BeforeMapping
-    protected void toApartmentCompareDto(Apartment apartment, @MappingTarget ApartmentCompareDto apartmentCompareDto, @Context Long userId) {
+    protected void toApartmentCompareDto(Apartment apartment, @MappingTarget ApartmentCompareDto apartmentCompareDto, @Context Long userId, @Context String ip) {
         apartmentCompareDto.setAddress(apartment.getApartmentAddress().getAddress() + ", "
                 + apartment.getApartmentAddress().getDistrict().getName() + ", "
                 + apartment.getApartmentAddress().getProvince().getName() + ", "
                 + apartment.getApartmentAddress().getCountry().getName());
         apartmentCompareDto.setTotalPrice(convertPriceToString(apartment));
+        apartmentCompareDto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment.getId(), ip, userId));
     }
 
     @BeanMapping(qualifiedByName = "toApartmentCompareDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -454,9 +526,9 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "apartmentDetail.toiletQuantity", target = "toiletQuantity")
     @Mapping(source = "apartmentDetail.moreInfo", target = "moreInfo")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
-    public abstract ApartmentCompareDto toApartmentCompareDto(Apartment apartment, @Context Long userId);
+    public abstract ApartmentCompareDto toApartmentCompareDto(Apartment apartment, @Context Long userId, @Context String ip);
 
     @BeanMapping(ignoreByDefault = true)
-    public abstract List<ApartmentCompareDto> toApartmentCompareDtoList(List<Apartment> apartmentList, @Context Long userId);
+    public abstract List<ApartmentCompareDto> toApartmentCompareDtoList(List<Apartment> apartmentList, @Context Long userId, @Context String ip);
 
 }

@@ -24,7 +24,7 @@ public interface ApartmentService {
 
     PaginationResponse<ApartmentBasicDto> findRecommendApartment(RecommendApartmentRequest req);
 
-    PaginationResponse<ApartmentBasicDto> findSimilarApartment(CatchInfoRequestExt req);
+//    PaginationResponse<ApartmentBasicDto> findSimilarApartment(CatchInfoRequestExt req);
 
     ApartmentDto getApartmentDetail(DetailApartmentRequest req);
 
@@ -43,8 +43,6 @@ public interface ApartmentService {
     Long findByTitleNewest(String title);
 
     void deletePermanent(String title);
-
-    PaginationResponse<ApartmentBasicDto> findApartmentWithSuitable(Long userId);
 
     @Async
     void findAndSaveRecommendApartmentForChatBox(ApartmentQueryParam req, String key);

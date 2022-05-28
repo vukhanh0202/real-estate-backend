@@ -27,6 +27,7 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
     private Long bedroomQuantity;
     private Long bathroomQuantity;
     private Long floorQuantity;
+    private Boolean highlight;
 
     public SearchApartmentRequest(Integer page, Integer size, Long districtId, Long provinceId, Double priceFrom, Double priceTo,
                                   Double areaFrom, Double areaTo, Long categoryId, String typeApartment, EApartmentStatus status,
@@ -54,5 +55,7 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
         this.bedroomQuantity = bedroomQuantity;
         this.bathroomQuantity = bathroomQuantity;
         this.floorQuantity = floorQuantity;
+    }
+    public SearchApartmentRequest() {
     }
 }

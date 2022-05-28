@@ -1,6 +1,11 @@
 package com.uit.realestate.domain.apartment;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
+
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
 
 public interface ApartmentRating{
 
@@ -27,4 +32,7 @@ public interface ApartmentRating{
     Long getDistrictId();
     Long getProvinceId();
     String getAddress();
+    @Temporal(TemporalType.TIMESTAMP)
+    Date getCreatedAt();
+
 }

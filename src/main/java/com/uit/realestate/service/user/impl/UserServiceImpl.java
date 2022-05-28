@@ -83,7 +83,6 @@ public class UserServiceImpl implements UserService {
                         id, null));
         result.setTotalFavouriteApartment(result.getFavouriteApartmentList().size());
         result.setTotalPostApartment(result.getPostApartmentList().size());
-        result.setTotalRecommendApartment(apartmentRepository.findRecommendApartmentByUserId(id).size());
         return result;
     }
 

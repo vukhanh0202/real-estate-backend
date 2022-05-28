@@ -12,6 +12,7 @@ import com.uit.realestate.dto.statistic.TotalStatisticDto;
 import com.uit.realestate.dto.statistic.UnitDto;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.apartment.ApartmentMapper;
+import com.uit.realestate.payload.apartment.SearchApartmentRequest;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
 import com.uit.realestate.service.statistic.IStatisticApartmentService;
 import com.uit.realestate.utils.CalculatorUnit;
@@ -68,8 +69,13 @@ public class StatisticPriceByCityServiceImpl extends IStatisticApartmentService 
             data.add(map.get(item));
         }
         result.setData(data);
-
-        result.setHighLightApartments(this.getSuitableApartment(apartments, userId, ip));
+        SearchApartmentRequest search = new SearchApartmentRequest();
+        search.setTypeApartment(typeApartment.name());
+        search.setPriceFrom(priceFrom);
+        if (priceTo != -1){
+            search.setPriceTo(priceTo);
+        }
+        result.setHighLightApartments(this.getSuitableApartment(search, userId, ip));
 
         DecimalFormat df = new DecimalFormat("###,###,###");
         TotalStatisticDto totalStatisticDto = new TotalStatisticDto();

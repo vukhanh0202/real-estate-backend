@@ -7,6 +7,7 @@ public enum ESortApartment {
     AREA("area"),
     TOTAL_PRICE("totalPrice"),
     HIGHLIGHT("highlight"),
+    CREATED_AT("createdAt"),
     RATING("rating");
 
     @Getter

@@ -10,8 +10,8 @@ public class CompareApartmentRequest extends CatchInfoRequest {
 
     List<Long> ids;
 
-    public CompareApartmentRequest(List<Long> ids, Long userId) {
-        super(userId);
+    public CompareApartmentRequest(List<Long> ids, Long userId, String ip) {
+        super(userId, ip);
         this.ids = ids;
     }
 }

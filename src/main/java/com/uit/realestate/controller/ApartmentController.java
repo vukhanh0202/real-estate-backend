@@ -40,12 +40,6 @@ public class ApartmentController {
 
     private final TrackingService trackingService;
 
-    @GetMapping(value = "/public/test")
-    public ResponseEntity<?> findHighlightApartment() {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.findHighLightApartment(null)));
-    }
-
     /**
      * Search apartment
      *
@@ -100,9 +94,9 @@ public class ApartmentController {
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment.name(), EApartmentStatus.OPEN, userId, IPUtils.getIp(request), search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
-        if(sortBy.getValue().equals("rating")){
+        if (sortBy.getValue().equals("rating")) {
             req.createPageable(JpaSort.unsafe(sortDirection, "(rating)"));
-        }else{
+        } else {
             req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
         }
         return ResponseEntity.status(HttpStatus.OK)
@@ -140,23 +134,23 @@ public class ApartmentController {
                 .body(new ApiResponse(apartmentService.findRecommendApartment(req)));
     }
 
-    /**
-     * Get similar apartment
-     *
-     * @return
-     */
-    @ApiOperation(value = "Get similar apartment ")
-    @GetMapping(value = "/public/apartment/similar")
-    public ResponseEntity<?> findSimilarApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
-                                                  @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
-                                                  @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
-                                                  HttpServletRequest request) {
-
-        CatchInfoRequestExt req = new CatchInfoRequestExt(userId, IPUtils.getIp(request), page, size);
-        req.createPageable();
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.findSimilarApartment(req)));
-    }
+//    /**
+//     * Get similar apartment
+//     *
+//     * @return
+//     */
+//    @ApiOperation(value = "Get similar apartment ")
+//    @GetMapping(value = "/public/apartment/similar")
+//    public ResponseEntity<?> findSimilarApartment(@RequestParam(value = "page", defaultValue = AppConstant.PAGE_NUMBER_DEFAULT) Integer page,
+//                                                  @RequestParam(value = "size", defaultValue = AppConstant.PAGE_SIZE_DEFAULT) Integer size,
+//                                                  @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
+//                                                  HttpServletRequest request) {
+//
+//        CatchInfoRequestExt req = new CatchInfoRequestExt(userId, IPUtils.getIp(request), page, size);
+//        req.createPageable();
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(new ApiResponse(apartmentService.findSimilarApartment(req)));
+//    }
 
     /**
      * Get latest new apartment (4 items)
@@ -270,8 +264,9 @@ public class ApartmentController {
     @ApiOperation(value = "Compare apartment")
     @GetMapping(value = "/public/apartment/compare")
     public ResponseEntity<?> compareApartment(@RequestParam(value = "apartment_list") List<Long> apartmentIds,
-                                              @RequestParam(value = "user_id", defaultValue = "-1") Long userId) {
+                                              @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
+                                              HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse(apartmentService.compareApartment(new CompareApartmentRequest(apartmentIds, userId))));
+                .body(new ApiResponse(apartmentService.compareApartment(new CompareApartmentRequest(apartmentIds, userId, IPUtils.getIp(request)))));
     }
 }

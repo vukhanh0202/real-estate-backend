@@ -6,6 +6,7 @@ import com.uit.realestate.constant.SuitabilityConstant;
 import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
+import com.uit.realestate.constant.enums.sort.ESortApartment;
 import com.uit.realestate.constant.enums.user.ERoleType;
 import com.uit.realestate.domain.TrackingTemporaryChat;
 import com.uit.realestate.domain.action.Favourite;
@@ -34,6 +35,9 @@ import com.uit.realestate.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,7 +107,7 @@ public class ApartmentServiceImpl implements ApartmentService {
         });
 
         log.info("Compare Apartment");
-        return apartmentMapper.toApartmentCompareDtoList(apartmentRepository.findAllByIdIn(req.getIds()), req.getUserId());
+        return apartmentMapper.toApartmentCompareDtoList(apartmentRepository.findAllByStatusAndIdIn(EApartmentStatus.OPEN, req.getIds()), req.getUserId(), req.getIp());
     }
 
     @Override
@@ -150,42 +154,56 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public List<ApartmentBasicDto> findHighLightApartment(HighlightApartmentRequest req) {
         log.info("Find top highlight apartment");
-        return apartmentMapper.toApartmentBasicDtoList(apartmentRepository
-                .findAllByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus.OPEN, req.getProvinceId()), req.getUserId(), req.getIp());
+        SearchApartmentRequest highlight = new SearchApartmentRequest();
+        highlight.setApartmentStatus(EApartmentStatus.OPEN.name());
+        highlight.setProvinceId(req.getProvinceId());
+        highlight.setHighlight(true);
+        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(highlight, req.getUserId(), req.getIp(),
+                PageRequest.of(0, 100, JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+
+        return apartmentMapper.toApartmentBasicRatingDtoList(result.getContent(), req.getUserId(), req.getIp());
     }
 
     @Override
     public List<ApartmentBasicDto> findLatestApartment(LatestApartmentRequest req) {
         log.info("Find top 16 new latest apartment");
-        return apartmentMapper.toApartmentBasicDtoList(apartmentRepository
-                .findTop16ByStatusAndTypeApartmentOrderByCreatedAtDesc(EApartmentStatus.OPEN, req.getTypeApartment()), req.getUserId(), req.getIp());
+        SearchApartmentRequest latest = new SearchApartmentRequest();
+        latest.setApartmentStatus(EApartmentStatus.OPEN.name());
+        latest.setTypeApartment(req.getTypeApartment().name());
+        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(latest, req.getUserId(), req.getIp(),
+                PageRequest.of(0, 16, Sort.by(Sort.Direction.DESC, ESortApartment.CREATED_AT.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)"))));
+        return apartmentMapper.toApartmentBasicRatingDtoList(result.getContent(), req.getUserId(), req.getIp());
     }
 
     @Override
     public PaginationResponse<ApartmentBasicDto> findRecommendApartment(RecommendApartmentRequest req) {
         log.info("Find recommend apartment");
-        Page<Apartment> result = apartmentRepository
-                .findRecommendApartmentByUserIdAndIp(req.getTypeApartment().name(), req.getUserId(), req.getIp(), req.getPageable());
+        SearchApartmentRequest recommend = new SearchApartmentRequest();
+        recommend.setApartmentStatus(EApartmentStatus.OPEN.name());
+        recommend.setTypeApartment(req.getTypeApartment().name());
+        Page<ApartmentRating> result = apartmentRepository
+                .findRecommendApartmentByUserIdAndIp(recommend, req.getUserId(), req.getIp(),
+                        PageRequest.of(req.getPage() -1 , req.getSize(), JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
         return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
-                , apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId(), req.getIp()));
+                , apartmentMapper.toApartmentBasicRatingDtoList(result.getContent(), req.getUserId(), req.getIp()));
     }
 
-    @Override
-    public PaginationResponse<ApartmentBasicDto> findSimilarApartment(CatchInfoRequestExt req) {
-        log.info("Find Similar apartment");
-        Page<Apartment> result = apartmentRepository
-                .findRecommendApartmentByUserIdAndIp(ETypeApartment.BUY.name(), req.getUserId(), req.getIp(), req.getPageable());
-        List<ApartmentBasicDto> contents = apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId(), req.getIp());
-        Collections.shuffle(contents);
-        return new PaginationResponse<>(
-                result.getTotalElements()
-                , result.getNumberOfElements()
-                , result.getNumber() + 1
-                , contents);
-    }
+//    @Override
+//    public PaginationResponse<ApartmentBasicDto> findSimilarApartment(CatchInfoRequestExt req) {
+//        log.info("Find Similar apartment");
+//        Page<Apartment> result = apartmentRepository
+//                .findRecommendApartmentByUserIdAndIp(ETypeApartment.BUY.name(), req.getUserId(), req.getIp(), req.getPageable());
+//        List<ApartmentBasicDto> contents = apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId(), req.getIp());
+//        Collections.shuffle(contents);
+//        return new PaginationResponse<>(
+//                result.getTotalElements()
+//                , result.getNumberOfElements()
+//                , result.getNumber() + 1
+//                , contents);
+//    }
 
     @Override
     public ApartmentDto getApartmentDetail(DetailApartmentRequest req) {
@@ -204,7 +222,7 @@ public class ApartmentServiceImpl implements ApartmentService {
                 }
             }
         }
-        ApartmentDto result = apartmentMapper.toApartmentFullDto(apartment, req.getUserId());
+        ApartmentDto result = apartmentMapper.toApartmentFullDto(apartment, req.getUserId(), req.getIp());
 
         log.info("Tracking User");
         Map<ETrackingType, String> map = new HashMap<>();
@@ -248,7 +266,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     public List<ApartmentSearchDto> searchAllApartment(String req) {
         log.info("Search All Apartment");
 
-        List<Apartment> result = apartmentRepository.findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus.OPEN, req);
+        List<Apartment> result = apartmentRepository.findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus.OPEN, req,  PageRequest.of(0, 20)).getContent();
 
         return apartmentMapper.toApartmentSearchDtoList(result);
     }
@@ -256,8 +274,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public PaginationResponse<ApartmentDto> searchApartment(SearchApartmentRequest req) {
         log.info("Search Apartment");
-//        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
-        Page<ApartmentRating> result = apartmentRepository.test2(req, req.getUserId(), req.getIp(), req.getPageable());
+        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
 
         return new PaginationResponse<>(
                 result.getTotalElements()
@@ -339,14 +356,6 @@ public class ApartmentServiceImpl implements ApartmentService {
         if (apartment.size() > 0) {
             apartmentRepository.delete(apartment.stream().findFirst().get());
         }
-    }
-
-    @Override
-    public PaginationResponse<ApartmentBasicDto> findApartmentWithSuitable(Long userId) {
-        List<Apartment> result = apartmentRepository
-                .findApartmentWithSuitableDesc(SuitabilityConstant.DEFAULT_ACCURACY,
-                        SuitabilityConstant.DEFAULT_ACCURACY_AREA, 2L, 1L, 1L);
-        return null;
     }
 
     @Override

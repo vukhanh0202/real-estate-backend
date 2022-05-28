@@ -24,7 +24,6 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
     List<Apartment> findAllByStatusAndTypeApartmentAndPriceBetweenAndAreaGreaterThan(EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double priceTo, Double areaFrom);
     List<Apartment> findAllByStatusAndTypeApartmentAndPriceGreaterThanAndAreaBetween(EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double areaFrom, Double areaTo);
     List<Apartment> findAllByStatusAndTypeApartmentAndPriceGreaterThanAndAreaGreaterThan(EApartmentStatus status, ETypeApartment typeApartment,Double priceFrom, Double areaFrom);
-
     List<Apartment> findAllByStatusAndTypeApartmentAndAreaBetween(EApartmentStatus status, ETypeApartment typeApartment, Double areaFrom, Double areaTo);
     List<Apartment> findAllByStatusAndTypeApartmentAndAreaGreaterThan(EApartmentStatus status, ETypeApartment typeApartment, Double areaFrom);
     List<Apartment> findAllByStatusAndTypeApartmentAndPriceBetween(EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double priceTo);
@@ -33,105 +32,69 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
     List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndAreaGreaterThan(Long provinceId,  EApartmentStatus status,ETypeApartment typeApartment, Double areaFrom);
     List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndPriceBetween(Long provinceId, EApartmentStatus status, ETypeApartment typeApartment, Double priceFrom, Double priceTo);
     List<Apartment> findAllByApartmentAddressProvinceIdAndStatusAndTypeApartmentAndPriceGreaterThan(Long provinceId,  EApartmentStatus status,ETypeApartment typeApartment, Double priceFrom);
+    Page<Apartment> findAllByAuthorIdAndStatusIn(Long userId, List<EApartmentStatus> status, Pageable pageable);
 
-    List<Apartment> findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus status, String title);
+    Page<Apartment> findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus status, String title, Pageable pageable);
 
-    List<Apartment> findTop16ByStatusAndTypeApartmentOrderByCreatedAtDesc(EApartmentStatus status, ETypeApartment typeApartment);
-
-    List<Apartment> findAllByHighlightTrueAndStatusAndApartmentAddressProvinceIdOrderByUpdatedAtDesc(EApartmentStatus status, Long provinceId);
-
-    List<Apartment> findAllByIdIn(List<Long> ids);
-
-    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
-            " FROM apartment ap " +
-            " JOIN apartment_address ad ON ap.id = ad.id " +
-            " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
-            " FULL OUTER JOIN tracking_province tp ON tp.province_id = ad.province_id " +
-            " FULL OUTER JOIN tracking_district td ON td.district_id = ad.district_id " +
-            " WHERE ((tc.ip = :ip OR tc.user_id = :userId) " +
-            "           OR (tp.ip = :ip OR tp.user_id = :userId) " +
-            "           OR (td.ip = :ip OR td.user_id = :userId)) " +
-            "       AND ap.status = 'OPEN' " +
-            "       AND ap.type_apartment = :typeApartment " +
-            " GROUP BY ap.id " +
-            " ORDER BY rating DESC, ap.created_at DESC ",
-            nativeQuery = true)
-    Page<Apartment> findRecommendApartmentByUserIdAndIp(String typeApartment, Long userId, String ip, Pageable pageable);
-
-    @Query(value = " SELECT ap.*, " +
-            " c.id as categoryId, c.name as categoryName," +
-            " ap.type_apartment as typeApartment," +
-            " ad.bedroom_quantity as bedroomQuantity, ad.bathroom_quantity as bathroomQuantity, ad.floor_quantity as floorQuantity," +
-            " add.district_id as districtId," +
-            " add.province_id as provinceId," +
-            " add.address as address," +
-            " ap.author_id as authorId," +
-            " (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
-            " FROM apartment ap " +
-            " JOIN apartment_address add ON ap.id = add.id " +
-            " JOIN apartment_detail ad ON ap.id = ad.id " +
-            " JOIN category c ON c.id = ap.category_id " +
-            " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id AND tc.ip = :ip OR tc.user_id = :userId" +
-            " FULL OUTER JOIN tracking_province tp ON tp.province_id = add.province_id AND tp.ip = :ip OR tp.user_id = :userId" +
-            " FULL OUTER JOIN tracking_district td ON td.district_id = add.district_id AND td.ip = :ip OR td.user_id = :userId" +
-            " WHERE  (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) " +
-            "       AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) " +
-            "       AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) " +
-            "       AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent)) " +
-            "       AND (:#{#param.priceTo} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.price_rent)) " +
-            "       AND (:#{#param.areaFrom} is null OR ap.area >= CAST(CAST(:#{#param.areaFrom} AS TEXT) AS DOUBLE PRECISION)) " +
-            "       AND (:#{#param.areaTo} is null OR ap.area <= CAST(CAST(:#{#param.areaTo} AS TEXT) AS DOUBLE PRECISION)) " +
-            "       AND (:#{#param.categoryId} is null OR ap.category_id = CAST(CAST(:#{#param.categoryId} AS TEXT) AS BIGINT)) " +
-            "       AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT)) " +
-            "       AND (:#{#param.search} is null OR ap.title LIKE CAST(:#{#param.search} AS TEXT)) " +
-            "       AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT)) " +
-            "       AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT)) " +
-            "       AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT)) " +
-            "       AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT)) " +
-            " GROUP BY ap.id, c.id, c.name, ap.type_apartment, ad.bedroom_quantity, ad.bathroom_quantity, ad.floor_quantity, add.district_id, add.province_id, add.address, ap.author_id",
-            nativeQuery = true)
-    Page<ApartmentRating> findRecommendApartmentByUserIdAndIp(SearchApartmentRequest param, Long userId, String ip, Pageable pageable);
-
-    @Query(value = "WITH tc_total AS (SELECT SUM(rating) as tc_total FROM tracking_category WHERE ip = :ip OR user_id = :userId),\n" +
+    @Query(value = "WITH tc_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tc_total FROM tracking_category WHERE ip = :ip OR user_id = :userId),\n" +
             "tc AS (SELECT category_id, SUM(rating) as tc_item FROM tracking_category WHERE ip = :ip OR user_id = :userId GROUP BY category_id),\n" +
-            "tp_total AS (SELECT SUM(rating) as tp_total FROM tracking_province WHERE ip = :ip OR user_id = :userId),\n" +
+            "tp_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tp_total FROM tracking_province WHERE ip = :ip OR user_id = :userId),\n" +
             "tp AS (SELECT province_id, SUM(rating) as tp_item FROM tracking_province WHERE ip = :ip OR user_id = :userId GROUP BY province_id),\n" +
-            "td_total AS (SELECT SUM(rating) as td_total FROM tracking_district WHERE ip = :ip OR user_id = :userId),\n" +
+            "td_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as td_total FROM tracking_district WHERE ip = :ip OR user_id = :userId),\n" +
             "td AS (SELECT district_id, SUM(rating) as td_item FROM tracking_district WHERE ip = :ip OR user_id = :userId GROUP BY district_id),\n" +
-            "tbath_total AS (SELECT SUM(rating) as tbath_total FROM tracking_bathroom WHERE ip = :ip OR user_id = :userId),\n" +
+            "tbath_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tbath_total FROM tracking_bathroom WHERE ip = :ip OR user_id = :userId),\n" +
             "tbath AS (SELECT bathroom, SUM(rating) as tbath_item FROM tracking_bathroom WHERE ip = :ip OR user_id = :userId GROUP BY bathroom),\n" +
-            "tbed_total AS (SELECT SUM(rating) as tbed_total FROM tracking_bedroom WHERE ip = :ip OR user_id = :userId),\n" +
+            "tbed_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tbed_total FROM tracking_bedroom WHERE ip = :ip OR user_id = :userId),\n" +
             "tbed AS (SELECT bedroom, SUM(rating) as tbed_item FROM tracking_bedroom WHERE ip = :ip OR user_id = :userId GROUP BY bedroom),\n" +
-            "tf_total AS (SELECT SUM(rating) as tf_total FROM tracking_floor WHERE ip = :ip OR user_id = :userId),\n" +
+            "tf_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tf_total FROM tracking_floor WHERE ip = :ip OR user_id = :userId),\n" +
             "tf AS (SELECT floor, SUM(rating) as tf_item FROM tracking_floor WHERE ip = :ip OR user_id = :userId GROUP BY floor),\n" +
-            "tt_total AS (SELECT SUM(rating) as tt_total FROM tracking_toilet WHERE ip = :ip OR user_id = :userId),\n" +
+            "tt_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tt_total FROM tracking_toilet WHERE ip = :ip OR user_id = :userId),\n" +
             "tt AS (SELECT toilet, SUM(rating) as tt_item FROM tracking_toilet WHERE ip = :ip OR user_id = :userId GROUP BY toilet),\n" +
-            "tarea_total AS (SELECT SUM(rating) as tarea_total FROM tracking_area WHERE ip = :ip OR user_id = :userId),\n" +
+            "tarea_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tarea_total FROM tracking_area WHERE ip = :ip OR user_id = :userId),\n" +
             "tarea AS (SELECT area, SUM(rating) as tarea_item FROM tracking_area WHERE ip = :ip OR user_id = :userId GROUP BY area),\n" +
-            "tprice_total AS (SELECT SUM(rating) as tprice_total FROM tracking_price WHERE ip = :ip OR user_id = :userId),\n" +
+            "tprice_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tprice_total FROM tracking_price WHERE ip = :ip OR user_id = :userId),\n" +
             "tprice AS (SELECT price, SUM(rating) as tprice_item FROM tracking_price WHERE ip = :ip OR user_id = :userId GROUP BY price),\n" +
-            "tdirec_total AS (SELECT SUM(rating) as tdirec_total FROM tracking_direction WHERE ip = :ip OR user_id = :userId),\n" +
-            "tdirec AS (SELECT direction, SUM(rating) as tdirec_item FROM tracking_direction WHERE ip = :ip OR user_id = :userId GROUP BY direction)\n" +
+            "tdirec_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tdirec_total FROM tracking_direction WHERE ip = :ip OR user_id = :userId),\n" +
+            "tdirec AS (SELECT direction, SUM(rating) as tdirec_item FROM tracking_direction WHERE ip = :ip OR user_id = :userId GROUP BY direction),\n" +
+            "tta_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tta_total FROM tracking_type_apartment WHERE ip = :ip OR user_id = :userId),\n" +
+            "tta AS (SELECT type_apartment, SUM(rating) as tta_item FROM tracking_type_apartment WHERE ip = :ip OR user_id = :userId GROUP BY type_apartment)\n" +
             "   SELECT ap.*, \n" +
-            "          c.id as categoryId, c.name as categoryName," +
-            "          ap.type_apartment as typeApartment," +
-            "          ad.bedroom_quantity as bedroomQuantity, ad.bathroom_quantity as bathroomQuantity, ad.floor_quantity as floorQuantity," +
-            "          add.district_id as districtId," +
-            "          add.province_id as provinceId," +
-            "          add.address as address," +
-            "          ap.author_id as authorId," +
-            "          ((tc.tc_item/tc_total.tc_total) + (tp.tp_item/tp_total.tp_total) + (td.td_item/td_total.td_total) " +
-            "           + (tbath.tbath_item/tbath_total.tbath_total) + (tbed.tbed_item/tbed_total.tbed_total) + (tf.tf_item/tf_total.tf_total) " +
-            "           + (tt.tt_item/tt_total.tt_total) + (tarea.tarea_item/tarea_total.tarea_total) + (tprice.tprice_item/tprice_total.tprice_total) " +
-            "           + (tdirec.tdirec_item/tdirec_total.tdirec_total))/10 as rating\n" +
-            "   FROM apartment ap, apartment_address add, apartment_detail ad, category c, tc_total, tc, tp_total, tp, td_total, td,\n" +
-            "        tbath_total, tbath, tbed_total, tbed, tf_total, tf, tt_total, tt, tarea_total, tarea, tprice_total, tprice, tdirec_total, tdirec\n" +
-            "   WHERE ap.id = ad.id AND ap.id = add.id AND ap.category_id = c.id AND tc.category_id = ap.category_id " +
-            "       AND tp.province_id = add.province_id AND td.district_id = add.district_id" +
-            "       AND tbath.bathroom = ad.bathroom_quantity AND tbed.bedroom = ad.bedroom_quantity" +
-            "       AND tf.floor = ad.floor_quantity AND tt.toilet = ad.toilet_quantity" +
-            "       AND tarea.area = ap.area AND (tprice.price = ap.total_price OR tprice.price = ap.price_rent) AND tdirec.direction = ad.house_direction" +
-            "       AND (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) \n" +
+            "           c.id as categoryId, c.name as categoryName,\n" +
+            "           ap.type_apartment as typeApartment,\n" +
+            "           ad.bedroom_quantity as bedroomQuantity, ad.bathroom_quantity as bathroomQuantity, ad.floor_quantity as floorQuantity,\n" +
+            "           ad.toilet_quantity as toiletQuantity, ad.house_direction as houseDirection,\n" +
+            "           add.district_id as districtId,\n" +
+            "           add.province_id as provinceId,\n" +
+            "           add.address as address,\n" +
+            "           ap.author_id as authorId,\n" +
+            "           ap.created_at as createdAt,\n" +
+            "           (((CASE WHEN tc.tc_item is null THEN 0 ELSE tc.tc_item END)/tc_total.tc_total) \n" +
+            "               + ((CASE WHEN tp.tp_item is null THEN 0 ELSE tp.tp_item END)/tp_total.tp_total) \n" +
+            "               + ((CASE WHEN td.td_item is null THEN 0 ELSE td.td_item END)/td_total.td_total)\n" +
+            "               + ((CASE WHEN tbath.tbath_item is null THEN 0 ELSE tbath.tbath_item END)/tbath_total.tbath_total) \n" +
+            "               + ((CASE WHEN tbed.tbed_item is null THEN 0 ELSE tbed.tbed_item END)/tbed_total.tbed_total) \n" +
+            "               + ((CASE WHEN tf.tf_item is null THEN 0 ELSE tf.tf_item END)/tf_total.tf_total)\n" +
+            "               + ((CASE WHEN tt.tt_item is null THEN 0 ELSE tt.tt_item END)/tt_total.tt_total)\n" +
+            "               + ((CASE WHEN tarea.tarea_item is null THEN 0 ELSE tarea.tarea_item END)/tarea_total.tarea_total) \n" +
+            "               + ((CASE WHEN tprice.tprice_item is null THEN 0 ELSE tprice.tprice_item END)/tprice_total.tprice_total)\n" +
+            "               + ((CASE WHEN tta.tta_item is null THEN 0 ELSE tta.tta_item END)/tta_total.tta_total)\n" +
+            "               + ((CASE WHEN tdirec.tdirec_item is null THEN 0 ELSE tdirec.tdirec_item END)/tdirec_total.tdirec_total)) as rating\n" +
+            "   FROM apartment ap\n" +
+            "           JOIN apartment_address add ON add.id = ap.id\n" +
+            "           JOIN apartment_detail ad ON ad.id = ap.id\n" +
+            "           JOIN category c ON c.id = ap.category_id\n" +
+            "           JOIN tc_total ON 1=1 LEFT JOIN tc ON tc.category_id = ap.category_id\n" +
+            "           JOIN tp_total ON 1=1 LEFT JOIN tp ON tp.province_id = add.province_id\n" +
+            "           JOIN td_total ON 1=1 LEFT JOIN td ON td.district_id = add.district_id\n" +
+            "           JOIN tbath_total ON 1=1 LEFT JOIN tbath ON tbath.bathroom = ad.bathroom_quantity\n" +
+            "           JOIN tbed_total ON 1=1 LEFT JOIN tbed ON tbed.bedroom = ad.bedroom_quantity\n" +
+            "           JOIN tf_total ON 1=1 LEFT JOIN tf ON tf.floor = ad.floor_quantity\n" +
+            "           JOIN tt_total ON 1=1 LEFT JOIN tt ON tt.toilet = ad.toilet_quantity\n" +
+            "           JOIN tarea_total ON 1=1 LEFT JOIN tarea ON tarea.area = ap.area\n" +
+            "           JOIN tprice_total ON 1=1 LEFT JOIN tprice ON tprice.price = ap.total_price OR tprice.price = ap.price_rent\n" +
+            "           JOIN tdirec_total ON 1=1 LEFT JOIN tdirec ON tdirec.direction = ad.house_direction\n" +
+            "           JOIN tta_total ON 1=1 LEFT JOIN tta ON tta.type_apartment = ap.type_apartment\n" +
+            "   WHERE (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) \n" +
             "            AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) \n" +
             "            AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) \n" +
             "            AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent))\n" +
@@ -144,25 +107,27 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "            AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT))\n" +
             "            AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT))\n" +
             "            AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT))\n" +
-            "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT)) \n",
+            "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT))\n" +
+            "            AND (:#{#param.highlight} is null OR ap.highlight = CAST(CAST(:#{#param.highlight} AS CHARACTER VARYING) AS BOOLEAN)) \n",
             countQuery = "select count(ap.*) from apartment ap, apartment_address add, apartment_detail ad" +
-            "           WHERE ap.id = ad.id AND ap.id = add.id " +
-            "            AND (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) \n" +
-            "            AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) \n" +
-            "            AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) \n" +
-            "            AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent))\n" +
-            "            AND (:#{#param.priceTo} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.price_rent))\n" +
-            "            AND (:#{#param.areaFrom} is null OR ap.area >= CAST(CAST(:#{#param.areaFrom} AS TEXT) AS DOUBLE PRECISION))\n" +
-            "            AND (:#{#param.areaTo} is null OR ap.area <= CAST(CAST(:#{#param.areaTo} AS TEXT) AS DOUBLE PRECISION))\n" +
-            "            AND (:#{#param.categoryId} is null OR ap.category_id = CAST(CAST(:#{#param.categoryId} AS TEXT) AS BIGINT))\n" +
-            "            AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT))\n" +
-            "            AND (:#{#param.search} is null OR ap.title LIKE CAST(:#{#param.search} AS TEXT))\n" +
-            "            AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT))\n" +
-            "            AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT))\n" +
-            "            AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT))\n" +
-            "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT)) \n",
+                    "           WHERE ap.id = ad.id AND ap.id = add.id " +
+                    "            AND (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) \n" +
+                    "            AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) \n" +
+                    "            AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) \n" +
+                    "            AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent))\n" +
+                    "            AND (:#{#param.priceTo} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.price_rent))\n" +
+                    "            AND (:#{#param.areaFrom} is null OR ap.area >= CAST(CAST(:#{#param.areaFrom} AS TEXT) AS DOUBLE PRECISION))\n" +
+                    "            AND (:#{#param.areaTo} is null OR ap.area <= CAST(CAST(:#{#param.areaTo} AS TEXT) AS DOUBLE PRECISION))\n" +
+                    "            AND (:#{#param.categoryId} is null OR ap.category_id = CAST(CAST(:#{#param.categoryId} AS TEXT) AS BIGINT))\n" +
+                    "            AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT))\n" +
+                    "            AND (:#{#param.search} is null OR ap.title LIKE CAST(:#{#param.search} AS TEXT))\n" +
+                    "            AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT))\n" +
+                    "            AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT))\n" +
+                    "            AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT))\n" +
+                    "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT)) \n"+
+                    "            AND (:#{#param.highlight} is null OR ap.highlight = CAST(CAST(:#{#param.highlight} AS CHARACTER VARYING) AS BOOLEAN)) \n",
             nativeQuery = true)
-    Page<ApartmentRating> test(@Param("param") SearchApartmentRequest param, @Param("userId") Long userId, @Param("ip") String ip, Pageable pageable);
+    Page<ApartmentRating> findRecommendApartmentByUserIdAndIp(@Param("param") SearchApartmentRequest param, @Param("userId") Long userId, @Param("ip") String ip, Pageable pageable);
 
     @Query(value = "WITH tc_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tc_total FROM tracking_category WHERE ip = :ip OR user_id = :userId),\n" +
             "tc AS (SELECT category_id, SUM(rating) as tc_item FROM tracking_category WHERE ip = :ip OR user_id = :userId GROUP BY category_id),\n" +
@@ -221,38 +186,9 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "           JOIN tprice_total ON 1=1 LEFT JOIN tprice ON tprice.price = ap.total_price OR tprice.price = ap.price_rent\n" +
             "           JOIN tdirec_total ON 1=1 LEFT JOIN tdirec ON tdirec.direction = ad.house_direction\n" +
             "           JOIN tta_total ON 1=1 LEFT JOIN tta ON tta.type_apartment = ap.type_apartment\n" +
-            "   WHERE (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) \n" +
-            "            AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) \n" +
-            "            AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) \n" +
-            "            AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent))\n" +
-            "            AND (:#{#param.priceTo} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.price_rent))\n" +
-            "            AND (:#{#param.areaFrom} is null OR ap.area >= CAST(CAST(:#{#param.areaFrom} AS TEXT) AS DOUBLE PRECISION))\n" +
-            "            AND (:#{#param.areaTo} is null OR ap.area <= CAST(CAST(:#{#param.areaTo} AS TEXT) AS DOUBLE PRECISION))\n" +
-            "            AND (:#{#param.categoryId} is null OR ap.category_id = CAST(CAST(:#{#param.categoryId} AS TEXT) AS BIGINT))\n" +
-            "            AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT))\n" +
-            "            AND (:#{#param.search} is null OR ap.title LIKE CAST(:#{#param.search} AS TEXT))\n" +
-            "            AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT))\n" +
-            "            AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT))\n" +
-            "            AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT))\n" +
-            "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT))\n",
-            countQuery = "select count(ap.*) from apartment ap, apartment_address add, apartment_detail ad" +
-                    "           WHERE ap.id = ad.id AND ap.id = add.id " +
-                    "            AND (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) \n" +
-                    "            AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) \n" +
-                    "            AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) \n" +
-                    "            AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent))\n" +
-                    "            AND (:#{#param.priceTo} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.price_rent))\n" +
-                    "            AND (:#{#param.areaFrom} is null OR ap.area >= CAST(CAST(:#{#param.areaFrom} AS TEXT) AS DOUBLE PRECISION))\n" +
-                    "            AND (:#{#param.areaTo} is null OR ap.area <= CAST(CAST(:#{#param.areaTo} AS TEXT) AS DOUBLE PRECISION))\n" +
-                    "            AND (:#{#param.categoryId} is null OR ap.category_id = CAST(CAST(:#{#param.categoryId} AS TEXT) AS BIGINT))\n" +
-                    "            AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT))\n" +
-                    "            AND (:#{#param.search} is null OR ap.title LIKE CAST(:#{#param.search} AS TEXT))\n" +
-                    "            AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT))\n" +
-                    "            AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT))\n" +
-                    "            AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT))\n" +
-                    "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT)) \n",
+            "   WHERE ap.id = :id\n",
             nativeQuery = true)
-    Page<ApartmentRating> test2(@Param("param") SearchApartmentRequest param, @Param("userId") Long userId, @Param("ip") String ip, Pageable pageable);
+    List<ApartmentRating> findApartmentDetailRatingByUserIdAndIp(Long id, @Param("userId") Long userId, @Param("ip") String ip);
 
     @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(tta.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
             " FROM apartment ap " +
@@ -284,24 +220,6 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             " ORDER BY rating DESC, ap.created_at DESC ",
             nativeQuery = true)
     Page<Apartment> findRecommendApartmentForChatBox(@Param("param") ApartmentQueryParam param, Long userId, String ip, Pageable pageable);
-
-    Page<Apartment> findAllByAuthorIdAndStatusIn(Long userId, List<EApartmentStatus> status, Pageable pageable);
-
-    @Query(value = "SELECT ap.*, (SUM(COALESCE(tc.rating, 0)) + SUM(COALESCE(tp.rating, 0)) + SUM(COALESCE(tta.rating, 0)) + SUM(COALESCE(td.rating, 0))) as rating\n" +
-            " FROM apartment ap " +
-            " JOIN apartment_address ad ON ap.id = ad.id " +
-            " FULL OUTER JOIN tracking_category tc ON tc.category_id = ap.category_id " +
-            " FULL OUTER JOIN tracking_province tp ON tp.province_id = ad.province_id " +
-            " FULL OUTER JOIN tracking_district td ON td.district_id = ad.district_id " +
-            " FULL OUTER JOIN tracking_type_apartment tta ON tta.type_apartment = ap.type_apartment " +
-            " WHERE ((tc.user_id = :userId) " +
-            "       OR (tp.user_id = :userId) " +
-            "       OR (tta.user_id = :userId) " +
-            "       OR (td.user_id = :userId)) " +
-            " GROUP BY ap.id " +
-            " ORDER BY rating DESC, ap.created_at DESC ",
-            nativeQuery = true)
-    List<Apartment> findRecommendApartmentByUserId(Long userId);
 
     @Query(value = "WITH district_tb AS (\n" +
             "   SELECT a.*,  \n" +
