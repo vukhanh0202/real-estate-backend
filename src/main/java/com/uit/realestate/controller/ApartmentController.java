@@ -91,6 +91,10 @@ public class ApartmentController {
         map.put(ETrackingType.DISTRICT, String.valueOf(districtId));
         map.put(ETrackingType.PROVINCE, String.valueOf(provinceId));
         map.put(ETrackingType.TYPE, typeApartment.name());
+        map.put(ETrackingType.BATHROOM, String.valueOf(bathroomQuantity));
+        map.put(ETrackingType.BEDROOM, String.valueOf(bedroomQuantity));
+        map.put(ETrackingType.DIRECTION, houseDirection);
+        map.put(ETrackingType.FLOOR, String.valueOf(floorQuantity));
         trackingService.tracking(userId, IPUtils.getIp(request), map, AppConstant.DEFAULT_RATING);
 
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
@@ -101,8 +105,6 @@ public class ApartmentController {
         }else{
             req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
         }
-
-
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.searchApartment(req)));
     }
@@ -164,7 +166,7 @@ public class ApartmentController {
     @ApiOperation(value = "Get latest new apartment ")
     @GetMapping(value = "/public/apartment/latest-new")
     public ResponseEntity<?> findLatestNewApartment(@RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
-                                                    @RequestParam(value = "user_id", required = false) Long userId,
+                                                    @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
                                                     HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.findLatestApartment(new LatestApartmentRequest(userId, IPUtils.getIp(request), typeApartment))));
@@ -179,7 +181,7 @@ public class ApartmentController {
     @GetMapping(value = "/public/apartment/highlight")
     public ResponseEntity<?> findHighlightApartment(@RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
                                                     @RequestParam(value = "province_id") Long provinceId,
-                                                    @RequestParam(value = "user_id", required = false) Long userId,
+                                                    @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
                                                     HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.findHighLightApartment(new HighlightApartmentRequest(userId, IPUtils.getIp(request), typeApartment, provinceId))));
@@ -195,7 +197,7 @@ public class ApartmentController {
     @ApiOperation(value = "Get apartment detail")
     @GetMapping(value = "/public/apartment/{id}")
     public ResponseEntity<?> findApartmentDetail(@PathVariable("id") Long id,
-                                                 @RequestParam(value = "user_id", required = false) Long userId,
+                                                 @RequestParam(value = "user_id", defaultValue = "-1") Long userId,
                                                  HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.getApartmentDetail(new DetailApartmentRequest(id, IPUtils.getIp(request), userId))));
@@ -268,7 +270,7 @@ public class ApartmentController {
     @ApiOperation(value = "Compare apartment")
     @GetMapping(value = "/public/apartment/compare")
     public ResponseEntity<?> compareApartment(@RequestParam(value = "apartment_list") List<Long> apartmentIds,
-                                              @RequestParam(value = "user_id", required = false) Long userId) {
+                                              @RequestParam(value = "user_id", defaultValue = "-1") Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.compareApartment(new CompareApartmentRequest(apartmentIds, userId))));
     }

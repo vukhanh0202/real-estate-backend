@@ -121,6 +121,13 @@ public class ApartmentServiceImpl implements ApartmentService {
         map.put(ETrackingType.DISTRICT, String.valueOf(apartment.getApartmentAddress().getDistrict().getId()));
         map.put(ETrackingType.PROVINCE, String.valueOf(apartment.getApartmentAddress().getProvince().getId()));
         map.put(ETrackingType.TYPE, apartment.getTypeApartment().name());
+        map.put(ETrackingType.AREA, String.valueOf(apartment.getArea()));
+        map.put(ETrackingType.BATHROOM, String.valueOf(apartment.getApartmentDetail().getBathroomQuantity()));
+        map.put(ETrackingType.BEDROOM, String.valueOf(apartment.getApartmentDetail().getBedroomQuantity()));
+        map.put(ETrackingType.DIRECTION, apartment.getApartmentDetail().getHouseDirection());
+        map.put(ETrackingType.FLOOR, String.valueOf(apartment.getApartmentDetail().getFloorQuantity()));
+        map.put(ETrackingType.PRICE, String.valueOf(apartment.getTypeApartment().equals(ETypeApartment.BUY) ? apartment.getTotalPrice() : apartment.getPriceRent()));
+        map.put(ETrackingType.TOILET, String.valueOf(apartment.getApartmentDetail().getToiletQuantity()));
 
         if (favourite == null) {
             log.info("Favourite Apartment with apartment ID: " + req.getApartmentId());
@@ -205,6 +212,14 @@ public class ApartmentServiceImpl implements ApartmentService {
         map.put(ETrackingType.DISTRICT, String.valueOf(apartment.getApartmentAddress().getDistrict().getId()));
         map.put(ETrackingType.PROVINCE, String.valueOf(apartment.getApartmentAddress().getProvince().getId()));
         map.put(ETrackingType.TYPE, apartment.getTypeApartment().name());
+        map.put(ETrackingType.AREA, String.valueOf(apartment.getArea()));
+        map.put(ETrackingType.BATHROOM, String.valueOf(apartment.getApartmentDetail().getBathroomQuantity()));
+        map.put(ETrackingType.BEDROOM, String.valueOf(apartment.getApartmentDetail().getBedroomQuantity()));
+        map.put(ETrackingType.DIRECTION, apartment.getApartmentDetail().getHouseDirection());
+        map.put(ETrackingType.FLOOR, String.valueOf(apartment.getApartmentDetail().getFloorQuantity()));
+        map.put(ETrackingType.PRICE, String.valueOf(apartment.getTypeApartment().equals(ETypeApartment.BUY) ? apartment.getTotalPrice() : apartment.getPriceRent()));
+        map.put(ETrackingType.TOILET, String.valueOf(apartment.getApartmentDetail().getToiletQuantity()));
+
         trackingService.tracking(req.getUserId(), req.getIp(), map, AppConstant.DEFAULT_RATING);
 
         log.info("Get detail apartment ID: " + req.getId());
@@ -241,7 +256,8 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public PaginationResponse<ApartmentDto> searchApartment(SearchApartmentRequest req) {
         log.info("Search Apartment");
-        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
+//        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
+        Page<ApartmentRating> result = apartmentRepository.test2(req, req.getUserId(), req.getIp(), req.getPageable());
 
         return new PaginationResponse<>(
                 result.getTotalElements()

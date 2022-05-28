@@ -1,7 +1,6 @@
 package com.uit.realestate.domain.apartment;
 
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
-import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 
 public interface ApartmentRating{
 
@@ -20,9 +19,11 @@ public interface ApartmentRating{
     String getCategoryName();
     Long getAuthorId();
     Long getRating();
-    Long getBedroomQuantity();
-    Long getBathroomQuantity();
-    Long getFloorQuantity();
+    Integer getBedroomQuantity();
+    Integer getBathroomQuantity();
+    Integer getFloorQuantity();
+    Integer getToiletQuantity();
+    String getDirection();
     Long getDistrictId();
     Long getProvinceId();
     String getAddress();

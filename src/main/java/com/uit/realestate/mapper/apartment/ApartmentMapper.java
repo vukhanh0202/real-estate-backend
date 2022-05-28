@@ -3,10 +3,7 @@ package com.uit.realestate.mapper.apartment;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.apartment.ApartmentRating;
-import com.uit.realestate.domain.tracking.TrackingCategory;
-import com.uit.realestate.domain.tracking.TrackingDistrict;
-import com.uit.realestate.domain.tracking.TrackingProvince;
-import com.uit.realestate.domain.tracking.TrackingTypeApartment;
+import com.uit.realestate.domain.tracking.*;
 import com.uit.realestate.domain.user.User;
 import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.apartment.ApartmentCompareDto;
@@ -19,12 +16,10 @@ import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.repository.location.DistrictRepository;
 import com.uit.realestate.repository.location.ProvinceRepository;
-import com.uit.realestate.repository.tracking.TrackingCategoryRepository;
-import com.uit.realestate.repository.tracking.TrackingDistrictRepository;
-import com.uit.realestate.repository.tracking.TrackingProvinceRepository;
-import com.uit.realestate.repository.tracking.TrackingTypeApartmentRepository;
+import com.uit.realestate.repository.tracking.*;
 import com.uit.realestate.repository.user.UserRepository;
 import com.uit.realestate.utils.StringUtils;
+import lombok.AllArgsConstructor;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,82 +32,166 @@ public abstract class ApartmentMapper implements MapperBase {
 
     @Autowired
     private ApartmentDetailMapper apartmentDetailMapper;
-
     @Autowired
     private CategoryRepository categoryRepository;
-
     @Autowired
     private ApartmentAddressMapper apartmentAddressMapper;
-
     @Autowired
     private FavouriteRepository favouriteRepository;
-
     @Autowired
     private SuitabilityMapper suitabilityMapper;
-
     @Autowired
     private TrackingCategoryRepository trackingCategoryRepository;
-
     @Autowired
     private TrackingTypeApartmentRepository trackingTypeApartmentRepository;
-
     @Autowired
     private TrackingDistrictRepository trackingDistrictRepository;
-
     @Autowired
     private TrackingProvinceRepository trackingProvinceRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private ProvinceRepository provinceRepository;
-
     @Autowired
     private DistrictRepository districtRepository;
+    @Autowired
+    private TrackingAreaRepository trackingAreaRepository;
+    @Autowired
+    private TrackingBedroomRepository trackingBedroomRepository;
+    @Autowired
+    private TrackingBathRoomRepository trackingBathRoomRepository;
+    @Autowired
+    private TrackingDirectionRepository trackingDirectionRepository;
+    @Autowired
+    private TrackingFloorRepository trackingFloorRepository;
+    @Autowired
+    private TrackingPriceRepository trackingPriceRepository;
+    @Autowired
+    private TrackingToiletRepository trackingToiletRepository;
 
-    private Double calculateSuitableWithIpAndUserId(Apartment apartment, String ip, Long userId){
-        if (ip != null && userId != null){
+    private int countValue(double result) {
+        if (result > 0) {
+            return 1;
+        }
+        return 0;
+    }
+
+    private Double calculateSuitableWithIpAndUserId(Apartment apartment, String ip, Long userId) {
+        if (ip != null && userId != null) {
             List<TrackingCategory> categories = trackingCategoryRepository.findAllByUserIdOrIp(userId, ip);
             List<TrackingTypeApartment> typeApartments = trackingTypeApartmentRepository.findAllByUserIdOrIp(userId, ip);
             List<TrackingDistrict> districts = trackingDistrictRepository.findAllByUserIdOrIp(userId, ip);
             List<TrackingProvince> provinces = trackingProvinceRepository.findAllByUserIdOrIp(userId, ip);
-            Double total = 0D;
-            total += (double) categories.stream().filter(item -> item.getCategory().getId().equals(apartment.getCategory().getId())).mapToLong(TrackingCategory::getRating).sum()
+            List<TrackingArea> areas = trackingAreaRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingBedroom> bedrooms = trackingBedroomRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingBathroom> bathrooms = trackingBathRoomRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingDirection> directions = trackingDirectionRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingFloor> floors = trackingFloorRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingPrice> prices = trackingPriceRepository.findAllByUserIdOrIp(userId, ip);
+            List<TrackingToilet> toilets = trackingToiletRepository.findAllByUserIdOrIp(userId, ip);
+            double total = 0D;
+            int count = 0;
+            double value;
+
+            value = (double) categories.stream().filter(item -> item.getCategory().getId().equals(apartment.getCategory().getId())).mapToLong(TrackingCategory::getRating).sum()
                     /  categories.stream().mapToLong(TrackingCategory::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) typeApartments.stream().filter(item -> item.getTypeApartment().equals(apartment.getTypeApartment())).mapToLong(TrackingTypeApartment::getRating).sum()
+                    / typeApartments.stream().mapToLong(TrackingTypeApartment::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) districts.stream().filter(item -> item.getDistrict().getId().equals(apartment.getApartmentAddress().getDistrict().getId())).mapToLong(TrackingDistrict::getRating).sum()
+                    / districts.stream().mapToLong(TrackingDistrict::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) provinces.stream().filter(item -> item.getProvince().getId().equals(apartment.getApartmentAddress().getProvince().getId())).mapToLong(TrackingProvince::getRating).sum()
+                    / provinces.stream().mapToLong(TrackingProvince::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) areas.stream().filter(item -> item.getArea().equals(apartment.getArea())).mapToLong(TrackingArea::getRating).sum()
+                    / areas.stream().mapToLong(TrackingArea::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) bedrooms.stream().filter(item -> item.getBedroom().equals(apartment.getApartmentDetail().getBedroomQuantity())).mapToLong(TrackingBedroom::getRating).sum()
+                    / bedrooms.stream().mapToLong(TrackingBedroom::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) bathrooms.stream().filter(item -> item.getBathroom().equals(apartment.getApartmentDetail().getBathroomQuantity())).mapToLong(TrackingBathroom::getRating).sum()
+                    / bathrooms.stream().mapToLong(TrackingBathroom::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) directions.stream().filter(item -> item.getDirection().equals(apartment.getApartmentDetail().getHouseDirection())).mapToLong(TrackingDirection::getRating).sum()
+                    / directions.stream().mapToLong(TrackingDirection::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) floors.stream().filter(item -> item.getFloor().equals(apartment.getApartmentDetail().getFloorQuantity())).mapToLong(TrackingFloor::getRating).sum()
+                    / floors.stream().mapToLong(TrackingFloor::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) toilets.stream().filter(item -> item.getToilet().equals(apartment.getApartmentDetail().getToiletQuantity())).mapToLong(TrackingToilet::getRating).sum()
+                    / toilets.stream().mapToLong(TrackingToilet::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
+            value = (double) prices.stream().filter(item -> {
+                if (apartment.getTypeApartment().equals(ETypeApartment.BUY)){
+                    return item.getPrice().equals(apartment.getTotalPrice());
+                }
+                return item.getPrice().equals(apartment.getPriceRent());
+            }).mapToLong(TrackingPrice::getRating).sum()
+                    / prices.stream().mapToLong(TrackingPrice::getRating).sum() * 100;
+            count += countValue(value);
+            total += value;
 
-            total += (double) typeApartments.stream().filter(item -> item.getTypeApartment().equals(apartment.getTypeApartment())).mapToLong(TrackingTypeApartment::getRating).sum()
-                    /  typeApartments.stream().mapToLong(TrackingTypeApartment::getRating).sum() * 100;
-
-            total += (double) districts.stream().filter(item -> item.getDistrict().getId().equals(apartment.getApartmentAddress().getDistrict().getId())).mapToLong(TrackingDistrict::getRating).sum()
-                    /  districts.stream().mapToLong(TrackingDistrict::getRating).sum() * 100;
-
-            total += (double) provinces.stream().filter(item -> item.getProvince().getId().equals(apartment.getApartmentAddress().getProvince().getId())).mapToLong(TrackingProvince::getRating).sum()
-                    /  provinces.stream().mapToLong(TrackingProvince::getRating).sum() * 100;
-            return Math.ceil(total / 4);
+            if (count > 0){
+                return Math.ceil(total / count);
+            }
+            return 0D;
         }
         return null;
     }
 
-    private Double calculateSuitableWithIpAndUserId(ApartmentRating apartment, String ip, Long userId){
-        if (ip != null && userId != null){
-            List<TrackingCategory> categories = trackingCategoryRepository.findAllByUserIdOrIp(userId, ip);
-            List<TrackingTypeApartment> typeApartments = trackingTypeApartmentRepository.findAllByUserIdOrIp(userId, ip);
-            List<TrackingDistrict> districts = trackingDistrictRepository.findAllByUserIdOrIp(userId, ip);
-            List<TrackingProvince> provinces = trackingProvinceRepository.findAllByUserIdOrIp(userId, ip);
-            Double total = 0D;
-            total += (double) categories.stream().filter(item -> item.getCategory().getId().equals(apartment.getCategoryId())).mapToLong(TrackingCategory::getRating).sum()
-                    /  categories.stream().mapToLong(TrackingCategory::getRating).sum() * 100;
+    private Double calculateSuitableWithIpAndUserId(ApartmentRating apartment, String ip, Long userId) {
+        if (ip != null && userId != null) {
+            int count = 0;
+            if(!trackingCategoryRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingTypeApartmentRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingDistrictRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingProvinceRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingAreaRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingBedroomRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingBathRoomRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingDirectionRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingFloorRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingPriceRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
+            if(!trackingToiletRepository.findAllByUserIdOrIp(userId, ip).isEmpty()){
+                count++;
+            };
 
-            total += (double) typeApartments.stream().filter(item -> item.getTypeApartment().equals(apartment.getTypeApartment())).mapToLong(TrackingTypeApartment::getRating).sum()
-                    /  typeApartments.stream().mapToLong(TrackingTypeApartment::getRating).sum() * 100;
-
-            total += (double) districts.stream().filter(item -> item.getDistrict().getId().equals(apartment.getDistrictId())).mapToLong(TrackingDistrict::getRating).sum()
-                    /  districts.stream().mapToLong(TrackingDistrict::getRating).sum() * 100;
-
-            total += (double) provinces.stream().filter(item -> item.getProvince().getId().equals(apartment.getProvinceId())).mapToLong(TrackingProvince::getRating).sum()
-                    /  provinces.stream().mapToLong(TrackingProvince::getRating).sum() * 100;
-            return Math.ceil(total / 4);
+            if (count > 0){
+                return Math.ceil((double)apartment.getRating() / count * 100);
+            }
+            return 0D;
         }
         return null;
     }
@@ -177,13 +256,13 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setPhotos(getFiles(apartment.getPhotos()));
         dto.setIsHighlight(apartment.getHighlight());
         dto.setAuthor(getUserInfo(userRepository.findById(apartment.getAuthorId()).orElse(new User())));
-        dto.setBedroomQuantity(apartment.getBedroomQuantity());
-        dto.setBathroomQuantity(apartment.getBathroomQuantity());
-        dto.setFloorQuantity(apartment.getFloorQuantity());
-        dto.setAddress(districtRepository.findById(apartment.getDistrictId()).get().getName() +", "+ provinceRepository.findById(apartment.getProvinceId()).get().getName());
+        dto.setBedroomQuantity(Long.valueOf(apartment.getBedroomQuantity()));
+        dto.setBathroomQuantity(Long.valueOf(apartment.getBathroomQuantity()));
+        dto.setFloorQuantity(Long.valueOf(apartment.getFloorQuantity()));
+        dto.setAddress(districtRepository.findById(apartment.getDistrictId()).get().getName() + ", " + provinceRepository.findById(apartment.getProvinceId()).get().getName());
         dto.setTypeApartment(ETypeApartment.valueOf(apartment.getTypeApartment()).getValue());
         if (apartment.getTypeApartment().equals(ETypeApartment.BUY.name())) {
-            dto.setTotalPrice( StringUtils.castPriceFromNumber(apartment.getTotal_Price()));
+            dto.setTotalPrice(StringUtils.castPriceFromNumber(apartment.getTotal_Price()));
         } else {
             if (apartment.getUnit_Rent() == null) {
                 dto.setTotalPrice("0");

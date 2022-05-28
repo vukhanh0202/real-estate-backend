@@ -38,9 +38,9 @@ public abstract class IStatisticApartmentService {
         if (userId == null || apartmentBasicDtoList.size() < 3) {
             Collections.shuffle(apartments);
             if (apartments.size() > 2) {
-                apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments.subList(0, 3), userId, ip);
+                apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments.subList(0, 3), -1L, ip);
             } else {
-                apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, userId, ip);
+                apartmentBasicDtoList = apartmentMapper.toApartmentBasicDtoList(apartments, -1L, ip);
             }
         }
         return apartmentBasicDtoList;
