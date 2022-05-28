@@ -1,12 +1,15 @@
 package com.uit.realestate.controller;
 
+import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.ExtendEventChatBot;
+import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.dialogflow.*;
 import com.uit.realestate.dto.apartment.ThumbnailChatDto;
 import com.uit.realestate.payload.apartment.ApartmentQueryParam;
 import com.uit.realestate.service.AsyncService;
 import com.uit.realestate.service.apartment.ApartmentService;
+import com.uit.realestate.service.tracking.TrackingService;
 import com.uit.realestate.utils.IPUtils;
 import com.uit.realestate.utils.JsonUtils;
 import io.swagger.annotations.Api;
@@ -35,6 +38,7 @@ public class DialogFlowController {
 
     private final ApartmentService apartmentService;
     private final AsyncService asyncService;
+    private final TrackingService trackingService;
 
     @ApiOperation(value = "Search apartment")
     @PostMapping(value = "/public/dialog", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -58,6 +62,7 @@ public class DialogFlowController {
         DialogResponse dialogResponse = new DialogResponse();
         if (event.isInitEvent()) {
             apartmentService.findAndSaveRecommendApartmentForChatBox(pr, key);
+            tracking(pr);
         }
         try {
             while (Instant.now().isBefore(deadline)) {
@@ -87,5 +92,25 @@ public class DialogFlowController {
             return event.generateJsonNextEvent(JsonUtils.marshal(param));
         }
         return dialogResponse.noResponseText();
+    }
+
+    private void tracking(ApartmentQueryParam param) {
+        log.info("Tracking User By chatbot");
+        Map<ETrackingType, String> map = new HashMap<>();
+        param.getCategories().forEach(item -> map.put(ETrackingType.CATEGORY, String.valueOf(item)));
+        param.getDistricts().forEach(item -> map.put(ETrackingType.DISTRICT, String.valueOf(item)));
+        param.getProvinces().forEach(item -> map.put(ETrackingType.PROVINCE, String.valueOf(item)));
+        map.put(ETrackingType.TYPE, param.getType());
+        param.getBathrooms().forEach(item -> map.put(ETrackingType.BATHROOM, String.valueOf(item)));
+        param.getBedrooms().forEach(item -> map.put(ETrackingType.BEDROOM, String.valueOf(item)));
+        param.getDirections().forEach(item -> map.put(ETrackingType.DIRECTION, String.valueOf(item)));
+        param.getFloors().forEach(item -> map.put(ETrackingType.FLOOR, String.valueOf(item)));
+        if (param.getAreaRange() != null){
+            map.put(ETrackingType.AREA, String.valueOf(param.getAreaRange()));
+        }
+        if (param.getPriceRange() != null){
+            map.put(ETrackingType.PRICE, String.valueOf(param.getPriceRange()));
+        }
+        trackingService.tracking(param.getUserId(), param.getIp(), map, AppConstant.DEFAULT_RATING);
     }
 }

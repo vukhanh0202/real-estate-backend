@@ -10,6 +10,7 @@ import com.uit.realestate.repository.tracking.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ public class TrackingService {
         return userId == null || userId == -1;
     }
 
+    @Async
     public void tracking(Long userId, String ip, Map<ETrackingType, String> mapTarget, Long rating) {
         try {
             for (ETrackingType trackingType : mapTarget.keySet()) {
