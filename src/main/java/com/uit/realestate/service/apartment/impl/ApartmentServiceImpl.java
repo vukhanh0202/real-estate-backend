@@ -2,7 +2,6 @@ package com.uit.realestate.service.apartment.impl;
 
 import com.uit.realestate.constant.AppConstant;
 import com.uit.realestate.constant.MessageCode;
-import com.uit.realestate.constant.SuitabilityConstant;
 import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
@@ -19,11 +18,9 @@ import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.TrackingChatbotMapper;
 import com.uit.realestate.mapper.apartment.ApartmentMapper;
-import com.uit.realestate.payload.CatchInfoRequestExt;
 import com.uit.realestate.payload.apartment.*;
 import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
-import com.uit.realestate.repository.apartment.spec.ApartmentSpecification;
 import com.uit.realestate.repository.category.CategoryRepository;
 import com.uit.realestate.repository.tracking.TrackingTemporaryChatRepository;
 import com.uit.realestate.repository.user.UserRepository;
@@ -183,27 +180,13 @@ public class ApartmentServiceImpl implements ApartmentService {
         recommend.setTypeApartment(req.getTypeApartment().name());
         Page<ApartmentRating> result = apartmentRepository
                 .findRecommendApartmentByUserIdAndIp(recommend, req.getUserId(), req.getIp(),
-                        PageRequest.of(req.getPage() -1 , req.getSize(), JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+                        PageRequest.of(req.getPage() - 1, req.getSize(), JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
         return new PaginationResponse<>(
                 result.getTotalElements()
                 , result.getNumberOfElements()
                 , result.getNumber() + 1
                 , apartmentMapper.toApartmentBasicRatingDtoList(result.getContent(), req.getUserId(), req.getIp()));
     }
-
-//    @Override
-//    public PaginationResponse<ApartmentBasicDto> findSimilarApartment(CatchInfoRequestExt req) {
-//        log.info("Find Similar apartment");
-//        Page<Apartment> result = apartmentRepository
-//                .findRecommendApartmentByUserIdAndIp(ETypeApartment.BUY.name(), req.getUserId(), req.getIp(), req.getPageable());
-//        List<ApartmentBasicDto> contents = apartmentMapper.toApartmentBasicDtoList(result.getContent(), req.getUserId(), req.getIp());
-//        Collections.shuffle(contents);
-//        return new PaginationResponse<>(
-//                result.getTotalElements()
-//                , result.getNumberOfElements()
-//                , result.getNumber() + 1
-//                , contents);
-//    }
 
     @Override
     public ApartmentDto getApartmentDetail(DetailApartmentRequest req) {
@@ -266,7 +249,7 @@ public class ApartmentServiceImpl implements ApartmentService {
     public List<ApartmentSearchDto> searchAllApartment(String req) {
         log.info("Search All Apartment");
 
-        List<Apartment> result = apartmentRepository.findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus.OPEN, req,  PageRequest.of(0, 20)).getContent();
+        List<Apartment> result = apartmentRepository.findAllByStatusAndTitleContainingIgnoreCase(EApartmentStatus.OPEN, req, PageRequest.of(0, 20)).getContent();
 
         return apartmentMapper.toApartmentSearchDtoList(result);
     }
@@ -274,13 +257,21 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public PaginationResponse<ApartmentDto> searchApartment(SearchApartmentRequest req) {
         log.info("Search Apartment");
-        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
-
+//        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
+        ApartmentQueryParam apartmentQueryParam = new ApartmentQueryParam();
+        apartmentQueryParam.setDistricts(List.of(14L));
+        List<ApartmentRating> result = apartmentRepository
+                .findSuitableApartmentForChatBox(apartmentQueryParam, req.getUserId(), req.getIp(), req.getPage() - 1, req.getSize());
         return new PaginationResponse<>(
-                result.getTotalElements()
-                , result.getNumberOfElements()
-                , result.getNumber() + 1
-                , apartmentMapper.toApartmentRatingPreviewDtoList(result.getContent(), req.getUserId(), req.getIp()));
+                5L
+                , 5
+                , 0 + 1
+                , apartmentMapper.toApartmentRatingPreviewDtoList(result, req.getUserId(), req.getIp()));
+//        return new PaginationResponse<>(
+//                result.getTotalElements()
+//                , result.getNumberOfElements()
+//                , result.getNumber() + 1
+//                , apartmentMapper.toApartmentRatingPreviewDtoList(result, req.getUserId(), req.getIp()));
     }
 
     @Override
@@ -369,11 +360,8 @@ public class ApartmentServiceImpl implements ApartmentService {
                 trackingTemporaryChat.setKey(key);
                 trackingTemporaryChatRepository.saveAndFlush(trackingTemporaryChat);
             }
-            if (Objects.nonNull(req.getUserId())) {
-                asyncService.findAndSaveWithUserTarget(req, key);
-            }
+
             asyncService.findAndSaveWithUserOrIp(req, key);
-            asyncService.findAndSaveWithLatestRandom(req, key);
         } catch (Exception e) {
             e.printStackTrace();
             asyncService.removeKey(key);
@@ -383,59 +371,21 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public List<ThumbnailChatDto> findApartmentForChat(String key, Long userId) {
         TrackingTemporaryChat trackingTemporaryChat = trackingTemporaryChatRepository.findByKey(key).orElse(null);
-        List<Long> ids;
-        List<Long> listTemp;
         if (Objects.isNull(trackingTemporaryChat)) {
             return new ArrayList<>();
         }
-        if (Objects.isNull(userId) || userId.equals(-1L)) {
-            listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserOrIp());
-            if (Objects.isNull(listTemp)) {
-                ids = truncateListIds(trackingTemporaryChat.getListRecommendWithLatestRandom());
-                if (!(Objects.isNull(ids) || ids.isEmpty())) {
-                    System.out.println("Bot with: No User - recommend with random");
-                }
-            } else {
-                ids = listTemp;
-                if (!ids.isEmpty()) {
-                    System.out.println("Bot with: No User - recommend with user or ip");
-                }
-            }
-        } else {
-            listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserTargets());
-            if (Objects.isNull(listTemp)) {
-                listTemp = truncateListIds(trackingTemporaryChat.getListRecommendWithUserOrIp());
-                if (Objects.isNull(listTemp)) {
-                    ids = truncateListIds(trackingTemporaryChat.getListRecommendWithLatestRandom());
-                    if (!(Objects.isNull(ids) || ids.isEmpty())) {
-                        System.out.println("Bot with: Had User - recommend with random");
-                    }
-                } else {
-                    ids = listTemp;
-                    if (!ids.isEmpty()) {
-                        System.out.println("Bot with: Had User - recommend with user or ip");
-                    }
-                }
-            } else {
-                ids = listTemp;
-                if (!ids.isEmpty()) {
-                    System.out.println("Bot with: Had User - recommend with User Target");
-                }
-            }
-        }
+        List<Long> ids = truncateListIds(trackingTemporaryChat.getValue());
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return new ArrayList<>();
         }
-        try {
-            List<Apartment> apartments = apartmentRepository.findAllByStatusAndIdIn(EApartmentStatus.OPEN, ids);
-            if (apartments.isEmpty()) {
-                return new ArrayList<>();
-            }
-            return trackingChatbotMapper.toThumbnailChatDtoList(apartments.stream().filter(apartment -> !apartment.getPhotos().equals("[]")).collect(Collectors.toList()));
-        } finally {
-            trackingTemporaryChatRepository.delete(trackingTemporaryChat);
-            trackingTemporaryChatRepository.flush();
+
+        List<Apartment> apartments = apartmentRepository.findAllByStatusAndIdIn(EApartmentStatus.OPEN, ids);
+        if (apartments.isEmpty()) {
+            return new ArrayList<>();
         }
+        trackingTemporaryChatRepository.delete(trackingTemporaryChat);
+        trackingTemporaryChatRepository.flush();
+        return trackingChatbotMapper.toThumbnailChatDtoList(apartments.stream().filter(apartment -> !apartment.getPhotos().equals("[]")).collect(Collectors.toList()));
     }
 
     private List<Long> truncateListIds(List<Long> list) {

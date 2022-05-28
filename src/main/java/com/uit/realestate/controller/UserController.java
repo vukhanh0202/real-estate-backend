@@ -72,31 +72,4 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(userService.findByAuthor(req)));
     }
-
-    @ApiOperation(value = "Add user target", authorizations = {@Authorization(value = "JWT")})
-    @PostMapping(value = "/token/target")
-    public ResponseEntity<?> addUserTarget(@RequestBody AddUserTargetRequest req) {
-        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        req.setUserId(userPrincipal.getId());
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(userService.addUserTarget(req)));
-    }
-
-    @ApiOperation(value = "Update user target", authorizations = {@Authorization(value = "JWT")})
-    @PutMapping(value = "/token/target")
-    public ResponseEntity<?> updateUserTarget(@RequestBody UpdateUserTargetRequest req) {
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(userService.updateUserTarget(req)));
-    }
-
-    @ApiOperation(value = "Find user target", authorizations = {@Authorization(value = "JWT")})
-    @GetMapping(value = "/token/target")
-    public ResponseEntity<?> findUserTarget() {
-        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(userService.findUserTarget(userPrincipal.getId())));
-    }
-
-    @ApiOperation(value = "Remove user target", authorizations = {@Authorization(value = "JWT")})
-    @DeleteMapping(value = "/token/target")
-    public ResponseEntity<?> removeUserTarget(@RequestParam(value = "id") Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(userService.removeUserTarget(id)));
-    }
 }

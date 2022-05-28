@@ -22,14 +22,7 @@ public class TrackingTemporaryChat {
 
     @Column
     @Convert(converter = ListToLongConverter.class)
-    private List<Long> listRecommendWithUserTargets;
+    private List<Long> value;
 
-    @Column
-    @Convert(converter = ListToLongConverter.class)
-    private List<Long> listRecommendWithUserOrIp;
-
-    @Column
-    @Convert(converter = ListToLongConverter.class)
-    private List<Long> listRecommendWithLatestRandom;
 }
 

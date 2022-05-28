@@ -82,8 +82,6 @@ public class DialogFlowController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            asyncService.removeKey(key);
         }
         if (Objects.nonNull(event.getEventNext())) {
             return event.generateJsonNextEvent(JsonUtils.marshal(param));

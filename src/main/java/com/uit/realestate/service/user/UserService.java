@@ -5,10 +5,8 @@ import com.uit.realestate.dto.response.FileCaption;
 import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.dto.user.UserDto;
-import com.uit.realestate.dto.user.UserTargetDto;
 import com.uit.realestate.payload.user.*;
 
-import java.util.List;
 import java.util.Set;
 
 public interface UserService {
@@ -23,15 +21,8 @@ public interface UserService {
 
     UserDto findUserById(Long userId);
 
-    List<UserTargetDto> findUserTarget(Long userId);
-
-    boolean removeUserTarget(Long targetId);
-
     Set<FileCaption> updateAvatar(UpdateAvatarUserRequest req);
 
     boolean updateInformation(UpdateUserRequest req);
 
-    boolean updateUserTarget(UpdateUserTargetRequest req);
-
-    boolean addUserTarget(AddUserTargetRequest req);
 }

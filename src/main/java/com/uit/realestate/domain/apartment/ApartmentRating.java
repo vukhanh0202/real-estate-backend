@@ -1,6 +1,5 @@
 package com.uit.realestate.domain.apartment;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 
 import javax.persistence.Temporal;

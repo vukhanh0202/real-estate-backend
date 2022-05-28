@@ -3,7 +3,6 @@ package com.uit.realestate.domain.location;
 import com.uit.realestate.domain.apartment.ApartmentAddress;
 import com.uit.realestate.domain.tracking.TrackingProvince;
 import com.uit.realestate.domain.user.UserAddress;
-import com.uit.realestate.domain.user.UserTarget;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

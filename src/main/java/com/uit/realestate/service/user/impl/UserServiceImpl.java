@@ -5,14 +5,11 @@ import com.uit.realestate.constant.enums.apartment.EApartmentStatus;
 import com.uit.realestate.domain.action.Favourite;
 import com.uit.realestate.domain.apartment.Apartment;
 import com.uit.realestate.domain.user.User;
-import com.uit.realestate.domain.user.UserTarget;
 import com.uit.realestate.dto.apartment.ApartmentDto;
 import com.uit.realestate.dto.response.FileCaption;
 import com.uit.realestate.dto.response.PaginationResponse;
 import com.uit.realestate.dto.user.UserDetailDto;
 import com.uit.realestate.dto.user.UserDto;
-import com.uit.realestate.dto.user.UserTargetDto;
-import com.uit.realestate.exception.InvalidException;
 import com.uit.realestate.exception.NotFoundException;
 import com.uit.realestate.mapper.apartment.ApartmentMapper;
 import com.uit.realestate.mapper.user.UserMapper;
@@ -20,7 +17,6 @@ import com.uit.realestate.payload.user.*;
 import com.uit.realestate.repository.action.FavouriteRepository;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
 import com.uit.realestate.repository.user.UserRepository;
-import com.uit.realestate.repository.user.UserTargetRepository;
 import com.uit.realestate.service.file.UploadService;
 import com.uit.realestate.service.location.DistrictService;
 import com.uit.realestate.service.user.UserService;
@@ -51,7 +47,6 @@ public class UserServiceImpl implements UserService {
     private final ApartmentMapper apartmentMapper;
     private final ApartmentRepository apartmentRepository;
     private final FavouriteRepository favouriteRepository;
-    private final UserTargetRepository userTargetRepository;
     private final UploadService uploadService;
     private final DistrictService districtService;
 
@@ -128,21 +123,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDto(user);
     }
 
-    @Override
-    public List<UserTargetDto> findUserTarget(Long userId) {
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.User.NOT_FOUND)));
-        return userMapper.toUserTargetDtoList(user.getUserTargets());
-    }
-
-    @Override
-    public boolean removeUserTarget(Long targetId) {
-        UserTarget userTarget = userTargetRepository.findById(targetId)
-                .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.UserTarget.NOT_FOUND)));
-        log.info("Remove user target "+ targetId);
-        userTargetRepository.delete(userTarget);
-        return true;
-    }
 
     @Override
     public Set<FileCaption> updateAvatar(UpdateAvatarUserRequest req) {
@@ -169,33 +149,6 @@ public class UserServiceImpl implements UserService {
 
         userMapper.updateUser(req, user);
         userRepository.save(user);
-        return true;
-    }
-
-    @Override
-    public boolean updateUserTarget(UpdateUserTargetRequest req) {
-        districtService.validationDistrict(req.getDistrictId(), req.getProvinceId());
-
-        log.info("Update user target ID:" + req.getId());
-
-        UserTarget userTarget = userTargetRepository.findById(req.getId())
-                .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.UserTarget.NOT_FOUND)));
-        userMapper.updateUserTarget(req, userTarget);
-        userTargetRepository.save(userTarget);
-        return true;
-    }
-
-    @Override
-    public boolean addUserTarget(AddUserTargetRequest req) {
-        districtService.validationDistrict(req.getDistrictId(), req.getProvinceId());
-
-        log.info("Add user target to user ID:" + req.getUserId());
-
-        User user = userRepository.findById(req.getUserId())
-                .orElseThrow(() -> new NotFoundException(messageHelper.getMessage(MessageCode.User.NOT_FOUND)));
-        user.addTarget(userMapper.toUserTarget(req));
-        userRepository.save(user);
-
         return true;
     }
 }

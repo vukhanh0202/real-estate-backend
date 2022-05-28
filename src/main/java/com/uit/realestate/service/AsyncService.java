@@ -1,14 +1,12 @@
 package com.uit.realestate.service;
 
 import com.google.common.base.Strings;
-import com.uit.realestate.constant.SuitabilityConstant;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.domain.TrackingTemporaryChat;
-import com.uit.realestate.domain.apartment.Apartment;
+import com.uit.realestate.domain.apartment.ApartmentRating;
 import com.uit.realestate.payload.TrackingTemporaryRequest;
 import com.uit.realestate.payload.apartment.ApartmentQueryParam;
 import com.uit.realestate.repository.apartment.ApartmentRepository;
-import com.uit.realestate.repository.apartment.spec.ApartmentSpecification;
 import com.uit.realestate.repository.tracking.TrackingTemporaryChatRepository;
 import com.uit.realestate.service.category.CategoryService;
 import com.uit.realestate.service.location.DistrictService;
@@ -16,8 +14,6 @@ import com.uit.realestate.service.location.ProvinceService;
 import com.uit.realestate.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -38,48 +34,16 @@ public class AsyncService {
     private final ProvinceService provinceService;
 
     @Async
-    public void findAndSaveWithUserTarget(ApartmentQueryParam req, @NonNull String key) {
-        try {
-            List<Apartment> result = apartmentRepository
-                    .findSuitableApartmentForChatBox(req, SuitabilityConstant.DEFAULT_ACCURACY,
-                            SuitabilityConstant.DEFAULT_ACCURACY_AREA, req.getUserId(), req.getPage(), req.getSize());
-            List<Long> ids = result.stream().map(Apartment::getId).collect(Collectors.toList());
-            if (ids.isEmpty()) {
-                ids.add(KEY_EMPTY_ID);
-            }
-            saveTrackingInfo(TrackingTemporaryRequest.builder().key(key).listRecommendWithUserTargets(ids).build());
-        } catch (Exception e) {
-            e.printStackTrace();
-            removeKey(key);
-        }
-    }
-
-    @Async
     public void findAndSaveWithUserOrIp(ApartmentQueryParam req, String key) {
         try {
-            List<Apartment> result = apartmentRepository
-                    .findRecommendApartmentForChatBox(req, req.getUserId(), req.getIp(), req.getPageable()).getContent();
+            List<ApartmentRating> result = apartmentRepository
+                    .findSuitableApartmentForChatBox(req, req.getUserId(), req.getIp(), req.getPage() -1, req.getSize());
 
-            List<Long> ids = result.stream().map(Apartment::getId).collect(Collectors.toList());
+            List<Long> ids = result.stream().map(ApartmentRating::getId).collect(Collectors.toList());
             if (ids.isEmpty()) {
                 ids.add(KEY_EMPTY_ID);
             }
-            saveTrackingInfo(TrackingTemporaryRequest.builder().key(key).listRecommendWithUserOrIp(ids).build());
-        } catch (Exception e) {
-            e.printStackTrace();
-            removeKey(key);
-        }
-    }
-
-    @Async
-    public void findAndSaveWithLatestRandom(ApartmentQueryParam req, String key) {
-        try {
-            List<Apartment> result = apartmentRepository.findAll(ApartmentSpecification.of(req), PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "updatedAt"))).getContent();
-            List<Long> ids = result.stream().map(Apartment::getId).collect(Collectors.toList());
-            if (ids.isEmpty()) {
-                ids.add(KEY_EMPTY_ID);
-            }
-            saveTrackingInfo(TrackingTemporaryRequest.builder().key(key).listRecommendWithLatestRandom(ids).build());
+            saveTrackingInfo(TrackingTemporaryRequest.builder().key(key).value(ids).build());
         } catch (Exception e) {
             e.printStackTrace();
             removeKey(key);
@@ -93,14 +57,8 @@ public class AsyncService {
             if (Objects.isNull(trackingTemporaryChat.getKey())) {
                 trackingTemporaryChat.setKey(request.getKey());
             }
-            if (Objects.nonNull(request.getListRecommendWithUserTargets())) {
-                trackingTemporaryChat.setListRecommendWithUserTargets(request.getListRecommendWithUserTargets());
-            }
-            if (Objects.nonNull(request.getListRecommendWithUserOrIp())) {
-                trackingTemporaryChat.setListRecommendWithUserOrIp(request.getListRecommendWithUserOrIp());
-            }
-            if (Objects.nonNull(request.getListRecommendWithLatestRandom())) {
-                trackingTemporaryChat.setListRecommendWithLatestRandom(request.getListRecommendWithLatestRandom());
+            if (Objects.nonNull(request.getValue())) {
+                trackingTemporaryChat.setValue(request.getValue());
             }
 
             trackingTemporaryChatRepository.saveAndFlush(trackingTemporaryChat);

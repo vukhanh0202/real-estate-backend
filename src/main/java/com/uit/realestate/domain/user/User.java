@@ -43,8 +43,8 @@ public class User extends SqlEntity {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,
-            orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.LAZY)
     private UserAddress userAddress;
 
     public void setUserAddress(UserAddress userAddress) {
@@ -52,8 +52,7 @@ public class User extends SqlEntity {
             if (this.userAddress != null) {
                 this.userAddress.setUser(null);
             }
-        }
-        else {
+        } else {
             userAddress.setUser(this);
         }
         this.userAddress = userAddress;
@@ -68,13 +67,13 @@ public class User extends SqlEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<TrackingDistrict> trackingCountries = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
             orphanRemoval = true, mappedBy = "user")
     private List<Favourite> favourites = new ArrayList<>();
 
     //Constructors, getters and setters removed for brevity
     public void addFavourite(Favourite favourite) {
-        if (favourites == null){
+        if (favourites == null) {
             favourites = new ArrayList<>();
         }
         favourites.add(favourite);
@@ -88,26 +87,6 @@ public class User extends SqlEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
     private List<Apartment> apartments = new ArrayList<>();
-
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,
-            orphanRemoval = true, mappedBy = "user")
-    private List<UserTarget> userTargets = new ArrayList<>();
-
-    //Constructors, getters and setters removed for brevity
-    public User addTarget(UserTarget target) {
-        if (userTargets == null){
-            userTargets = new ArrayList<>();
-        }
-        userTargets.add(target);
-        target.setUser(this);
-        return this;
-    }
-
-    public User removeTarget(UserTarget target) {
-        userTargets.remove(target);
-        target.setUser(null);
-        return this;
-    }
 
     public User(Long id) {
         this.id = id;

@@ -12,7 +12,5 @@ public class TrackingTemporaryRequest {
 
     @NonNull
     private String key;
-    private List<Long> listRecommendWithUserTargets;
-    private List<Long> listRecommendWithUserOrIp;
-    private List<Long> listRecommendWithLatestRandom;
+    private List<Long> value;
 }

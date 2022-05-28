@@ -106,7 +106,7 @@ public class ApartmentQueryParam extends CatchInfoRequestExt {
         }
 
         if(Objects.nonNull(areaHigh)){
-            str.append("-" + "area_to=").append(Math.round(areaLow));
+            str.append("-" + "area_to=").append(Math.round(areaHigh));
         }
 
         if(Objects.nonNull(priceLow)){
