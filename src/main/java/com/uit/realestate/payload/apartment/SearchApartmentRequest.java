@@ -45,7 +45,7 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
         }
         this.categoryId = categoryId;
         this.typeApartment = typeApartment;
-        this.apartmentStatus = status.name();
+        this.apartmentStatus = status == null ? null :status.name();
         if (search != null){
             this.search = "%" + search + "%";
         }

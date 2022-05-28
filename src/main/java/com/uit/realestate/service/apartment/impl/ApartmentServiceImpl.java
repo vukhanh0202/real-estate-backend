@@ -32,6 +32,7 @@ import com.uit.realestate.utils.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
@@ -155,10 +156,10 @@ public class ApartmentServiceImpl implements ApartmentService {
         highlight.setApartmentStatus(EApartmentStatus.OPEN.name());
         highlight.setProvinceId(req.getProvinceId());
         highlight.setHighlight(true);
-        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(highlight, req.getUserId(), req.getIp(),
+        List<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(highlight, req.getUserId(), req.getIp(),
                 PageRequest.of(0, 100, JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
 
-        return apartmentMapper.toApartmentBasicRatingDtoList(result.getContent(), req.getUserId(), req.getIp());
+        return apartmentMapper.toApartmentBasicRatingDtoList(result, req.getUserId(), req.getIp());
     }
 
     @Override
@@ -167,9 +168,10 @@ public class ApartmentServiceImpl implements ApartmentService {
         SearchApartmentRequest latest = new SearchApartmentRequest();
         latest.setApartmentStatus(EApartmentStatus.OPEN.name());
         latest.setTypeApartment(req.getTypeApartment().name());
-        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(latest, req.getUserId(), req.getIp(),
+        List<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(latest, req.getUserId(), req.getIp(),
                 PageRequest.of(0, 16, Sort.by(Sort.Direction.DESC, ESortApartment.CREATED_AT.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)"))));
-        return apartmentMapper.toApartmentBasicRatingDtoList(result.getContent(), req.getUserId(), req.getIp());
+
+        return apartmentMapper.toApartmentBasicRatingDtoList(result, req.getUserId(), req.getIp());
     }
 
     @Override
@@ -178,14 +180,17 @@ public class ApartmentServiceImpl implements ApartmentService {
         SearchApartmentRequest recommend = new SearchApartmentRequest();
         recommend.setApartmentStatus(EApartmentStatus.OPEN.name());
         recommend.setTypeApartment(req.getTypeApartment().name());
-        Page<ApartmentRating> result = apartmentRepository
+        PageRequest pageable = PageRequest.of(req.getPage() - 1, req.getSize(), JpaSort.unsafe(Sort.Direction.DESC, "(rating)"));
+        List<ApartmentRating> result = apartmentRepository
                 .findRecommendApartmentByUserIdAndIp(recommend, req.getUserId(), req.getIp(),
-                        PageRequest.of(req.getPage() - 1, req.getSize(), JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+                        pageable);
+        long total = apartmentRepository.countRecommendApartmentByUserIdAndIp(recommend);
+        Page<ApartmentRating> page =  new PageImpl<>(result, pageable, total);
         return new PaginationResponse<>(
-                result.getTotalElements()
-                , result.getNumberOfElements()
-                , result.getNumber() + 1
-                , apartmentMapper.toApartmentBasicRatingDtoList(result.getContent(), req.getUserId(), req.getIp()));
+                page.getTotalElements()
+                , page.getNumberOfElements()
+                , page.getNumber() + 1
+                , apartmentMapper.toApartmentBasicRatingDtoList(page.getContent(), req.getUserId(), req.getIp()));
     }
 
     @Override
@@ -257,21 +262,15 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public PaginationResponse<ApartmentDto> searchApartment(SearchApartmentRequest req) {
         log.info("Search Apartment");
-//        Page<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
-        ApartmentQueryParam apartmentQueryParam = new ApartmentQueryParam();
-        apartmentQueryParam.setDistricts(List.of(14L));
-        List<ApartmentRating> result = apartmentRepository
-                .findSuitableApartmentForChatBox(apartmentQueryParam, req.getUserId(), req.getIp(), req.getPage() - 1, req.getSize());
+        List<ApartmentRating> result = apartmentRepository.findRecommendApartmentByUserIdAndIp(req, req.getUserId(), req.getIp(), req.getPageable());
+
+        long total = apartmentRepository.countRecommendApartmentByUserIdAndIp(req);
+        Page<ApartmentRating> page =  new PageImpl<>(result, req.getPageable(), total);
         return new PaginationResponse<>(
-                5L
-                , 5
-                , 0 + 1
-                , apartmentMapper.toApartmentRatingPreviewDtoList(result, req.getUserId(), req.getIp()));
-//        return new PaginationResponse<>(
-//                result.getTotalElements()
-//                , result.getNumberOfElements()
-//                , result.getNumber() + 1
-//                , apartmentMapper.toApartmentRatingPreviewDtoList(result, req.getUserId(), req.getIp()));
+                page.getTotalElements()
+                , page.getNumberOfElements()
+                , page.getNumber() + 1
+                , apartmentMapper.toApartmentRatingPreviewDtoList(page.getContent(), req.getUserId(), req.getIp()));
     }
 
     @Override

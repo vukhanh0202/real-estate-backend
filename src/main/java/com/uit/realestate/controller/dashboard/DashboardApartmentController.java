@@ -78,7 +78,7 @@ public class DashboardApartmentController {
     ) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
-                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment.name(), status, userPrincipal.getId(), IPUtils.getIp(request), search,
+                priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment == null ? null : typeApartment.name(), status, userPrincipal.getId(), IPUtils.getIp(request), search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
         req.createPageable(Sort.by(ESortApartment.HIGHLIGHT.getValue()).descending()
                 .and(Sort.by(sortDirection, sortBy.getValue())));

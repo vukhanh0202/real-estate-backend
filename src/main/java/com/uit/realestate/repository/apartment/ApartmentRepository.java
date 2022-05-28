@@ -124,25 +124,28 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
             "            AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT))\n" +
             "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT))\n" +
             "            AND (:#{#param.highlight} is null OR ap.highlight = CAST(CAST(:#{#param.highlight} AS CHARACTER VARYING) AS BOOLEAN)) \n",
-            countQuery = "select count(ap.*) from apartment ap, apartment_address add, apartment_detail ad" +
-                    "           WHERE ap.id = ad.id AND ap.id = add.id " +
-                    "            AND (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) \n" +
-                    "            AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) \n" +
-                    "            AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) \n" +
-                    "            AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent))\n" +
-                    "            AND (:#{#param.priceTo} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.price_rent))\n" +
-                    "            AND (:#{#param.areaFrom} is null OR ap.area >= CAST(CAST(:#{#param.areaFrom} AS TEXT) AS DOUBLE PRECISION))\n" +
-                    "            AND (:#{#param.areaTo} is null OR ap.area <= CAST(CAST(:#{#param.areaTo} AS TEXT) AS DOUBLE PRECISION))\n" +
-                    "            AND (:#{#param.categoryId} is null OR ap.category_id = CAST(CAST(:#{#param.categoryId} AS TEXT) AS BIGINT))\n" +
-                    "            AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT))\n" +
-                    "            AND (:#{#param.search} is null OR ap.title LIKE CAST(:#{#param.search} AS TEXT))\n" +
-                    "            AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT))\n" +
-                    "            AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT))\n" +
-                    "            AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT))\n" +
-                    "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT)) \n" +
-                    "            AND (:#{#param.highlight} is null OR ap.highlight = CAST(CAST(:#{#param.highlight} AS CHARACTER VARYING) AS BOOLEAN)) \n",
             nativeQuery = true)
-    Page<ApartmentRating> findRecommendApartmentByUserIdAndIp(@Param("param") SearchApartmentRequest param, @Param("userId") Long userId, @Param("ip") String ip, Pageable pageable);
+    List<ApartmentRating> findRecommendApartmentByUserIdAndIp(@Param("param") SearchApartmentRequest param, @Param("userId") Long userId, @Param("ip") String ip, Pageable pageable);
+
+    @Query(value = "select count(ap.*) from apartment ap, apartment_address add, apartment_detail ad" +
+            "           WHERE ap.id = ad.id AND ap.id = add.id " +
+            "            AND (:#{#param.apartmentStatus} is null OR ap.status = CAST(:#{#param.apartmentStatus} AS TEXT)) \n" +
+            "            AND (:#{#param.districtId} is null OR add.district_id = CAST(CAST(:#{#param.districtId} AS TEXT) AS BIGINT)) \n" +
+            "            AND (:#{#param.provinceId} is null OR add.province_id = CAST(CAST(:#{#param.provinceId} AS TEXT) AS BIGINT)) \n" +
+            "            AND (:#{#param.priceFrom} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceFrom} AS TEXT) AS DOUBLE PRECISION) <= ap.price_rent))\n" +
+            "            AND (:#{#param.priceTo} is null OR (:#{#param.typeApartment} = 'BUY' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.total_price) OR (:#{#param.typeApartment} = 'RENT' AND CAST(CAST(:#{#param.priceTo} AS TEXT) AS DOUBLE PRECISION) >= ap.price_rent))\n" +
+            "            AND (:#{#param.areaFrom} is null OR ap.area >= CAST(CAST(:#{#param.areaFrom} AS TEXT) AS DOUBLE PRECISION))\n" +
+            "            AND (:#{#param.areaTo} is null OR ap.area <= CAST(CAST(:#{#param.areaTo} AS TEXT) AS DOUBLE PRECISION))\n" +
+            "            AND (:#{#param.categoryId} is null OR ap.category_id = CAST(CAST(:#{#param.categoryId} AS TEXT) AS BIGINT))\n" +
+            "            AND (:#{#param.typeApartment} is null OR ap.type_apartment = CAST(:#{#param.typeApartment} AS TEXT))\n" +
+            "            AND (:#{#param.search} is null OR ap.title LIKE CAST(:#{#param.search} AS TEXT))\n" +
+            "            AND (:#{#param.houseDirection} is null OR ad.house_direction LIKE CAST(:#{#param.houseDirection} AS TEXT))\n" +
+            "            AND (:#{#param.bedroomQuantity} is null OR ad.bedroom_quantity = CAST(CAST(:#{#param.bedroomQuantity} AS TEXT) AS BIGINT))\n" +
+            "            AND (:#{#param.bathroomQuantity} is null OR ad.bathroom_quantity = CAST(CAST(:#{#param.bathroomQuantity} AS TEXT) AS BIGINT))\n" +
+            "            AND (:#{#param.floorQuantity} is null OR ad.floor_quantity = CAST(CAST(:#{#param.floorQuantity} AS TEXT) AS BIGINT)) \n" +
+            "            AND (:#{#param.highlight} is null OR ap.highlight = CAST(CAST(:#{#param.highlight} AS CHARACTER VARYING) AS BOOLEAN)) \n",
+            nativeQuery = true)
+    Long countRecommendApartmentByUserIdAndIp(@Param("param") SearchApartmentRequest param);
 
     @Query(value = "WITH tc_total AS (SELECT (CASE WHEN SUM(rating) is null THEN 1 ELSE SUM(rating) END) as tc_total FROM tracking_category WHERE ip = :ip OR user_id = :userId),\n" +
             "tc AS (SELECT category_id, SUM(rating) as tc_item FROM tracking_category WHERE ip = :ip OR user_id = :userId GROUP BY category_id),\n" +
