@@ -18,7 +18,7 @@ public interface ApartmentRating{
     Long getCategoryId();
     String getCategoryName();
     Long getAuthorId();
-    Long getRating();
+    Double getRating();
     Integer getBedroomQuantity();
     Integer getBathroomQuantity();
     Integer getFloorQuantity();
