@@ -33,7 +33,7 @@ public class TrackingCategory extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingCategory(Long userId, Category category, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (category != null){

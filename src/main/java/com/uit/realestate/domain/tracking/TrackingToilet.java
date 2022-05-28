@@ -32,7 +32,7 @@ public class TrackingToilet extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingToilet(Long userId, Integer toilet, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (toilet != null){

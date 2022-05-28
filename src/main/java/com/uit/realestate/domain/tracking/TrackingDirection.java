@@ -31,7 +31,7 @@ public class TrackingDirection extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingDirection(Long userId, String direction, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (direction != null){

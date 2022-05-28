@@ -34,7 +34,7 @@ public class TrackingTypeApartment extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingTypeApartment(Long userId, ETypeApartment typeApartment, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (typeApartment != null){

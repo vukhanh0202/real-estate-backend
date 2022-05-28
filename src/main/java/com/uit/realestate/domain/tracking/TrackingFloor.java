@@ -32,7 +32,7 @@ public class TrackingFloor extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingFloor(Long userId, Integer floor, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (floor != null){

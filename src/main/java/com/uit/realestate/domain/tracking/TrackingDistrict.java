@@ -35,7 +35,7 @@ public class TrackingDistrict extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingDistrict(Long userId, District district, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (district != null){

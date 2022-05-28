@@ -32,7 +32,7 @@ public class TrackingPrice extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingPrice(Long userId, Double price, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (price != null){

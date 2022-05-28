@@ -31,7 +31,7 @@ public class TrackingBathroom extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingBathroom(Long userId, Integer bathroom, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (bathroom != null){

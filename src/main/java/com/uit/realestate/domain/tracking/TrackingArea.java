@@ -31,7 +31,7 @@ public class TrackingArea extends SqlEntity {
     private Long rating = 0L;
 
     public TrackingArea(Long userId, Double area, String ip, Long rating) {
-        if (userId != null){
+        if (userId != null && userId != -1){
             this.user = new User(userId);
         }
         if (area != null){
