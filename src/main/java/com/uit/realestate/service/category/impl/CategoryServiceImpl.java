@@ -101,7 +101,9 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto findOrCreate(String name) {
         Category category = categoryRepository.findByNameAndIsDeletedFalse(name).orElse(null);
         if (Objects.isNull(category)) {
-            boolean res = createCategory(CategoryRequest.builder().name(name).build());
+            CategoryRequest rq = new CategoryRequest();
+            rq.setName(name);
+            boolean res = createCategory(rq);
             if (!res){
                 throw new InvalidException(messageHelper.getMessage(MessageCode.Category.NOT_FOUND));
             }

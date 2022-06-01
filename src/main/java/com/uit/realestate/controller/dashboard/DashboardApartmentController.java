@@ -19,6 +19,7 @@ import io.swagger.annotations.Authorization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -80,8 +81,11 @@ public class DashboardApartmentController {
         SearchApartmentRequest req = new SearchApartmentRequest(page, size, districtId, provinceId,
                 priceFrom, priceTo, areaFrom, areaTo, categoryId, typeApartment == null ? null : typeApartment.name(), status, userPrincipal.getId(), IPUtils.getIp(request), search,
                 houseDirection, bedroomQuantity, bathroomQuantity, floorQuantity);
-        req.createPageable(Sort.by(ESortApartment.HIGHLIGHT.getValue()).descending()
-                .and(Sort.by(sortDirection, sortBy.getValue())));
+        if (sortBy.getValue().equals("rating")) {
+            req.createPageable(JpaSort.unsafe(sortDirection, "(rating)"));
+        } else {
+            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.searchApartment(req)));
     }

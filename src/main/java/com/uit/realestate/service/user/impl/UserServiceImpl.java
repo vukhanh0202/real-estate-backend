@@ -69,15 +69,17 @@ public class UserServiceImpl implements UserService {
         log.info("Find detail user with ID: " + id);
 
         UserDetailDto result = userMapper.toUserDetailDto(user);
-        result.setPostApartmentList(apartmentMapper.toApartmentPreviewDtoList(user.getApartments(), id, null));
-        result.setFavouriteApartmentList(apartmentMapper
-                .toApartmentPreviewDtoList(user.getFavourites()
-                                .stream()
-                                .map(Favourite::getApartment)
-                                .collect(Collectors.toList()),
-                        id, null));
-        result.setTotalFavouriteApartment(result.getFavouriteApartmentList().size());
-        result.setTotalPostApartment(result.getPostApartmentList().size());
+        if (id != 1){
+            result.setPostApartmentList(apartmentMapper.toApartmentPreviewDtoList(user.getApartments(), id, null));
+            result.setFavouriteApartmentList(apartmentMapper
+                    .toApartmentPreviewDtoList(user.getFavourites()
+                                    .stream()
+                                    .map(Favourite::getApartment)
+                                    .collect(Collectors.toList()),
+                            id, null));
+            result.setTotalFavouriteApartment(result.getFavouriteApartmentList().size());
+            result.setTotalPostApartment(result.getPostApartmentList().size());
+        }
         return result;
     }
 
