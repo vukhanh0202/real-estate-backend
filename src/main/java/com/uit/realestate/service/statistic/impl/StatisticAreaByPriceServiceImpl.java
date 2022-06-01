@@ -7,7 +7,6 @@ import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.constant.enums.statistic.ECriteria;
 import com.uit.realestate.constant.enums.statistic.EStatistic;
 import com.uit.realestate.domain.apartment.Apartment;
-import com.uit.realestate.dto.apartment.ApartmentBasicDto;
 import com.uit.realestate.dto.statistic.StatisticDto;
 import com.uit.realestate.dto.statistic.TotalStatisticDto;
 import com.uit.realestate.dto.statistic.UnitDto;
@@ -50,21 +49,25 @@ public class StatisticAreaByPriceServiceImpl extends IStatisticApartmentService 
         Double priceTo = Math.floor(criteria.getTo());
         Long gap;
         List<Apartment> apartments;
-        if (areaTo == -1 && priceTo == -1) {
+        if (priceTo == -1) {
+            priceTo = null;
+        }
+        if (areaTo == -1) {
+            areaTo = null;
+        }
+        if (areaTo == null && priceTo == null) {
             isGreaterMaxValue = true;
             gap = Math.round((AppConstant.DEFAULT_MAX_VALUE_PRICE - priceFrom) / 10);
-            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndPriceGreaterThanAndAreaGreaterThan(EApartmentStatus.OPEN, typeApartment, priceFrom, areaFrom);
-        } else if (areaTo == -1) {
+        } else if (areaTo == null) {
             gap = Math.round((priceTo - priceFrom) / 10);
-            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndPriceBetweenAndAreaGreaterThan(EApartmentStatus.OPEN, typeApartment, priceFrom, priceTo, areaFrom);
-        } else if (priceTo == -1) {
+        } else if (priceTo == null) {
             isGreaterMaxValue = true;
             gap = Math.round((AppConstant.DEFAULT_MAX_VALUE_PRICE - priceFrom) / 10);
-            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndPriceGreaterThanAndAreaBetween(EApartmentStatus.OPEN, typeApartment, priceFrom, areaFrom, areaTo);
         } else {
             gap = Math.round((priceTo - priceFrom) / 10);
-            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndPriceBetweenAndAreaBetween(EApartmentStatus.OPEN, typeApartment, priceFrom, priceTo, areaFrom, areaTo);
         }
+        apartments = apartmentRepository.findAllByStatusAndPriceBetweenAndAreaBetween(EApartmentStatus.OPEN.name(), typeApartment.name(), priceFrom, priceTo, areaFrom, areaTo);
+
         UnitDto unitForGap = CalculatorUnit.calculatorUnit(gap);
 
         Map<Double, Long> map = new LinkedHashMap<>();
@@ -72,8 +75,15 @@ public class StatisticAreaByPriceServiceImpl extends IStatisticApartmentService 
             int finalI = i;
             map.put(priceFrom + gap * (i), apartments
                     .stream()
-                    .filter(apartment -> apartment.getTotalPrice() >= priceFrom + gap * (finalI - 1) &&
-                            (apartment.getTotalPrice() < priceFrom + gap * (finalI)))
+                    .filter(apartment -> {
+                        if (apartment.getTypeApartment().equals(ETypeApartment.BUY)) {
+                            return apartment.getTotalPrice() >= priceFrom + gap * (finalI - 1) &&
+                                    (apartment.getTotalPrice() < priceFrom + gap * (finalI));
+                        } else {
+                            return apartment.getPriceRent() >= priceFrom + gap * (finalI - 1) &&
+                                    (apartment.getPriceRent() < priceFrom + gap * (finalI));
+                        }
+                    })
                     .count());
         }
         DecimalFormat df = new DecimalFormat("###,###,###");
@@ -93,34 +103,13 @@ public class StatisticAreaByPriceServiceImpl extends IStatisticApartmentService 
         }
         result.setData(data);
         SearchApartmentRequest search = new SearchApartmentRequest();
-        search.setTypeApartment(typeApartment.name());
         search.setPriceFrom(priceFrom);
         search.setAreaFrom(areaFrom);
-        if (areaTo != -1) {
-            search.setAreaTo(areaTo);
-        }
-        if (priceTo != -1){
-            search.setPriceTo(priceTo);
-        }
+        search.setAreaTo(areaTo);
+        search.setPriceTo(priceTo);
         result.setHighLightApartments(this.getSuitableApartment(search, userId, ip));
 
-        TotalStatisticDto totalStatisticDto = new TotalStatisticDto();
-        int sizeApartmentsDivide = apartments.size();
-        if (sizeApartmentsDivide == 0){
-            sizeApartmentsDivide = 1;
-        }
-        totalStatisticDto.setTotalApartment(df.format(apartments.size()) + " BĐS");
-        var totalPrice = (long) apartments.stream().mapToDouble(Apartment::getTotalPrice).sum();
-        UnitDto unitForTotalPrice = CalculatorUnit.calculatorUnit(totalPrice);
-        totalStatisticDto.setTotalPrice(df.format(totalPrice / unitForTotalPrice.getUnit()) + unitForTotalPrice.getUnitCoinStr());
-        UnitDto unitForAveragePrice = CalculatorUnit.calculatorUnit(totalPrice / sizeApartmentsDivide);
-        totalStatisticDto.setAveragePrice(df.format((totalPrice / sizeApartmentsDivide) / unitForAveragePrice.getUnit()) + unitForAveragePrice.getUnitCoinStr());
-        var totalArea = (long) apartments.stream().mapToDouble(Apartment::getArea).sum();
-        UnitDto unitForTotalSquare = CalculatorUnit.calculatorUnit(totalArea);
-        totalStatisticDto.setTotalSquare(df.format(totalArea / unitForTotalSquare.getUnit()) + unitForTotalSquare.getUnitAreaStr());
-        UnitDto unitForAverageSquare = CalculatorUnit.calculatorUnit(totalArea / sizeApartmentsDivide);
-        totalStatisticDto.setAverageSquare(df.format((totalArea / sizeApartmentsDivide) / unitForAverageSquare.getUnit()) + unitForAverageSquare.getUnitAreaStr());
-        result.setTotalStatisticDto(totalStatisticDto);
+        result.setTotalStatisticDto(displaySummary(apartments, typeApartment));
         return result;
     }
 

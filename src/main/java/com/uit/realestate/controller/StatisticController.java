@@ -53,7 +53,7 @@ public class StatisticController {
                                            @RequestParam(value = "criteria_from", required = false) Double criteriaPriceFrom,
                                            @RequestParam(value = "criteria_to", required = false) Double criteriaPriceTo,
                                            @RequestParam(value = "user_id", required = false) Long userId,
-                                           @RequestParam(value = "type_apartment", defaultValue = "BUY") ETypeApartment typeApartment,
+                                           @RequestParam(value = "type_apartment", defaultValue = "RENT") ETypeApartment typeApartment,
                                            HttpServletRequest request) {
         statistic.setId(statisticCityId);
         statistic.setFrom(statisticPriceFrom);

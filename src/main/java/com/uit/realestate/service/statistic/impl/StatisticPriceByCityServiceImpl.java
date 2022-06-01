@@ -36,14 +36,13 @@ public class StatisticPriceByCityServiceImpl extends IStatisticApartmentService 
         if (statistic.getFrom() == null || statistic.getTo() == null) {
             throw new NotFoundException(messageHelper.getMessage(MessageCode.Area.INVALID));
         }
-        var priceFrom = Math.ceil(statistic.getFrom());
-        var priceTo = Math.floor(statistic.getTo());
+        Double priceFrom = Math.ceil(statistic.getFrom());
+        Double priceTo = Math.floor(statistic.getTo());
         List<Apartment> apartments;
         if (priceTo == -1) {
-            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndPriceGreaterThan(EApartmentStatus.OPEN, typeApartment, priceFrom);
-        } else {
-            apartments = apartmentRepository.findAllByStatusAndTypeApartmentAndPriceBetween(EApartmentStatus.OPEN, typeApartment, priceFrom, priceTo);
+            priceTo = null;
         }
+        apartments = apartmentRepository.findAllByStatusAndPriceBetweenAndAreaBetween(EApartmentStatus.OPEN.name(), typeApartment.name(), priceFrom, priceTo, null, null);
 
         Map<String, Long> map = new LinkedHashMap<>();
         for (Apartment apartment : apartments) {
@@ -70,31 +69,11 @@ public class StatisticPriceByCityServiceImpl extends IStatisticApartmentService 
         }
         result.setData(data);
         SearchApartmentRequest search = new SearchApartmentRequest();
-        search.setTypeApartment(typeApartment.name());
         search.setPriceFrom(priceFrom);
-        if (priceTo != -1){
-            search.setPriceTo(priceTo);
-        }
+        search.setPriceTo(priceTo);
         result.setHighLightApartments(this.getSuitableApartment(search, userId, ip));
 
-        DecimalFormat df = new DecimalFormat("###,###,###");
-        TotalStatisticDto totalStatisticDto = new TotalStatisticDto();
-        int sizeApartmentsDivide = apartments.size();
-        if (sizeApartmentsDivide == 0) {
-            sizeApartmentsDivide = 1;
-        }
-        totalStatisticDto.setTotalApartment(df.format(apartments.size()) + " BĐS");
-        var totalPrice = (long) apartments.stream().mapToDouble(Apartment::getTotalPrice).sum();
-        UnitDto unitForTotalPrice = CalculatorUnit.calculatorUnit(totalPrice);
-        totalStatisticDto.setTotalPrice(df.format(totalPrice / unitForTotalPrice.getUnit()) + unitForTotalPrice.getUnitCoinStr());
-        UnitDto unitForAveragePrice = CalculatorUnit.calculatorUnit(totalPrice / sizeApartmentsDivide);
-        totalStatisticDto.setAveragePrice(df.format((totalPrice / sizeApartmentsDivide) / unitForAveragePrice.getUnit()) + unitForAveragePrice.getUnitCoinStr());
-        var totalArea = (long) apartments.stream().mapToDouble(Apartment::getArea).sum();
-        UnitDto unitForTotalSquare = CalculatorUnit.calculatorUnit(totalArea);
-        totalStatisticDto.setTotalSquare(df.format(totalArea / unitForTotalSquare.getUnit()) + unitForTotalSquare.getUnitAreaStr());
-        UnitDto unitForAverageSquare = CalculatorUnit.calculatorUnit(totalArea / sizeApartmentsDivide);
-        totalStatisticDto.setAverageSquare(df.format((totalArea / sizeApartmentsDivide) / unitForAverageSquare.getUnit()) + unitForAverageSquare.getUnitAreaStr());
-        result.setTotalStatisticDto(totalStatisticDto);
+        result.setTotalStatisticDto(displaySummary(apartments, typeApartment));
         return result;
     }
 

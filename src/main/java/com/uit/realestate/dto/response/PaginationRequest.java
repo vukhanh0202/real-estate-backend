@@ -15,12 +15,12 @@ public class PaginationRequest {
     /**
      * Page number.
      */
-    private Integer page = 1;
+    private Integer page;
 
     /**
      * Page size.
      */
-    private Integer size = 10;
+    private Integer size;
 
     private Pageable pageable;
 

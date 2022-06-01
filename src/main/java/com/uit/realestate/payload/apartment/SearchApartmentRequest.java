@@ -57,5 +57,6 @@ public class SearchApartmentRequest extends CatchInfoRequestExt {
         this.floorQuantity = floorQuantity;
     }
     public SearchApartmentRequest() {
+        this.search = "%%";
     }
 }
