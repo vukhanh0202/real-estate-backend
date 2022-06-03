@@ -99,6 +99,7 @@ public class StatisticCityByPriceServiceImpl extends IStatisticApartmentService 
         SearchApartmentRequest search = new SearchApartmentRequest();
         search.setPriceFrom(priceFrom);
         search.setPriceTo(priceTo);
+        search.setTypeApartment(typeApartment.name());
         result.setHighLightApartments(this.getSuitableApartment(search, userId, ip));
 
         result.setTotalStatisticDto(displaySummary(apartments, typeApartment));

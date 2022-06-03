@@ -59,7 +59,6 @@ public class StatisticAreaByCityServiceImpl extends IStatisticApartmentService {
             } else {
                 map.put(key, 1L);
             }
-
         }
         var sorted_map = new TreeMap<String, Long>(new ValueComparator(map));
         sorted_map.putAll(map);
@@ -77,6 +76,7 @@ public class StatisticAreaByCityServiceImpl extends IStatisticApartmentService {
         SearchApartmentRequest search = new SearchApartmentRequest();
         search.setAreaFrom(areaFrom);
         search.setAreaTo(areaTo);
+        search.setTypeApartment(typeApartment.name());
         result.setHighLightApartments(this.getSuitableApartment(search, userId, ip));
 
         result.setTotalStatisticDto(displaySummary(apartments, typeApartment));

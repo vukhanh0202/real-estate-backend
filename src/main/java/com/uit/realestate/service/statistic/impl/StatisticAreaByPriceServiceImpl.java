@@ -107,6 +107,7 @@ public class StatisticAreaByPriceServiceImpl extends IStatisticApartmentService 
         search.setAreaFrom(areaFrom);
         search.setAreaTo(areaTo);
         search.setPriceTo(priceTo);
+        search.setTypeApartment(typeApartment.name());
         result.setHighLightApartments(this.getSuitableApartment(search, userId, ip));
 
         result.setTotalStatisticDto(displaySummary(apartments, typeApartment));

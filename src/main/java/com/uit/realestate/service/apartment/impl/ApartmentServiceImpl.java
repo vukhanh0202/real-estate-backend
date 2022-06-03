@@ -69,15 +69,7 @@ public class ApartmentServiceImpl implements ApartmentService {
         if (Objects.nonNull(req.getApartmentAddress())) {
             districtService.validationDistrict(req.getApartmentAddress().getDistrictId(), req.getApartmentAddress().getProvinceId());
         }
-        if (req.getTypeApartment().equals(ETypeApartment.BUY)) {
-            if (req.getTotalPrice() == null) {
-                throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid total price"));
-            }
-        } else {
-            if (req.getPriceRent() == null || req.getUnitRent() == null) {
-                throw new InvalidException(messageHelper.getMessage(MessageCode.ERROR, "Invalid Price Rent"));
-            }
-        }
+
         log.info("Add a new Apartment");
         apartmentRepository.save(apartmentMapper.toApartment(req));
 

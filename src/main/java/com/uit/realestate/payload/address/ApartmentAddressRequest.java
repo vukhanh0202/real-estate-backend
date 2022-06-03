@@ -18,4 +18,13 @@ public class ApartmentAddressRequest {
     private Long districtId;
 
     private String address;
+
+    public ApartmentAddressRequest() {
+    }
+    public ApartmentAddressRequest(String countryCode, Long provinceId, Long districtId, String address) {
+        this.countryCode = countryCode;
+        this.provinceId = provinceId;
+        this.districtId = districtId;
+        this.address = address;
+    }
 }

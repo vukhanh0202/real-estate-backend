@@ -166,31 +166,14 @@ public class ScraperAloNhaDatImpl extends ScraperService {
         DistrictDto district;
         ProvinceDto province;
         try {
-            Document document = Jsoup.connect(url).get();
 
             district = districtService.findDistrictNameIn(rawData.getDistrict().toLowerCase().replace("thành phố", "").trim());
             province = provinceService.findByDistrict(district.getId());
             if (province.getId() == 1) {
                 System.out.println("Skip HCM apartment");
                 return false;
-            } else if (province.getId() == 2) {
-                System.out.println("Skip HN apartment");
-                return false;
-            } else if (province.getId() == 5) {
-                System.out.println("Skip VungTau apartment");
-                return false;
-            } else if (province.getId() == 36) {
-                System.out.println("Skip LongAn apartment");
-                return false;
-            } else if (province.getId() == 62) {
-                System.out.println("Skip DN apartment");
-                return false;
             }
-            String category = getValueSingle("Category", document, "#right .search-box .property-type-container.multicolumns", ".text", null, true);
-            if (category.equals("Nhà mặt tiền")) {
-                System.out.println("Skip " + category);
-                return false;
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -230,7 +213,10 @@ public class ScraperAloNhaDatImpl extends ScraperService {
             double floor = StringUtils.castNumberFromString(rawData.getFloors());
             int bathRoom = (int) (bedRoom + NumberUtils.random(-bedRoom + 1, bedRoom - 1));
             int toilet = (int) (bedRoom + NumberUtils.random(-bedRoom + 1, bedRoom - 1));
-            String description = getHtml(document, "#tab-overview", ".tab-content.entry-content");
+            String description = getHtml(document, "#left", ".detail ");
+            if (org.apache.commons.lang3.StringUtils.isBlank(description)){
+                throw new InvalidException("not found description");
+            }
             addApartmentRequest.setApartmentDetail(ApartmentDetailRequest
                     .builder()
                     .description(description)

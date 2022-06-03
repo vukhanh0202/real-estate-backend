@@ -27,7 +27,7 @@ public class ScraperController {
 
     @GetMapping(path = "/")
     public ResponseEntity<?> scraping() {
-        CompletableFuture.runAsync(() -> scraperServiceFactory.getScraperService(EScraper.ALOND).scrapingData(4000));
+        CompletableFuture.runAsync(() -> scraperServiceFactory.getScraperService(EScraper.ALOND).scrapingData(1000));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(true));
     }

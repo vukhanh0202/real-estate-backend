@@ -27,10 +27,10 @@ public class AddApartmentRequest {
     @JsonProperty("total_price")
     private Double totalPrice;
 
-    @JsonProperty("price_rent")
+    @JsonIgnore
     private Double priceRent;
 
-    @JsonProperty("price_rent")
+    @JsonIgnore
     private String unitRent;
 
     @JsonProperty("type_apartment")

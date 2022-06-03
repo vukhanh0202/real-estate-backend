@@ -453,8 +453,8 @@ public abstract class ApartmentMapper implements MapperBase {
             apartment.setTotalPrice(addApartmentRequest.getTotalPrice());
             apartment.setPrice((double) Math.round(addApartmentRequest.getTotalPrice() / addApartmentRequest.getArea()));
         } else {
-            apartment.setPriceRent(addApartmentRequest.getPriceRent());
-            apartment.setUnitRent(addApartmentRequest.getUnitRent());
+            apartment.setPriceRent(addApartmentRequest.getTotalPrice());
+            apartment.setUnitRent(addApartmentRequest.getTotalPrice().toString() + " / tháng");
         }
     }
 

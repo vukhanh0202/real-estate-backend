@@ -29,4 +29,17 @@ public class ApartmentDetailRequest {
 
     @JsonProperty("more_info")
     private List<String> moreInfo;
+
+    public ApartmentDetailRequest() {
+    }
+
+    public ApartmentDetailRequest(String description, String houseDirection, Integer floorQuantity, Integer bedroomQuantity, Integer bathroomQuantity, Integer toiletQuantity, List<String> moreInfo) {
+        this.description = description;
+        this.houseDirection = houseDirection;
+        this.floorQuantity = floorQuantity;
+        this.bedroomQuantity = bedroomQuantity;
+        this.bathroomQuantity = bathroomQuantity;
+        this.toiletQuantity = toiletQuantity;
+        this.moreInfo = moreInfo;
+    }
 }

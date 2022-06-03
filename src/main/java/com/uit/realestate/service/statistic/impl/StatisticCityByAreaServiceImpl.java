@@ -90,6 +90,7 @@ public class StatisticCityByAreaServiceImpl extends IStatisticApartmentService {
         SearchApartmentRequest search = new SearchApartmentRequest();
         search.setAreaFrom(areaFrom);
         search.setAreaTo(areaTo);
+        search.setTypeApartment(typeApartment.name());
         result.setHighLightApartments(this.getSuitableApartment(search, userId, ip));
 
         result.setTotalStatisticDto(displaySummary(apartments, typeApartment));

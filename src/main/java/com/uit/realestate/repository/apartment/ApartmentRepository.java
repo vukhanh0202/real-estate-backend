@@ -26,23 +26,23 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long>, Jpa
     @Query(value = "SELECT * FROM apartment " +
             " WHERE status = :status" +
             " AND type_apartment = :type" +
-            " AND :areaFrom is null OR CAST(CAST(:areaFrom AS TEXT) AS DOUBLE PRECISION) <= area" +
-            " AND :areaTo is null OR CAST(CAST(:areaTo AS TEXT) AS DOUBLE PRECISION) >= area" +
-            " AND (:priceFrom is null OR (type_apartment = 'BUY' AND CAST(CAST(:priceFrom AS TEXT) AS DOUBLE PRECISION) <= total_price) OR (type_apartment = 'RENT' AND CAST(CAST(:priceFrom AS TEXT) AS DOUBLE PRECISION) <= price_rent))\n" +
-            " AND (:priceTo is null OR (type_apartment = 'BUY' AND CAST(CAST(:priceTo AS TEXT) AS DOUBLE PRECISION) >= total_price) OR (type_apartment = 'RENT' AND CAST(CAST(:priceTo AS TEXT) AS DOUBLE PRECISION) >= price_rent))\n"
+            " AND (:areaFrom is null OR CAST(CAST(:areaFrom AS TEXT) AS DOUBLE PRECISION) <= area)" +
+            " AND (:areaTo is null OR CAST(CAST(:areaTo AS TEXT) AS DOUBLE PRECISION) >= area)" +
+            " AND (:priceFrom is null OR (:type = 'BUY' AND CAST(CAST(:priceFrom AS TEXT) AS DOUBLE PRECISION) <= total_price) OR (:type = 'RENT' AND CAST(CAST(:priceFrom AS TEXT) AS DOUBLE PRECISION) <= price_rent))\n" +
+            " AND (:priceTo is null OR (:type = 'BUY' AND CAST(CAST(:priceTo AS TEXT) AS DOUBLE PRECISION) >= total_price) OR (:type = 'RENT' AND CAST(CAST(:priceTo AS TEXT) AS DOUBLE PRECISION) >= price_rent))\n"
             , nativeQuery = true)
     List<Apartment> findAllByStatusAndPriceBetweenAndAreaBetween(String status, String type, Double priceFrom, Double priceTo, Double areaFrom, Double areaTo);
 
-    @Query(value = "SELECT * FROM apartment a JOIN apartment_address ad ON a.id = ad.id " +
+    @Query(value = "SELECT a.* FROM apartment a JOIN apartment_address ad ON a.id = ad.id " +
             " WHERE a.status = :status" +
             " AND a.type_apartment = :type" +
-            " AND ad.district_id = :districtId" +
-            " AND :areaFrom is null OR CAST(CAST(:areaFrom AS TEXT) AS DOUBLE PRECISION) <= a.area" +
-            " AND :areaTo is null OR CAST(CAST(:areaTo AS TEXT) AS DOUBLE PRECISION) >= a.area" +
-            " AND (:priceFrom is null OR (a.type_apartment = 'BUY' AND CAST(CAST(:priceFrom AS TEXT) AS DOUBLE PRECISION) <= a.total_price) OR (a.type_apartment = 'RENT' AND CAST(CAST(:priceFrom AS TEXT) AS DOUBLE PRECISION) <= a.price_rent))\n" +
-            " AND (:priceTo is null OR (a.type_apartment = 'BUY' AND CAST(CAST(:priceTo AS TEXT) AS DOUBLE PRECISION) >= a.total_price) OR (a.type_apartment = 'RENT' AND CAST(CAST(:priceTo AS TEXT) AS DOUBLE PRECISION) >= a.price_rent))\n"
+            " AND ad.province_id = :provinceId" +
+            " AND (:areaFrom is null OR CAST(CAST(:areaFrom AS TEXT) AS DOUBLE PRECISION) <= a.area)" +
+            " AND (:areaTo is null OR CAST(CAST(:areaTo AS TEXT) AS DOUBLE PRECISION) >= a.area)" +
+            " AND (:priceFrom is null OR (:type = 'BUY' AND CAST(CAST(:priceFrom AS TEXT) AS DOUBLE PRECISION) <= a.total_price) OR (:type = 'RENT' AND CAST(CAST(:priceFrom AS TEXT) AS DOUBLE PRECISION) <= a.price_rent))\n" +
+            " AND (:priceTo is null OR (:type = 'BUY' AND CAST(CAST(:priceTo AS TEXT) AS DOUBLE PRECISION) >= a.total_price) OR (:type = 'RENT' AND CAST(CAST(:priceTo AS TEXT) AS DOUBLE PRECISION) >= a.price_rent))\n"
             , nativeQuery = true)
-    List<Apartment> findAllByStatusAndDistrictAndPriceBetweenAndAreaBetween(String status, Long districtId, String type, Double priceFrom, Double priceTo, Double areaFrom, Double areaTo);
+    List<Apartment> findAllByStatusAndDistrictAndPriceBetweenAndAreaBetween(String status, Long provinceId, String type, Double priceFrom, Double priceTo, Double areaFrom, Double areaTo);
 
     Page<Apartment> findAllByAuthorIdAndStatusIn(Long userId, List<EApartmentStatus> status, Pageable pageable);
 
