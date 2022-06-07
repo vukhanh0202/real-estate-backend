@@ -84,7 +84,15 @@ public class DashboardApartmentController {
         if (sortBy.getValue().equals("rating")) {
             req.createPageable(JpaSort.unsafe(sortDirection, "(rating)"));
         } else {
-            req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+            if (sortBy.equals(ESortApartment.TOTAL_PRICE)){
+                if (typeApartment != null && typeApartment.equals(ETypeApartment.BUY)){
+                    req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+                }else{
+                    req.createPageable(Sort.by(sortDirection, "price_rent").and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+                }
+            }else{
+                req.createPageable(Sort.by(sortDirection, sortBy.getValue()).and(JpaSort.unsafe(Sort.Direction.DESC, "(rating)")));
+            }
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(apartmentService.searchApartment(req)));

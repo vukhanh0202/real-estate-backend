@@ -48,7 +48,7 @@ public class ApartmentBasicDto extends BaseDto {
     @JsonProperty("type_apartment")
     private String typeApartment;
 
-    private EApartmentStatus status;
+    private String status;
 
     private List<FileCaption> photos;
 

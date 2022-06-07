@@ -256,6 +256,7 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setTotalPrice(convertPriceToString(apartment));
         dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment, ip, userId));
+        dto.setStatus(apartment.getStatus().getValue());
     }
 
     @BeanMapping(qualifiedByName = "toApartmentPreviewDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -263,7 +264,6 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "area", target = "area")
-    @Mapping(source = "status", target = "status")
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "apartmentDetail.bedroomQuantity", target = "bedroomQuantity")
     @Mapping(source = "apartmentDetail.bathroomQuantity", target = "bathroomQuantity")
@@ -283,7 +283,7 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setId(apartment.getId());
         dto.setTitle(apartment.getTitle());
         dto.setArea(apartment.getArea());
-        dto.setStatus(apartment.getStatus());
+        dto.setStatus(apartment.getStatus().getValue());
         dto.setCategoryName(apartment.getCategoryName());
         dto.setPhotos(getFiles(apartment.getPhotos()));
         dto.setIsHighlight(apartment.getHighlight());
@@ -356,13 +356,13 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setTotalPrice(convertPriceToString(apartment));
         dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment.getId(), ip, userId));
+        dto.setStatus(apartment.getStatus().getValue());
     }
 
     @BeanMapping(qualifiedByName = "toApartmentFullDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "area", target = "area")
-    @Mapping(source = "status", target = "status")
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
@@ -384,6 +384,7 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setTypeApartment(apartment.getTypeApartment().getValue());
         dto.setTotalPrice(convertPriceToString(apartment));
         dto.setPercentSuitable(calculateSuitableWithIpAndUserId(apartment, ip, userId));
+        dto.setStatus(apartment.getStatus().getValue());
     }
 
     @BeanMapping(qualifiedByName = "toApartmentBasicDto", ignoreByDefault = true, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -395,7 +396,6 @@ public abstract class ApartmentMapper implements MapperBase {
     @Mapping(source = "createdBy", target = "createdBy", qualifiedByName = "getAudit")
     @Mapping(source = "createdAt", target = "createdAt")
     @Mapping(source = "category.name", target = "categoryName")
-    @Mapping(source = "status", target = "status")
     @Mapping(source = "photos", target = "photos", qualifiedByName = "getFiles")
     @Mapping(source = "author", target = "author", qualifiedByName = "getUserInfo")
     public abstract ApartmentBasicDto toApartmentBasicDto(Apartment apartment, @Context Long userId, @Context String ip);
@@ -409,7 +409,7 @@ public abstract class ApartmentMapper implements MapperBase {
         dto.setId(apartment.getId());
         dto.setTitle(apartment.getTitle());
         dto.setArea(apartment.getArea());
-        dto.setStatus(apartment.getStatus());
+        dto.setStatus(apartment.getStatus().getValue());
         dto.setCategoryName(apartment.getCategoryName());
         dto.setPhotos(getFiles(apartment.getPhotos()));
         dto.setAuthor(getUserInfo(userRepository.findById(apartment.getAuthorId()).orElse(new User())));

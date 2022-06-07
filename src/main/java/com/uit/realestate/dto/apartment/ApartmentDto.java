@@ -44,7 +44,7 @@ public class ApartmentDto extends BaseDto {
 
     private Double area;
 
-    private EApartmentStatus status;
+    private String status;
 
     private Boolean favourite = false;
 

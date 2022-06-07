@@ -6,9 +6,11 @@ import com.uit.realestate.constant.enums.ETrackingType;
 import com.uit.realestate.constant.enums.apartment.ETypeApartment;
 import com.uit.realestate.dialogflow.*;
 import com.uit.realestate.dto.apartment.ThumbnailChatDto;
+import com.uit.realestate.dto.location.ProvinceDto;
 import com.uit.realestate.payload.apartment.ApartmentQueryParam;
 import com.uit.realestate.service.AsyncService;
 import com.uit.realestate.service.apartment.ApartmentService;
+import com.uit.realestate.service.location.ProvinceService;
 import com.uit.realestate.service.tracking.TrackingService;
 import com.uit.realestate.utils.IPUtils;
 import com.uit.realestate.utils.JsonUtils;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +42,7 @@ public class DialogFlowController {
     private final ApartmentService apartmentService;
     private final AsyncService asyncService;
     private final TrackingService trackingService;
+    private final ProvinceService provinceService;
 
     @ApiOperation(value = "Search apartment")
     @PostMapping(value = "/public/dialog", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -58,7 +62,7 @@ public class DialogFlowController {
         String key = pr.generateKey();
         ExtendEventChatBot event = ExtendEventChatBot.of(dialogRequest.getQueryResult().getAction());
         System.out.println(key);
-        final Instant deadline = Instant.now().plusMillis(4000);
+        final Instant deadline = Instant.now().plusMillis(3800);
         DialogResponse dialogResponse = new DialogResponse();
         if (event.isInitEvent()) {
             apartmentService.findAndSaveRecommendApartmentForChatBox(pr, key);
@@ -79,7 +83,12 @@ public class DialogFlowController {
                     } else {
                         type = "/nha-dat-thue";
                     }
-                    values.put("Xem thêm", hostFE + type + "?" + pr.generateSearch());
+                    StringBuilder str = new StringBuilder();
+                    if (!pr.getDistricts().isEmpty() && pr.getProvinces().isEmpty()) {
+                        ProvinceDto provinceDto = provinceService.findByDistrict(pr.getDistricts().get(0));
+                        str.append("&" + "province_id=").append(provinceDto.getId());
+                    }
+                    values.put("Xem thêm", hostFE + type + "?" + pr.generateSearch() + str);
                     values.put("Biểu đồ thống kê", hostFE + "/thong-ke");
                     dialogResponse.setChips(List.of(new Chip(values)));
                     return dialogResponse.convertText();
@@ -105,10 +114,10 @@ public class DialogFlowController {
         param.getBedrooms().forEach(item -> map.put(ETrackingType.BEDROOM, String.valueOf(item)));
         param.getDirections().forEach(item -> map.put(ETrackingType.DIRECTION, String.valueOf(item)));
         param.getFloors().forEach(item -> map.put(ETrackingType.FLOOR, String.valueOf(item)));
-        if (param.getAreaRange() != null){
+        if (param.getAreaRange() != null) {
             map.put(ETrackingType.AREA, String.valueOf(param.getAreaRange()));
         }
-        if (param.getPriceRange() != null){
+        if (param.getPriceRange() != null) {
             map.put(ETrackingType.PRICE, String.valueOf(param.getPriceRange()));
         }
         trackingService.tracking(param.getUserId(), param.getIp(), map, AppConstant.DEFAULT_RATING);
